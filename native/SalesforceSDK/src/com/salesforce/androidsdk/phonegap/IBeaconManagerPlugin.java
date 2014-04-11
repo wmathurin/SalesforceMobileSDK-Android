@@ -57,7 +57,10 @@ public class IBeaconManagerPlugin extends ForcePlugin implements IBeaconConsumer
 	private static final String MAJOR_FIELD = "major";
 	private static final String UUID_FIELD = "uuid";
 	private static final String PROXIMITY_FIELD = "proximity";
-	protected static final String DETAIL_FIELD = "detail";
+	private static final String ACCURACY_FIELD = "accuracy";
+	private static final String DETAIL_FIELD = "detail";
+	private static final String RSSI_FIELD = "rssi";
+	private static final String TX_POWER_FIELD = "txPower";
 
 	/**
 	 * Supported plugin actions that the client can take.
@@ -196,7 +199,9 @@ public class IBeaconManagerPlugin extends ForcePlugin implements IBeaconConsumer
 		json.put(MAJOR_FIELD, beacon.getMajor());
 		json.put(MINOR_FIELD, beacon.getMinor());
 		json.put(PROXIMITY_FIELD,  beacon.getProximity());
-		// TODO rest of the fields
+		json.put(ACCURACY_FIELD, beacon.getAccuracy());
+		json.put(RSSI_FIELD, beacon.getRssi());
+		json.put(TX_POWER_FIELD, beacon.getTxPower());
 		return json;
 	}
 
