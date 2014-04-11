@@ -52,11 +52,12 @@ import com.radiusnetworks.ibeacon.Region;
  */
 public class IBeaconManagerPlugin extends ForcePlugin implements IBeaconConsumer {
 	
-	// JSON fields in region / ibeacon
+	// JSON fields in region / ibeacon / event
 	private static final String MINOR_FIELD = "minor";
 	private static final String MAJOR_FIELD = "major";
 	private static final String UUID_FIELD = "uuid";
 	private static final String PROXIMITY_FIELD = "proximity";
+	protected static final String DETAIL_FIELD = "detail";
 
 	/**
 	 * Supported plugin actions that the client can take.
@@ -131,8 +132,9 @@ public class IBeaconManagerPlugin extends ForcePlugin implements IBeaconConsumer
 			@Override
 			public void didRangeBeaconsInRegion(Collection<IBeacon> iBeacons, Region region) {
 				try {
-					JSONArray json = jsonForIBeacons(iBeacons);
-			        webView.loadUrl("javascript:cordova.fireDocumentEvent('didRangeBeaconsInRegion', " + json.toString() + ");");
+					JSONObject event = new JSONObject();
+					event.put(DETAIL_FIELD, jsonForIBeacons(iBeacons));
+			        webView.loadUrl("javascript:cordova.fireDocumentEvent('didRangeBeaconsInRegion', " + event.toString() + ");");
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					Log.e("IBeaconPlugin.didRangeBeaconsInRegion", e.getMessage(), e);
