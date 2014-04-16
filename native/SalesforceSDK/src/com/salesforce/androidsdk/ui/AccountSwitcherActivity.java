@@ -36,6 +36,7 @@ import android.widget.RadioGroup;
 import com.salesforce.androidsdk.accounts.UserAccount;
 import com.salesforce.androidsdk.accounts.UserAccountManager;
 import com.salesforce.androidsdk.app.SalesforceSDKManager;
+import com.salesforce.androidsdk.tracking.UsageTracker;
 
 /**
  * This class provides UI to switch between existing signed in user accounts,
@@ -62,7 +63,7 @@ public class AccountSwitcherActivity extends Activity {
 		super.onResume();
 		
 		// Tracking
-        SalesforceSDKManager.getInstance().reportScreenView(getClass().getSimpleName());
+        UsageTracker.getInstance().reportScreenView(getClass().getSimpleName());
 		
 		buildAccountList();
 	}

@@ -383,9 +383,6 @@ public class RestClient {
 				headers.put("Authorization", "Bearer " + authToken);
 			}
 
-			// Timing
-			long start = System.currentTimeMillis();
-			
 			// Do the actual call
 			switch(method) {
 			case Request.Method.DELETE:
@@ -402,9 +399,6 @@ public class RestClient {
 				exec = httpAccessor.doPut(headers, url, httpEntity); break;
 			}
 
-			long duration = System.currentTimeMillis() - start;
-			SalesforceSDKManager.getInstance().reportTiming("RestClient.performRequest", url.getPath(), duration);
-			
 			HttpResponse response = exec.response;
 			int statusCode = response.getStatusLine().getStatusCode();
 			

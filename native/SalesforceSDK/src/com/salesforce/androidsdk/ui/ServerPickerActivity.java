@@ -42,6 +42,7 @@ import android.widget.RadioGroup;
 import com.salesforce.androidsdk.app.SalesforceSDKManager;
 import com.salesforce.androidsdk.auth.LoginServerManager;
 import com.salesforce.androidsdk.auth.LoginServerManager.LoginServer;
+import com.salesforce.androidsdk.tracking.UsageTracker;
 
 /**
  * This class provides UI to change the login server URL to use
@@ -124,7 +125,7 @@ public class ServerPickerActivity extends Activity implements
     	super.onResume();
     	
 		// Tracking
-        SalesforceSDKManager.getInstance().reportScreenView(getClass().getSimpleName());
+        UsageTracker.getInstance().reportScreenView(getClass().getSimpleName());
     	
     	rebuildDisplay();
     }

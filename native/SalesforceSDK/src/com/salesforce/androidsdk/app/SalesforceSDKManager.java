@@ -49,12 +49,6 @@ import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.salesforce.androidsdk.R;
 import com.salesforce.androidsdk.accounts.UserAccount;
 import com.salesforce.androidsdk.accounts.UserAccountManager;
 import com.salesforce.androidsdk.auth.AccountWatcher;
@@ -72,6 +66,7 @@ import com.salesforce.androidsdk.rest.ClientManager.LoginOptions;
 import com.salesforce.androidsdk.security.Encryptor;
 import com.salesforce.androidsdk.security.PRNGFixes;
 import com.salesforce.androidsdk.security.PasscodeManager;
+import com.salesforce.androidsdk.tracking.UsageTracker;
 import com.salesforce.androidsdk.ui.AccountSwitcherActivity;
 import com.salesforce.androidsdk.ui.LoginActivity;
 import com.salesforce.androidsdk.ui.PasscodeActivity;
@@ -128,8 +123,6 @@ public class SalesforceSDKManager implements AccountRemoved {
     private AdminPrefsManager adminPrefsManager;
     private PushNotificationInterface pushNotificationInterface;
     private volatile boolean loggedOut = false;
-    private Tracker tracker;
-    private String trackerScreenPrefix;
 
     /**
      * Returns a singleton instance of this class.
@@ -161,39 +154,8 @@ public class SalesforceSDKManager implements AccountRemoved {
     	if (loginActivity != null) {
             this.loginActivityClass = loginActivity;	
     	}
-    	
-    	if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS) {
-    		this.tracker = GoogleAnalytics.getInstance(context).newTracker(R.xml.sf__analytics);
-    		tracker.setAppVersion(SDK_VERSION);
-    	    String nativeOrHybrid = (isHybrid() ? "Hybrid" : "Native");
-    		trackerScreenPrefix = String.format("/%s/%s/", nativeOrHybrid, getAppNameAndVersion());
-    	}
     }
 
-    /**
-     * Report timing
-     */
-    public void reportTiming(String category, String action, long duration) {
-    	if (tracker != null) {
-			tracker.send(new HitBuilders.TimingBuilder()
-							.setCategory(category)
-							.setVariable(action)
-							.setValue(duration)
-							.build());
-    	}
-    }
-    
-    /**
-     * Report misc usage
-     * @param params
-     */
-    public void reportScreenView(String screenName) {
-    	if (tracker != null) {
-    		tracker.setScreenName(trackerScreenPrefix + screenName);
-    		tracker.send(new HitBuilders.AppViewBuilder().build());
-    	}
-    }
-    
     /**
      * Returns the class for the main activity.
      *
@@ -337,6 +299,9 @@ public class SalesforceSDKManager implements AccountRemoved {
     	// Applies PRNG fixes for certain older versions of Android.
         PRNGFixes.apply();
 
+        // Initializes the usage tracker
+        UsageTracker.init(context);
+        
         // Initializes the encryption module.
         Encryptor.init(context);
 
@@ -902,7 +867,7 @@ public class SalesforceSDKManager implements AccountRemoved {
     /**
      * @return appName/appVersion
      */
-    private String getAppNameAndVersion() {
+    public String getAppNameAndVersion() {
         String appName = "";
         String appVersion = "";
         try {
@@ -910,10 +875,10 @@ public class SalesforceSDKManager implements AccountRemoved {
             appName = context.getString(packageInfo.applicationInfo.labelRes);
             appVersion = packageInfo.versionName;
         } catch (NameNotFoundException e) {
-            Log.w("SalesforceSDKManager:getUserAgent", e);
+            Log.w("SalesforceSDKManager:getAppNameAndVersion", e);
         } catch (Resources.NotFoundException nfe) {
             // if your application doesn't have a name (like a test harness from Gradle)
-            Log.w("SalesforceSDKManager:getUserAgent", nfe);
+            Log.w("SalesforceSDKManager:getAppNameAndVersion", nfe);
         }
 	    return String.format("%s/%s", appName, appVersion);
     }

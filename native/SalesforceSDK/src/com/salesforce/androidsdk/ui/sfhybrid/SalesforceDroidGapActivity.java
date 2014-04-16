@@ -67,6 +67,7 @@ import com.salesforce.androidsdk.rest.RestClient.ClientInfo;
 import com.salesforce.androidsdk.rest.RestRequest;
 import com.salesforce.androidsdk.rest.RestResponse;
 import com.salesforce.androidsdk.security.PasscodeManager;
+import com.salesforce.androidsdk.tracking.UsageTracker;
 import com.salesforce.androidsdk.util.EventsObservable;
 import com.salesforce.androidsdk.util.EventsObservable.EventType;
 import com.salesforce.androidsdk.util.TokenRevocationReceiver;
@@ -185,7 +186,7 @@ public class SalesforceDroidGapActivity extends CordovaActivity {
     	if (passcodeManager.onResume(this)) {
 
     		// Tracking
-            SalesforceSDKManager.getInstance().reportScreenView(getClass().getSimpleName() + "/" + bootconfig.getStartPage());
+            UsageTracker.getInstance().reportScreenView(getClass().getSimpleName());
     		
             // Get client (if already logged in)
             try {

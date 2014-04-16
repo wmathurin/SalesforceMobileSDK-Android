@@ -43,6 +43,7 @@ import android.widget.TextView;
 import com.salesforce.androidsdk.app.SalesforceSDKManager;
 import com.salesforce.androidsdk.rest.ClientManager.LoginOptions;
 import com.salesforce.androidsdk.security.PasscodeManager;
+import com.salesforce.androidsdk.tracking.UsageTracker;
 import com.salesforce.androidsdk.ui.OAuthWebviewHelper.OAuthWebviewHelperEvents;
 import com.salesforce.androidsdk.util.EventsObservable;
 import com.salesforce.androidsdk.util.EventsObservable.EventType;
@@ -115,7 +116,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OAuth
 		super.onResume();
 
 		// Tracking
-        SalesforceSDKManager.getInstance().reportScreenView(getClass().getSimpleName());
+        UsageTracker.getInstance().reportScreenView(getClass().getSimpleName());
 		
 		if (wasBackgrounded) {
 			webviewHelper.clearView();
