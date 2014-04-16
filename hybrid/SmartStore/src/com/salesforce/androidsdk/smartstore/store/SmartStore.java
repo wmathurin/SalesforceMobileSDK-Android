@@ -40,6 +40,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.text.TextUtils;
 
+import com.salesforce.androidsdk.app.SalesforceSDKManager;
 import com.salesforce.androidsdk.smartstore.store.QuerySpec.QueryType;
 
 /**
@@ -177,6 +178,8 @@ public class SmartStore  {
         if (indexSpecs.length == 0) throw new SmartStoreException("No indexSpecs specified for soup: " + soupName);
         if (hasSoup(soupName)) return; // soup already exist - do nothing
 
+        long start = System.currentTimeMillis();
+        
         // First get a table name
         String soupTableName = null;
         ContentValues soupMapValues = new ContentValues();
@@ -250,6 +253,7 @@ public class SmartStore  {
         }
         finally {
             db.endTransaction();
+			SalesforceSDKManager.getInstance().reportTiming("SmartStore", "registerSoup", System.currentTimeMillis() - start);
         }
     }
 
@@ -273,6 +277,7 @@ public class SmartStore  {
     public void dropSoup(String soupName) {
         String soupTableName = DBHelper.INSTANCE.getSoupTableName(db, soupName);
         if (soupTableName != null) {
+            long start = System.currentTimeMillis();
             db.execSQL("DROP TABLE IF EXISTS " + soupTableName);
             try {
                 db.beginTransaction();
@@ -285,6 +290,7 @@ public class SmartStore  {
             }
             finally {
                 db.endTransaction();
+    			SalesforceSDKManager.getInstance().reportTiming("SmartStore", "dropSoup", System.currentTimeMillis() - start);
             }
         }
     }
@@ -327,6 +333,8 @@ public class SmartStore  {
      * @throws JSONException 
 	 */
 	public JSONArray query(QuerySpec querySpec, int pageIndex) throws JSONException {
+        long start = System.currentTimeMillis();
+		
 		QueryType qt = querySpec.queryType;
     	String sql = convertSmartSql(querySpec.smartSql);
 
@@ -338,7 +346,6 @@ public class SmartStore  {
     	
     	Cursor cursor = null;
     	try {
-
     		cursor = DBHelper.INSTANCE.limitRawQuery(db, sql, limit, querySpec.getArgs());
 
             JSONArray results = new JSONArray();
@@ -360,6 +367,7 @@ public class SmartStore  {
     	}
     	finally {
     		safeClose(cursor);
+			SalesforceSDKManager.getInstance().reportTiming("SmartStore", "dropSoup", System.currentTimeMillis() - start);
     	}
 	}
 
@@ -436,6 +444,8 @@ public class SmartStore  {
      * @throws JSONException
      */
     public JSONObject create(String soupName, JSONObject soupElt, boolean handleTx) throws JSONException {
+        long start = System.currentTimeMillis();
+
         String soupTableName = DBHelper.INSTANCE.getSoupTableName(db, soupName);
         if (soupTableName == null) throw new SmartStoreException("Soup: " + soupName + " does not exist");
         IndexSpec[] indexSpecs = DBHelper.INSTANCE.getIndexSpecs(db, soupName);
@@ -479,6 +489,7 @@ public class SmartStore  {
             if (handleTx) {
                 db.endTransaction();
             }
+			SalesforceSDKManager.getInstance().reportTiming("SmartStore", "create", System.currentTimeMillis() - start);
         }
     }
 
@@ -553,6 +564,8 @@ public class SmartStore  {
      * @throws JSONException
      */
     public JSONObject update(String soupName, JSONObject soupElt, long soupEntryId, boolean handleTx) throws JSONException {
+        long start = System.currentTimeMillis();        
+
         String soupTableName = DBHelper.INSTANCE.getSoupTableName(db, soupName);
         if (soupTableName == null) throw new SmartStoreException("Soup: " + soupName + " does not exist");
         IndexSpec[] indexSpecs = DBHelper.INSTANCE.getIndexSpecs(db, soupName);
@@ -591,6 +604,8 @@ public class SmartStore  {
             if (handleTx) {
                 db.endTransaction();
             }
+
+			SalesforceSDKManager.getInstance().reportTiming("SmartStore", "update", System.currentTimeMillis() - start);
         }
     }
 
@@ -661,6 +676,8 @@ public class SmartStore  {
      * @param fieldValue
      */
     public long lookupSoupEntryId(String soupName, String fieldPath, String fieldValue) {
+        long start = System.currentTimeMillis();
+        
         String soupTableName = DBHelper.INSTANCE.getSoupTableName(db, soupName);
         if (soupTableName == null) throw new SmartStoreException("Soup: " + soupName + " does not exist");
         String columnName = DBHelper.INSTANCE.getColumnNameForPath(db, soupName, fieldPath);
@@ -680,6 +697,7 @@ public class SmartStore  {
         }
         finally {
             safeClose(cursor);
+			SalesforceSDKManager.getInstance().reportTiming("SmartStore", "lookupSoupEntryId", System.currentTimeMillis() - start);
         }
     }
 
@@ -699,6 +717,8 @@ public class SmartStore  {
      * @param handleTx
      */
     public void delete(String soupName, Long[] soupEntryIds, boolean handleTx) {
+        long start = System.currentTimeMillis();
+
         String soupTableName = DBHelper.INSTANCE.getSoupTableName(db, soupName);
         if (soupTableName == null) throw new SmartStoreException("Soup: " + soupName + " does not exist");
 
@@ -716,6 +736,7 @@ public class SmartStore  {
             if (handleTx) {
                 db.endTransaction();
             }
+			SalesforceSDKManager.getInstance().reportTiming("SmartStore", "delete", System.currentTimeMillis() - start);
         }
     }
 

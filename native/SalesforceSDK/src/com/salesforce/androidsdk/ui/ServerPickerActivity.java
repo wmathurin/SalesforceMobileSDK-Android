@@ -122,6 +122,10 @@ public class ServerPickerActivity extends Activity implements
     @Override
     public void onResume() {
     	super.onResume();
+    	
+		// Tracking
+        SalesforceSDKManager.getInstance().reportScreenView(getClass().getSimpleName());
+    	
     	rebuildDisplay();
     }
 

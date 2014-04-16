@@ -113,6 +113,10 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OAuth
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		// Tracking
+        SalesforceSDKManager.getInstance().reportScreenView(getClass().getSimpleName());
+		
 		if (wasBackgrounded) {
 			webviewHelper.clearView();
 			webviewHelper.loadLoginPage();

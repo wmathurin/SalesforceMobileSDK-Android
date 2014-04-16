@@ -60,6 +60,10 @@ public class AccountSwitcherActivity extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		// Tracking
+        SalesforceSDKManager.getInstance().reportScreenView(getClass().getSimpleName());
+		
 		buildAccountList();
 	}
 

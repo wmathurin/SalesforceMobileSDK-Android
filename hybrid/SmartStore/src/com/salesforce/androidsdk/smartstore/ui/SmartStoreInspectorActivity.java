@@ -50,6 +50,7 @@ import android.widget.GridView;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.MultiAutoCompleteTextView.Tokenizer;
 
+import com.salesforce.androidsdk.app.SalesforceSDKManager;
 import com.salesforce.androidsdk.smartstore.R;
 import com.salesforce.androidsdk.smartstore.app.SalesforceSDKManagerWithSmartStore;
 import com.salesforce.androidsdk.smartstore.store.QuerySpec;
@@ -85,6 +86,10 @@ public class SmartStoreInspectorActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		
+		// Tracking
+        SalesforceSDKManager.getInstance().reportScreenView(getClass().getSimpleName());
+		
 		smartStore = SalesforceSDKManagerWithSmartStore.getInstance()
 				.getSmartStore();
 		setupAutocomplete(queryText);

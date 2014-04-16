@@ -53,6 +53,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.HttpStack;
 import com.android.volley.toolbox.NoCache;
 import com.google.common.collect.Maps;
+import com.salesforce.androidsdk.app.SalesforceSDKManager;
 import com.salesforce.androidsdk.auth.HttpAccess;
 import com.salesforce.androidsdk.auth.HttpAccess.Execution;
 import com.salesforce.androidsdk.rest.RestRequest.RestMethod;
@@ -382,6 +383,9 @@ public class RestClient {
 				headers.put("Authorization", "Bearer " + authToken);
 			}
 
+			// Timing
+			long start = System.currentTimeMillis();
+			
 			// Do the actual call
 			switch(method) {
 			case Request.Method.DELETE:
@@ -398,9 +402,12 @@ public class RestClient {
 				exec = httpAccessor.doPut(headers, url, httpEntity); break;
 			}
 
+			long duration = System.currentTimeMillis() - start;
+			SalesforceSDKManager.getInstance().reportTiming("RestClient.performRequest", url.getPath(), duration);
+			
 			HttpResponse response = exec.response;
 			int statusCode = response.getStatusLine().getStatusCode();
-
+			
 			// 401 bad access token *
 			if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
 				// If we haven't retried already and we have an accessTokenProvider

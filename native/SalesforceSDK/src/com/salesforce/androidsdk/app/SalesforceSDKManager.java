@@ -49,6 +49,12 @@ import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.salesforce.androidsdk.R;
 import com.salesforce.androidsdk.accounts.UserAccount;
 import com.salesforce.androidsdk.accounts.UserAccountManager;
 import com.salesforce.androidsdk.auth.AccountWatcher;
@@ -122,6 +128,8 @@ public class SalesforceSDKManager implements AccountRemoved {
     private AdminPrefsManager adminPrefsManager;
     private PushNotificationInterface pushNotificationInterface;
     private volatile boolean loggedOut = false;
+    private Tracker tracker;
+    private String trackerScreenPrefix;
 
     /**
      * Returns a singleton instance of this class.
@@ -153,8 +161,39 @@ public class SalesforceSDKManager implements AccountRemoved {
     	if (loginActivity != null) {
             this.loginActivityClass = loginActivity;	
     	}
+    	
+    	if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS) {
+    		this.tracker = GoogleAnalytics.getInstance(context).newTracker(R.xml.sf__analytics);
+    		tracker.setAppVersion(SDK_VERSION);
+    	    String nativeOrHybrid = (isHybrid() ? "Hybrid" : "Native");
+    		trackerScreenPrefix = String.format("/%s/%s/", nativeOrHybrid, getAppNameAndVersion());
+    	}
     }
 
+    /**
+     * Report timing
+     */
+    public void reportTiming(String category, String action, long duration) {
+    	if (tracker != null) {
+			tracker.send(new HitBuilders.TimingBuilder()
+							.setCategory(category)
+							.setVariable(action)
+							.setValue(duration)
+							.build());
+    	}
+    }
+    
+    /**
+     * Report misc usage
+     * @param params
+     */
+    public void reportScreenView(String screenName) {
+    	if (tracker != null) {
+    		tracker.setScreenName(trackerScreenPrefix + screenName);
+    		tracker.send(new HitBuilders.AppViewBuilder().build());
+    	}
+    }
+    
     /**
      * Returns the class for the main activity.
      *
@@ -854,6 +893,16 @@ public class SalesforceSDKManager implements AccountRemoved {
      * @return The user agent string to use for all requests.
      */
     public final String getUserAgent() {
+	    String appNameAndVersion = getAppNameAndVersion();
+	    String nativeOrHybrid = (isHybrid() ? "Hybrid" : "Native");
+	    return String.format("SalesforceMobileSDK/%s android mobile/%s (%s) %s %s",
+	            SDK_VERSION, Build.VERSION.RELEASE, Build.MODEL, appNameAndVersion, nativeOrHybrid);
+	}
+
+    /**
+     * @return appName/appVersion
+     */
+    private String getAppNameAndVersion() {
         String appName = "";
         String appVersion = "";
         try {
@@ -866,10 +915,8 @@ public class SalesforceSDKManager implements AccountRemoved {
             // if your application doesn't have a name (like a test harness from Gradle)
             Log.w("SalesforceSDKManager:getUserAgent", nfe);
         }
-	    String nativeOrHybrid = (isHybrid() ? "Hybrid" : "Native");
-	    return String.format("SalesforceMobileSDK/%s android mobile/%s (%s) %s/%s %s",
-	            SDK_VERSION, Build.VERSION.RELEASE, Build.MODEL, appName, appVersion, nativeOrHybrid);
-	}
+	    return String.format("%s/%s", appName, appVersion);
+    }
 
 	/**
 	 * Returns whether the application is a hybrid application or not.
