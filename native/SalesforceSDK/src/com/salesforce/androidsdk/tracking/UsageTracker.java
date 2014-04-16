@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, salesforce.com, inc.
+ * Copyright (c) 2014, salesforce.com, inc.
  * All rights reserved.
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -26,6 +26,7 @@
  */
 package com.salesforce.androidsdk.tracking;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
@@ -35,14 +36,29 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.salesforce.androidsdk.R;
+import com.salesforce.androidsdk.accounts.UserAccount;
 import com.salesforce.androidsdk.app.SalesforceSDKManager;
-import com.salesforce.androidsdk.rest.BootConfig;
+import com.salesforce.androidsdk.security.Encryptor;
 
 public class UsageTracker {
+	
+	// Make sure to create the following custom dimensions for you property
+	// Indexes for custom dimensions 
+	private static final int SDK_VERSION = 1;
+	private static final int APP_TYPE = 2;
+	private static final int APP_SUB_TYPE = 3;
+	private static final int ORG_ID = 4;
 
+	// Make sure to create the following custom metrics for you property
+	// Indexes for custom metrics
+	private static final int APP_AGE = 1;
+	
+	// Singleton
 	private static UsageTracker INSTANCE;
+	
+	// Underlying google analytics tracker
 	private Tracker tracker;
-	private String trackerScreenPrefix;
+	private SalesforceSDKManager sdkMgr;
 	
 	/**
      * Returns a singleton instance of this class.
@@ -71,33 +87,33 @@ public class UsageTracker {
      * @param context
      */
     protected UsageTracker(Context context) {
-    	int googlePlayServicesAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
-		if (googlePlayServicesAvailable == ConnectionResult.SUCCESS) {
+    	sdkMgr = SalesforceSDKManager.getInstance();
+    	int available = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
+		if (available == ConnectionResult.SUCCESS) {
     		Log.i("UsageTracker", "Setting up tracker");
 			tracker = GoogleAnalytics.getInstance(context).newTracker(R.xml.sf__analytics);
-    		tracker.setAppVersion(SalesforceSDKManager.SDK_VERSION);
-    		String nativeOrHybrid = "native";
-			if (SalesforceSDKManager.getInstance().isHybrid()) {
-        	    BootConfig bootconfig = BootConfig.getBootConfig(context);
-        	    nativeOrHybrid  = "Hybrid" + (bootconfig.isLocal() ? "Local" : "Remote");
-    		}
-    		trackerScreenPrefix = String.format("/%s/%s/", nativeOrHybrid, SalesforceSDKManager.getInstance().getAppNameAndVersion());
     	}
     	else {
-    		Log.w("UsageTracker", "GooglePlayServices not available (connection result = " + googlePlayServicesAvailable);
+    		Log.w("UsageTracker", "GooglePlayServices not available (connection result = " + available);
     	}
     }
     
     /**
      * Report event
      */
-    public void reportEvent(String category, String action) {
+    public void reportEvent(String category, String action, String label) {
     	if (tracker != null) {
-    		Log.i("UsageTracker", "Recording event: " + category + " " + action);
-    		tracker.send(new HitBuilders.EventBuilder()
-							.setCategory(category)
-							.setAction(action)
-							.build());
+			Log.i("UsageTracker", "Recording event: " + category + " " + action);
+			tracker.send(new HitBuilders.EventBuilder()
+								.setCategory(category)
+								.setAction(action)
+								.setLabel(label)
+								.setCustomDimension(SDK_VERSION, SalesforceSDKManager.SDK_VERSION)
+								.setCustomDimension(APP_TYPE, sdkMgr.getAppInfo().appType)
+								.setCustomDimension(APP_SUB_TYPE, sdkMgr.getAppInfo().appSubType)
+								.setCustomDimension(ORG_ID, getHashedOrgId())
+								.setCustomMetric(APP_AGE, sdkMgr.getAppInfo().appAge)
+								.build());
     	}
     }
     
@@ -105,11 +121,26 @@ public class UsageTracker {
      * Report screen view
      * @param params
      */
-    public void reportScreenView(String screenName) {
+    public void reportScreenView(Activity activity) {
     	if (tracker != null) {
-    		Log.i("UsageTracker", "Recording screen view: " + screenName);
-    		tracker.setScreenName(trackerScreenPrefix + screenName);
-    		tracker.send(new HitBuilders.AppViewBuilder().build());
+    		String screenName = activity.getClass().getSimpleName();
+			Log.i("UsageTracker", "Recording screen view: " + screenName);
+    		tracker.setScreenName(screenName);
+    		tracker.send(new HitBuilders.AppViewBuilder()
+							.setCustomDimension(SDK_VERSION, SalesforceSDKManager.SDK_VERSION)
+							.setCustomDimension(APP_TYPE, sdkMgr.getAppInfo().appType)
+							.setCustomDimension(APP_SUB_TYPE, sdkMgr.getAppInfo().appSubType)
+							.setCustomDimension(ORG_ID, getHashedOrgId())
+							.setCustomMetric(APP_AGE, sdkMgr.getAppInfo().appAge)
+							.build());
     	}
+    }
+    
+    /**
+     * @return hashed org id
+     */
+    private String getHashedOrgId() {
+    	UserAccount userAccount = SalesforceSDKManager.getInstance().getUserAccountManager().getCurrentUser();
+    	return (userAccount != null ? Encryptor.hash(userAccount.getOrgId(), userAccount.getOrgId()) : "NotLoggedIn");
     }
 }

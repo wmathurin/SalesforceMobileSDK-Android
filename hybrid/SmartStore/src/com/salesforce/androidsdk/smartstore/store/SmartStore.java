@@ -251,7 +251,7 @@ public class SmartStore  {
         }
         finally {
             db.endTransaction();
-			UsageTracker.getInstance().reportEvent("SmartStore", "registerSoup");
+			UsageTracker.getInstance().reportEvent("SmartStore", "registerSoup", "");
         }
     }
 
@@ -287,7 +287,7 @@ public class SmartStore  {
             }
             finally {
                 db.endTransaction();
-    			UsageTracker.getInstance().reportEvent("SmartStore", "dropSoup");
+    			UsageTracker.getInstance().reportEvent("SmartStore", "dropSoup", "");
             }
         }
     }

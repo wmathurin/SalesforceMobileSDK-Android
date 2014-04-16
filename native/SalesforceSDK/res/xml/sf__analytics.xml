@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <resources xmlns:tools="https://schemas.android.com/tools" tools:ignore="TypographyDashes">
-	<string name="ga_trackingId">UA-50073703-1</string>
-	<integer name="ga_sessionTimeout">30</integer>
+	<string name="ga_trackingId">UA-50073703-3</string>
+	<integer name="ga_sessionTimeout">5</integer>
 	<bool name="ga_logLevel">versbose</bool>
 	<integer name="ga_dispatchPeriod">10</integer>
-	<bool name="ga_autoActivityTracking">true</bool>
-	<bool name="ga_reportUncaughtExceptions">true</bool>
 </resources>
 

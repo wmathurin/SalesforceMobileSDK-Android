@@ -63,7 +63,7 @@ public class AccountSwitcherActivity extends Activity {
 		super.onResume();
 		
 		// Tracking
-        UsageTracker.getInstance().reportScreenView(getClass().getSimpleName());
+        UsageTracker.getInstance().reportScreenView(this);
 		
 		buildAccountList();
 	}

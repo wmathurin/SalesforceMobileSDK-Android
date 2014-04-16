@@ -125,7 +125,7 @@ public class ServerPickerActivity extends Activity implements
     	super.onResume();
     	
 		// Tracking
-        UsageTracker.getInstance().reportScreenView(getClass().getSimpleName());
+        UsageTracker.getInstance().reportScreenView(this);
     	
     	rebuildDisplay();
     }

@@ -186,7 +186,7 @@ public class SalesforceDroidGapActivity extends CordovaActivity {
     	if (passcodeManager.onResume(this)) {
 
     		// Tracking
-            UsageTracker.getInstance().reportScreenView(getClass().getSimpleName());
+            UsageTracker.getInstance().reportScreenView(this);
     		
             // Get client (if already logged in)
             try {

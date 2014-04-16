@@ -123,6 +123,7 @@ public class SalesforceSDKManager implements AccountRemoved {
     private AdminPrefsManager adminPrefsManager;
     private PushNotificationInterface pushNotificationInterface;
     private volatile boolean loggedOut = false;
+	private SalesforceSDKAppInfo appInfo;
 
     /**
      * Returns a singleton instance of this class.
@@ -296,6 +297,9 @@ public class SalesforceSDKManager implements AccountRemoved {
 	 */
     public static void initInternal(Context context) {
 
+    	// Get app info
+    	INSTANCE.appInfo = new SalesforceSDKAppInfo(context);
+    	
     	// Applies PRNG fixes for certain older versions of Android.
         PRNGFixes.apply();
 
@@ -858,38 +862,24 @@ public class SalesforceSDKManager implements AccountRemoved {
      * @return The user agent string to use for all requests.
      */
     public final String getUserAgent() {
-	    String appNameAndVersion = getAppNameAndVersion();
-	    String nativeOrHybrid = (isHybrid() ? "Hybrid" : "Native");
-	    return String.format("SalesforceMobileSDK/%s android mobile/%s (%s) %s %s",
-	            SDK_VERSION, Build.VERSION.RELEASE, Build.MODEL, appNameAndVersion, nativeOrHybrid);
+	    return String.format("SalesforceMobileSDK/%s android mobile/%s (%s) %s/%s %s",
+	            SDK_VERSION, Build.VERSION.RELEASE, Build.MODEL, appInfo.appName, appInfo.appVersion, appInfo.appType);
 	}
-
+    
     /**
-     * @return appName/appVersion
-     */
-    public String getAppNameAndVersion() {
-        String appName = "";
-        String appVersion = "";
-        try {
-            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            appName = context.getString(packageInfo.applicationInfo.labelRes);
-            appVersion = packageInfo.versionName;
-        } catch (NameNotFoundException e) {
-            Log.w("SalesforceSDKManager:getAppNameAndVersion", e);
-        } catch (Resources.NotFoundException nfe) {
-            // if your application doesn't have a name (like a test harness from Gradle)
-            Log.w("SalesforceSDKManager:getAppNameAndVersion", nfe);
-        }
-	    return String.format("%s/%s", appName, appVersion);
-    }
-
-	/**
 	 * Returns whether the application is a hybrid application or not.
 	 *
 	 * @return True - if this is an hybrid application, False - otherwise.
 	 */
 	public boolean isHybrid() {
 		return SalesforceDroidGapActivity.class.isAssignableFrom(getMainActivityClass());
+	}
+	
+	/**
+	 * @return app info
+	 */
+	public SalesforceSDKAppInfo getAppInfo() {
+		return appInfo;
 	}
 
     /**

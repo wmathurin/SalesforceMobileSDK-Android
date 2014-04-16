@@ -34,6 +34,7 @@ import org.json.JSONException;
 import android.util.Log;
 
 import com.salesforce.androidsdk.app.SalesforceSDKManager;
+import com.salesforce.androidsdk.tracking.UsageTracker;
 
 /**
  * Abstract super class for all Salesforce plugins
@@ -68,6 +69,9 @@ public abstract class ForcePlugin extends CordovaPlugin {
 		JavaScriptPluginVersion jsVersion = new JavaScriptPluginVersion(jsVersionStr);
     	Log.i(getClass().getSimpleName() + ".execute", "action: " + action + ", jsVersion: " + jsVersion);
 
+    	// Tracking
+    	UsageTracker.getInstance().reportEvent("Cordova", getClass().getSimpleName(), action);
+    	
     	if (jsVersion.isOlder()) {
 	    	Log.w(getClass().getSimpleName() + ".execute", "is being called by js from older sdk, jsVersion: " + jsVersion + ", nativeVersion: " + SalesforceSDKManager.SDK_VERSION);
     	}

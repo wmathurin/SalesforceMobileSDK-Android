@@ -53,10 +53,10 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.HttpStack;
 import com.android.volley.toolbox.NoCache;
 import com.google.common.collect.Maps;
-import com.salesforce.androidsdk.app.SalesforceSDKManager;
 import com.salesforce.androidsdk.auth.HttpAccess;
 import com.salesforce.androidsdk.auth.HttpAccess.Execution;
 import com.salesforce.androidsdk.rest.RestRequest.RestMethod;
+import com.salesforce.androidsdk.tracking.UsageTracker;
 
 /**
  * RestClient allows you to send authenticated HTTP requests to a force.com server.
@@ -158,6 +158,7 @@ public class RestClient {
 	 * @return volley.Request object wrapped around the restRequest (to allow cancellation etc)
 	 */
 	public Request<?> sendAsync(RestRequest restRequest, AsyncRequestCallback callback) {
+    	UsageTracker.getInstance().reportEvent("RestClient", "sendAsync", restRequest.getMethod().toString());
 		WrappedRestRequest wrappedRestRequest = new WrappedRestRequest(clientInfo, restRequest, callback);
 		return requestQueue.add(wrappedRestRequest);
 	}
@@ -200,6 +201,7 @@ public class RestClient {
 	 * @throws IOException
 	 */
 	public RestResponse sendSync(RestMethod method, String path, HttpEntity httpEntity, Map<String, String> additionalHttpHeaders) throws IOException {
+    	UsageTracker.getInstance().reportEvent("RestClient", "sendSync", method.toString());
 		return new RestResponse(httpStack.performRequest(method.asVolleyMethod(), clientInfo.resolveUrl(path), httpEntity, additionalHttpHeaders, true));
 	}
 	

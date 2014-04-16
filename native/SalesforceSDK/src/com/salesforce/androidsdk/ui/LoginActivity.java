@@ -116,7 +116,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OAuth
 		super.onResume();
 
 		// Tracking
-        UsageTracker.getInstance().reportScreenView(getClass().getSimpleName());
+        UsageTracker.getInstance().reportScreenView(this);
 		
 		if (wasBackgrounded) {
 			webviewHelper.clearView();
