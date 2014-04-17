@@ -43,21 +43,19 @@ public class SalesforceSDKAppInfo {
 	private static final String REMOTE = "Remote";
 	private static final String LOCAL = "Local";
 	private static final String HYBRID = "Hybrid";
-	private static final long MILLIS_PER_DAY = 1000 * 3600 * 24;
-	
 	
 	public final String appName;
 	public final String appVersion;
 	public final String appType;
 	public final String appSubType;
-	public final long appAge;
+	public final long appInstallTime;
 	
 	
 	public SalesforceSDKAppInfo(Context context) {
 		
 		String appNameFromPackageInfo = "";
 		String appVersionFromPackageInfo = "";
-		long appAgeFromPackageInfo = 0;
+		long appInstallTimeFromPackageInfo = 0;
 		boolean isHybrid = SalesforceSDKManager.getInstance().isHybrid();
 		boolean isLocal = !isHybrid || BootConfig.getBootConfig(context).isLocal();
 		
@@ -65,7 +63,7 @@ public class SalesforceSDKAppInfo {
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             appNameFromPackageInfo = context.getString(packageInfo.applicationInfo.labelRes);
             appVersionFromPackageInfo = packageInfo.versionName;
-            appAgeFromPackageInfo = packageInfo.firstInstallTime / MILLIS_PER_DAY;
+            appInstallTimeFromPackageInfo = packageInfo.firstInstallTime;
             
         } catch (Exception e) {
             Log.w("AppInfo:constructor", e);
@@ -76,7 +74,7 @@ public class SalesforceSDKAppInfo {
         appVersion = appVersionFromPackageInfo;
         appType = isHybrid ? HYBRID : NATIVE;
         appSubType = isLocal ? LOCAL : REMOTE;
-        appAge = appAgeFromPackageInfo;
+        appInstallTime = appInstallTimeFromPackageInfo;
 	}
 
 }

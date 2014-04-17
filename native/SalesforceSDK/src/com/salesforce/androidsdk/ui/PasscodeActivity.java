@@ -46,6 +46,7 @@ import com.salesforce.androidsdk.accounts.UserAccount;
 import com.salesforce.androidsdk.accounts.UserAccountManager;
 import com.salesforce.androidsdk.app.SalesforceSDKManager;
 import com.salesforce.androidsdk.security.PasscodeManager;
+import com.salesforce.androidsdk.tracking.UsageTracker;
 
 /**
  * Passcode activity: takes care of creating/verifying a user passcode.
@@ -117,7 +118,17 @@ public class PasscodeActivity extends Activity implements OnEditorActionListener
         }
     }
 
-    @Override
+    /* (non-Javadoc)
+	 * @see android.app.Activity#onResume()
+	 */
+	@Override
+	protected void onResume() {
+		super.onResume();
+		// Tracking
+        UsageTracker.getInstance().reportScreenView(this);
+	}
+
+	@Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             moveTaskToBack(true);

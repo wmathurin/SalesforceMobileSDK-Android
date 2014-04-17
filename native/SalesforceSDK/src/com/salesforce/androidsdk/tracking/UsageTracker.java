@@ -52,6 +52,9 @@ public class UsageTracker {
 	// Make sure to create the following custom metrics for you property
 	// Indexes for custom metrics
 	private static final int APP_AGE = 1;
+
+	// Misc constant
+	private static final long MILLIS_PER_DAY = 1000 * 3600 * 24;
 	
 	// Singleton
 	private static UsageTracker INSTANCE;
@@ -112,7 +115,7 @@ public class UsageTracker {
 								.setCustomDimension(APP_TYPE, sdkMgr.getAppInfo().appType)
 								.setCustomDimension(APP_SUB_TYPE, sdkMgr.getAppInfo().appSubType)
 								.setCustomDimension(ORG_ID, getHashedOrgId())
-								.setCustomMetric(APP_AGE, sdkMgr.getAppInfo().appAge)
+								.setCustomMetric(APP_AGE, getAppAge())
 								.build());
     	}
     }
@@ -131,7 +134,7 @@ public class UsageTracker {
 							.setCustomDimension(APP_TYPE, sdkMgr.getAppInfo().appType)
 							.setCustomDimension(APP_SUB_TYPE, sdkMgr.getAppInfo().appSubType)
 							.setCustomDimension(ORG_ID, getHashedOrgId())
-							.setCustomMetric(APP_AGE, sdkMgr.getAppInfo().appAge)
+							.setCustomMetric(APP_AGE, sdkMgr.getAppInfo().appInstallTime)
 							.build());
     	}
     }
@@ -142,5 +145,9 @@ public class UsageTracker {
     private String getHashedOrgId() {
     	UserAccount userAccount = SalesforceSDKManager.getInstance().getUserAccountManager().getCurrentUser();
     	return (userAccount != null ? Encryptor.hash(userAccount.getOrgId(), userAccount.getOrgId()) : "NotLoggedIn");
+    }
+    
+    private long getAppAge() {
+    	return (sdkMgr.getAppInfo().appInstallTime - System.currentTimeMillis()) / MILLIS_PER_DAY;
     }
 }
