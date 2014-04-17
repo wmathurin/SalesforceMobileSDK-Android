@@ -124,6 +124,14 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OAuth
 			wasBackgrounded = false;
 		}
 	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		
+		// Tracking
+        UsageTracker.getInstance().reportScreenViewEnd(this);
+	}
 
 	@Override
 	public void onSaveInstanceState(Bundle bundle) {

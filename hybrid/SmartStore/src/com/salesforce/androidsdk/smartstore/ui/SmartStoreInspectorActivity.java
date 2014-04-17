@@ -94,6 +94,14 @@ public class SmartStoreInspectorActivity extends Activity {
 				.getSmartStore();
 		setupAutocomplete(queryText);
 	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		
+		// Tracking
+        UsageTracker.getInstance().reportScreenViewEnd(this);
+	}
 
 	/**
 	 * Called when "Clear" button is clicked

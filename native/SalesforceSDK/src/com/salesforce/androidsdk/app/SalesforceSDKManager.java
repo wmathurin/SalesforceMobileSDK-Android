@@ -124,6 +124,7 @@ public class SalesforceSDKManager implements AccountRemoved {
     private PushNotificationInterface pushNotificationInterface;
     private volatile boolean loggedOut = false;
 	private SalesforceSDKAppInfo appInfo;
+	private UsageTracker usageTracker;
 
     /**
      * Returns a singleton instance of this class.
@@ -304,7 +305,7 @@ public class SalesforceSDKManager implements AccountRemoved {
         PRNGFixes.apply();
 
         // Initializes the usage tracker
-        UsageTracker.init(context);
+        INSTANCE.usageTracker = UsageTracker.newInstance(context);
         
         // Initializes the encryption module.
         Encryptor.init(context);
@@ -880,6 +881,13 @@ public class SalesforceSDKManager implements AccountRemoved {
 	 */
 	public SalesforceSDKAppInfo getAppInfo() {
 		return appInfo;
+	}
+	
+	/**
+	 * @return usage tracker
+	 */
+	public UsageTracker getUsageTracker() {
+		return usageTracker;
 	}
 
     /**

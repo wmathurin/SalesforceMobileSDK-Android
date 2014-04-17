@@ -316,8 +316,11 @@ public class SalesforceDroidGapActivity extends CordovaActivity {
         if (tokenRevocationRegistered) {
         	unregisterReceiver(tokenRevocationReceiver);
         }
+        
+		// Tracking
+        UsageTracker.getInstance().reportScreenViewEnd(this);
     }
-
+    
     @Override
     public void onDestroy() {
     	unregisterReceiver(userSwitchReceiver);

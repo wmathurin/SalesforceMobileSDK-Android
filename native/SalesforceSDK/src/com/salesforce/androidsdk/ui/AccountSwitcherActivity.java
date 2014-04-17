@@ -67,6 +67,14 @@ public class AccountSwitcherActivity extends Activity {
 		
 		buildAccountList();
 	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		
+		// Tracking
+        UsageTracker.getInstance().reportScreenViewEnd(this);
+	}
 
 	/**
 	 * This method is triggered when the 'Apply' button is clicked. It

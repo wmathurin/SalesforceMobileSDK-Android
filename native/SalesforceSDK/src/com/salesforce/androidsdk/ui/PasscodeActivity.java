@@ -127,6 +127,14 @@ public class PasscodeActivity extends Activity implements OnEditorActionListener
 		// Tracking
         UsageTracker.getInstance().reportScreenView(this);
 	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		
+		// Tracking
+        UsageTracker.getInstance().reportScreenViewEnd(this);
+	}
 
 	@Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

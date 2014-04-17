@@ -129,6 +129,14 @@ public class ServerPickerActivity extends Activity implements
     	
     	rebuildDisplay();
     }
+    
+	@Override
+	protected void onPause() {
+		super.onPause();
+		
+		// Tracking
+        UsageTracker.getInstance().reportScreenViewEnd(this);
+	}
 
     @Override
     public void onDestroy() {
