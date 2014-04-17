@@ -8,6 +8,6 @@
 	<integer name="ga_dispatchPeriod">10</integer>
 	
 	<!-- Localytics -->
-	<!--  TBD -->
+	<string name="la_app_key">efb187a85182b087d4553cc-b98299bc-c65a-11e3-99b4-005cf8cbabd8</string>
 </resources>
 
