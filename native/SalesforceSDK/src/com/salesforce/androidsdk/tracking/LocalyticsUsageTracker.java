@@ -26,8 +26,6 @@
  */
 package com.salesforce.androidsdk.tracking;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +42,11 @@ public class LocalyticsUsageTracker extends UsageTracker {
 	// "SDK_VERSION", "APP_TYPE", "APP_SUB_TYPE"
 
 	// Custom attributes
+	private static final String APP_NAME = "APP_NAME";
+	private static final String APP_VERSION = "APP_VERSION";
+	private static final String SDK_VERSION = "SDK_VERSION";
+	private static final String APP_TYPE = "APP_TYPE";
+	private static final String APP_SUB_TYPE = "APP_SUB_TYPE";
 	private static final String ORG_ID = "ORG_ID";
 	private static final String APP_AGE = "APP_AGE";
 
@@ -90,6 +93,7 @@ public class LocalyticsUsageTracker extends UsageTracker {
 		session.upload();
     }
 
+    /*
 	private Map<String, String> getAttributes() {
 		Map<String, String> attributes = new HashMap<String, String>();
 		attributes.put(ORG_ID, getHashedOrgId());
@@ -104,4 +108,22 @@ public class LocalyticsUsageTracker extends UsageTracker {
 		customDimensions.add(getAppInfo().appSubType);
 		return customDimensions;
 	}
+	*/
+
+	private Map<String, String> getAttributes() {
+		Map<String, String> attributes = new HashMap<String, String>();
+		attributes.put(SDK_VERSION, SalesforceSDKManager.SDK_VERSION);
+		attributes.put(APP_NAME, getAppInfo().appName);
+		attributes.put(APP_VERSION, getAppInfo().appVersion);
+		attributes.put(APP_TYPE, getAppInfo().appType);
+		attributes.put(APP_SUB_TYPE, getAppInfo().appSubType);
+		attributes.put(ORG_ID, getHashedOrgId());
+		attributes.put(APP_AGE, "" + getAppAge());
+		return attributes;
+	}
+
+	private List<String> getCustomDimensions() {
+		return null;
+	}
+
 }
