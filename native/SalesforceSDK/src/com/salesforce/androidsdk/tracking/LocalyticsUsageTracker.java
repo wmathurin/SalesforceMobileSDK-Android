@@ -93,23 +93,6 @@ public class LocalyticsUsageTracker extends UsageTracker {
 		session.upload();
     }
 
-    /*
-	private Map<String, String> getAttributes() {
-		Map<String, String> attributes = new HashMap<String, String>();
-		attributes.put(ORG_ID, getHashedOrgId());
-		attributes.put(APP_AGE, "" + getAppAge());
-		return attributes;
-	}
-
-	private List<String> getCustomDimensions() {
-		List<String> customDimensions = new ArrayList<String>();
-		customDimensions.add(SalesforceSDKManager.SDK_VERSION);
-		customDimensions.add(getAppInfo().appType);
-		customDimensions.add(getAppInfo().appSubType);
-		return customDimensions;
-	}
-	*/
-
 	private Map<String, String> getAttributes() {
 		Map<String, String> attributes = new HashMap<String, String>();
 		attributes.put(SDK_VERSION, SalesforceSDKManager.SDK_VERSION);
@@ -123,6 +106,11 @@ public class LocalyticsUsageTracker extends UsageTracker {
 	}
 
 	private List<String> getCustomDimensions() {
+//		List<String> customDimensions = new ArrayList<String>();
+//		customDimensions.add(SalesforceSDKManager.SDK_VERSION);
+//		customDimensions.add(getAppInfo().appType);
+//		customDimensions.add(getAppInfo().appSubType);
+//		return customDimensions;
 		return null;
 	}
 
