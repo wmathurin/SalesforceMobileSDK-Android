@@ -116,6 +116,14 @@ update_react_package_json ()
     gsed -i "s/SalesforceMobileSDK-ReactNative.git\#[^\"]*\"/SalesforceMobileSDK-ReactNative.git\#${sdkTag}\"/g" ${file}
 }
 
+update_readme ()
+{
+    local file=$1
+    local version=$2
+    gsed -i "s/\#\#\# What's New.*/### What's New in ${version}/g" ${file}
+    gsed -i "s/releases\/tag\/.*[)]/releases\/tag\/v${version}\)/g" ${file}
+}
+
 parse_opts "$@"
 
 VERSION_SUFFIXED=""
@@ -143,7 +151,7 @@ echo "*** Updating build.gradle files ***"
 update_build_gradle "./libs/SalesforceAnalytics/build.gradle" "${OPT_VERSION}"
 update_build_gradle "./libs/SalesforceSDK/build.gradle" "${OPT_VERSION}"
 update_build_gradle "./libs/SmartStore/build.gradle" "${OPT_VERSION}"
-update_build_gradle "./libs/SmartSync/build.gradle" "${OPT_VERSION}"
+update_build_gradle "./libs/MobileSync/build.gradle" "${OPT_VERSION}"
 update_build_gradle "./libs/SalesforceHybrid/build.gradle" "${OPT_VERSION}"
 update_build_gradle "./libs/SalesforceReact/build.gradle" "${OPT_VERSION}"
 
@@ -151,7 +159,7 @@ echo "*** Updating manifests ***"
 update_manifest "./libs/SalesforceAnalytics/AndroidManifest.xml" "${VERSION_SUFFIXED}" "${OPT_CODE}"
 update_manifest "./libs/SalesforceSDK/AndroidManifest.xml" "${VERSION_SUFFIXED}" "${OPT_CODE}"
 update_manifest "./libs/SmartStore/AndroidManifest.xml" "${VERSION_SUFFIXED}" "${OPT_CODE}"
-update_manifest "./libs/SmartSync/AndroidManifest.xml" "${VERSION_SUFFIXED}" "${OPT_CODE}"
+update_manifest "./libs/MobileSync/AndroidManifest.xml" "${VERSION_SUFFIXED}" "${OPT_CODE}"
 update_manifest "./libs/SalesforceHybrid/AndroidManifest.xml" "${VERSION_SUFFIXED}" "${OPT_CODE}"
 update_manifest "./libs/SalesforceReact/AndroidManifest.xml" "${VERSION_SUFFIXED}" "${OPT_CODE}"
 
@@ -164,3 +172,6 @@ update_salesforcesdkmanager_java "./libs/SalesforceSDK/src/com/salesforce/androi
 
 echo "*** Updating generate_doc.sh ***"
 update_generate_doc "./tools/generate_doc.sh" "${SHORT_VERSION}"
+
+echo "*** Updating README.md ***"
+update_readme "./README.md" "${OPT_VERSION}"

@@ -97,10 +97,15 @@ public class SalesforceKeyGenerator {
      * @return Encryption key.
      */
     public static String getEncryptionKey(String name) {
+        if (TextUtils.isEmpty(name)) {
+            return null;
+        }
         String encryptionKey = CACHED_ENCRYPTION_KEYS.get(name);
         if (encryptionKey == null) {
             encryptionKey = generateEncryptionKey(name);
-            CACHED_ENCRYPTION_KEYS.put(name, encryptionKey);
+            if (encryptionKey != null) {
+                CACHED_ENCRYPTION_KEYS.put(name, encryptionKey);
+            }
         }
         return encryptionKey;
     }
@@ -134,42 +139,6 @@ public class SalesforceKeyGenerator {
             SalesforceSDKLogger.e(TAG, "Exception thrown while generating SHA-256 hash", e);
         }
         return hashedString;
-    }
-
-    /**
-     * Generates an RSA keypair and returns the public key.
-     *
-     * @param name Alias of the entry in which the generated key will appear in Android KeyStore.
-     * @param length Key length.
-     * @return RSA public key.
-     * @deprecated Will be removed in Mobile SDK 8.0. Use {@link KeyStoreWrapper#getRSAPublicKey(String, int)} instead.
-     */
-    public static PublicKey getRSAPublicKey(String name, int length) {
-        return KeyStoreWrapper.getInstance().getRSAPublicKey(name, length);
-    }
-
-    /**
-     * Generates an RSA keypair and returns the encoded public key string.
-     *
-     * @param name Alias of the entry in which the generated key will appear in Android KeyStore.
-     * @param length Key length.
-     * @return RSA public key string.
-     * @deprecated Will be removed in Mobile SDK 8.0. Use {@link KeyStoreWrapper#getRSAPublicString(String, int)} instead.
-     */
-    public static String getRSAPublicString(String name, int length) {
-        return KeyStoreWrapper.getInstance().getRSAPublicString(name, length);
-    }
-
-    /**
-     * Generates an RSA keypair and returns the private key.
-     *
-     * @param name Alias of the entry in which the generated key will appear in Android KeyStore.
-     * @param length Key length.
-     * @return RSA private key.
-     * @deprecated Will be removed in Mobile SDK 8.0. Use {@link KeyStoreWrapper#getRSAPrivateKey(String, int)} instead.
-     */
-    public static PrivateKey getRSAPrivateKey(String name, int length) {
-        return KeyStoreWrapper.getInstance().getRSAPrivateKey(name, length);
     }
 
     /**
