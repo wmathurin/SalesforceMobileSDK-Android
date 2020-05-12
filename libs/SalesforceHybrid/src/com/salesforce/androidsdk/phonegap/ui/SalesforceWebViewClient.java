@@ -32,20 +32,20 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-
 import com.salesforce.androidsdk.app.Features;
 import com.salesforce.androidsdk.app.SalesforceSDKManager;
+import com.salesforce.androidsdk.phonegap.plugin.TestRunnerPlugin;
+import com.salesforce.androidsdk.phonegap.plugin.TestRunnerPluginBinder;
 import com.salesforce.androidsdk.phonegap.util.SalesforceHybridLogger;
-
+import com.salesforce.nimbus.Bridge;
+import java.io.File;
+import java.io.IOException;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaResourceApi;
 import org.apache.cordova.CordovaResourceApi.OpenForReadResult;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.engine.SystemWebView;
 import org.apache.cordova.engine.SystemWebViewClient;
-
-import java.io.File;
-import java.io.IOException;
 
 public class SalesforceWebViewClient extends SystemWebViewClient {
 
@@ -56,6 +56,8 @@ public class SalesforceWebViewClient extends SystemWebViewClient {
     protected boolean foundHomeUrl = false;
     protected Context ctx;
     protected CordovaWebView cordovaWebView;
+
+    protected Bridge nimbusBridge;
 
 	/**
 	 * Parameterized constructor.
@@ -86,6 +88,11 @@ public class SalesforceWebViewClient extends SystemWebViewClient {
     		webSettings.setAppCacheEnabled(true);
     		webSettings.setAllowFileAccess(true);
     		webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+
+    		// Initialize nimbus
+			nimbusBridge = new Bridge();
+			nimbusBridge.add(new TestRunnerPluginBinder(new TestRunnerPlugin()));
+			nimbusBridge.attach(webView);
         }
     }
 
@@ -123,8 +130,20 @@ public class SalesforceWebViewClient extends SystemWebViewClient {
     		return response;
     	}
 
-    	// Not a localhost request.
 		Uri origUri = Uri.parse(url);
+
+    	// Nimbus.js
+		if (origUri.getPath().endsWith("nimbus.js")) {
+			try {
+				SalesforceHybridLogger.i(TAG, "Loading nimbus.js");
+				return new WebResourceResponse("application/javascript", "UTF-8", ctx.getAssets().open("nimbus.js"));
+			} catch (IOException e) {
+				SalesforceHybridLogger.e(TAG, "Could not load nimbus.js", e);
+				return new WebResourceResponse("text/plain", "UTF-8", null);
+			}
+		}
+
+    	// Not a localhost request.
 		String host = origUri.getHost();
 		if (host == null || !host.equals("localhost")) {
 			return null;
@@ -149,6 +168,7 @@ public class SalesforceWebViewClient extends SystemWebViewClient {
             SalesforceHybridLogger.e(TAG, "Invalid localhost URL: " + url, e);
 			return new WebResourceResponse("text/plain", "UTF-8", null);
 		}
+
     }
 
     private boolean isFileUnder(String filePath, String dirPath) throws IOException {

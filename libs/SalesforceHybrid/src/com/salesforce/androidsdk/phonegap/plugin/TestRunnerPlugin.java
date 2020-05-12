@@ -26,100 +26,54 @@
  */
 package com.salesforce.androidsdk.phonegap.plugin;
 
+import android.webkit.WebView;
 import com.salesforce.androidsdk.phonegap.util.SalesforceHybridLogger;
-
-import org.apache.cordova.CallbackContext;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import com.salesforce.nimbus.BoundMethod;
+import com.salesforce.nimbus.Bridge;
+import com.salesforce.nimbus.Plugin;
+import com.salesforce.nimbus.PluginOptions;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * PhoneGap plugin to run javascript tests.
+ * Nimbus plugin to run javascript tests.
  */
-public class TestRunnerPlugin extends ForcePlugin {
+@PluginOptions(name="TestRunnerPlugin")
+public class TestRunnerPlugin implements Plugin {
 
 	private static final String TAG = "TestRunnerPlugin";
-	
-	// Keys in json from/to javascript
-	private static final String TEST_NAME = "testName";
-	private static final String SUCCESS = "success";
-	private static final String MESSAGE = "message";
-	private static final String DURATION = "testDuration";
 	
 	// To synchronize with the tests
 	public final static BlockingQueue<Boolean> readyForTests = new ArrayBlockingQueue<Boolean>(1);
 	public final static BlockingQueue<TestResult> testResults = new ArrayBlockingQueue<TestResult>(1);
-	
-	/**
-	 * Supported plugin actions that the client can take.
-	 */
-	enum Action {
-		onReadyForTests,
-		onTestComplete
-	};
 
-    @Override
-    public boolean execute(String actionStr, JavaScriptPluginVersion jsVersion, JSONArray args, CallbackContext callbackContext) throws JSONException {
-    	// Figure out action
-    	Action action = null;
-    	try {
-    		action = Action.valueOf(actionStr);
-			switch(action) {
-				case onReadyForTests:            onReadyForTests(args, callbackContext); return true;
-				case onTestComplete:             onTestComplete(args, callbackContext); return true;
-				default: return false;
-	    	}
-    	}
-    	catch (IllegalArgumentException e) {
-    		return false;
-    	}
-    	catch (InterruptedException e) {
-    		callbackContext.error(e.getMessage()); 
-    		return true; 
-    	}
-    }
+	@Override
+	public void cleanup(WebView webView, Bridge bridge) {
+	}
 
-	/**
-	 * Native implementation of onTestComplete
-	 * @param args
-	 * @param callbackContext
-	 * @throws JSONException
-	 * @throws InterruptedException 
-	 */
-	private void onTestComplete(JSONArray args,  CallbackContext callbackContext) throws JSONException, InterruptedException {
+	@Override
+	public void customize(WebView webView, Bridge bridge) {
+	}
 
-		// Parse args
-		JSONObject arg0 = args.getJSONObject(0);
-		String testName = arg0.getString(TEST_NAME);
-		boolean success = arg0.getBoolean(SUCCESS);
-		String message = stripHtml(arg0.getString(MESSAGE));
-        int durationMsec =  arg0.getInt(DURATION);
+	@BoundMethod
+	public void onTestComplete(String testName, boolean success, String rawMessage, int durationMsec) {
+		String message = stripHtml(rawMessage);
         double duration = durationMsec / 1000.0;
 		TestResult testResult = new TestResult(testName, success, message, duration);
-		testResults.put(testResult);
+		testResults.add(testResult);
         SalesforceHybridLogger.w(TAG, testResult.testName + " completed in " + testResult.duration);
-		callbackContext.success();
 	}
 
 	private String stripHtml(String message) {
 		return message.replaceAll("<[^>]+>", "|").replaceAll("[|]+"," ");
 	}
 	
-	/**
-	 * Native implementation of onReadyForTests
-	 * @param args
-	 * @param callbackContext
-	 */
-	private void onReadyForTests(JSONArray args,  CallbackContext callbackContext)  {
+	@BoundMethod
+	public void onReadyForTests() {
 		readyForTests.add(Boolean.TRUE);
-		callbackContext.success();
 	}
 	
 	public static class TestResult {
-
 		public final String testName;
 		public final boolean success;
 		public final String message;

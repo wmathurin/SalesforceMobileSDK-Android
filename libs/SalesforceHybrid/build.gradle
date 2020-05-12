@@ -6,16 +6,22 @@ buildscript {
     dependencies {
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50"
     }
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 dependencies {
   api project(':libs:MobileSync')
   api 'org.apache.cordova:framework:8.1.0'
+  implementation 'com.salesforce.nimbus:nimbus:1.0.1'
+  kapt 'com.salesforce.nimbus:nimbus-compiler:1.0.1'
+  implementation 'com.salesforce.nimbus:nimbusjs:1.0.1'
   androidTestImplementation 'androidx.test:runner:1.2.0'
   androidTestImplementation 'androidx.test:rules:1.2.0'
   androidTestImplementation 'androidx.test.ext:junit:1.1.1'
