@@ -64,14 +64,13 @@ public class SDKInfoPluginTest {
 		Assert.assertEquals("Wrong app name", "SalesforceHybridTest", sdkInfo.getString("appName"));
         Assert.assertEquals("Wrong app version", "1.0", sdkInfo.getString("appVersion"));
         List<String> sdkInfoPlugins = toList(sdkInfo.getJSONArray("forcePluginsAvailable"));
-        Assert.assertEquals("Wrong number of plugins", 7, sdkInfoPlugins.size());
+        Assert.assertEquals("Wrong number of plugins", 6, sdkInfoPlugins.size());
         Assert.assertTrue("network plugin should have been returned", sdkInfoPlugins.contains("com.salesforce.network"));
         Assert.assertTrue("oauth plugin should have been returned", sdkInfoPlugins.contains("com.salesforce.oauth"));
         Assert.assertTrue("sdkinfo plugin should have been returned", sdkInfoPlugins.contains("com.salesforce.sdkinfo"));
         Assert.assertTrue("sfaccountmanager plugin should have been returned", sdkInfoPlugins.contains("com.salesforce.sfaccountmanager"));
         Assert.assertTrue("smartstore plugin should have been returned", sdkInfoPlugins.contains("com.salesforce.smartstore"));
         Assert.assertTrue("mobilesync plugin should have been returned", sdkInfoPlugins.contains("com.salesforce.mobilesync"));
-        Assert.assertTrue("testrunner plugin should have been returned", sdkInfoPlugins.contains("com.salesforce.testrunner"));
         Assert.assertEquals("Wrong version", SalesforceSDKManager.SDK_VERSION, sdkInfo.getString("sdkVersion"));
 		JSONObject sdkInfoBootConfig = sdkInfo.getJSONObject("bootConfig");
         Assert.assertEquals("Wrong bootconfig shouldAuthenticate", bootconfig.shouldAuthenticate(), sdkInfoBootConfig.getBoolean("shouldAuthenticate"));
@@ -100,14 +99,13 @@ public class SDKInfoPluginTest {
 	@Test
 	public void testGetForcePluginsFromXML() {
 		List<String> plugins = SDKInfoPlugin.getForcePluginsFromXML(InstrumentationRegistry.getInstrumentation().getTargetContext());
-        Assert.assertEquals("Wrong number of force plugins", 7, plugins.size());
+        Assert.assertEquals("Wrong number of force plugins", 6, plugins.size());
         Assert.assertTrue("network plugin should have been returned", plugins.contains("com.salesforce.network"));
         Assert.assertTrue("oauth plugin should have been returned", plugins.contains("com.salesforce.oauth"));
         Assert.assertTrue("sdkinfo plugin should have been returned", plugins.contains("com.salesforce.sdkinfo"));
         Assert.assertTrue("sfaccountmanager plugin should have been returned", plugins.contains("com.salesforce.sfaccountmanager"));
         Assert.assertTrue("smartstore plugin should have been returned", plugins.contains("com.salesforce.smartstore"));
         Assert.assertTrue("mobilesync plugin should have been returned", plugins.contains("com.salesforce.mobilesync"));
-        Assert.assertTrue("testrunner plugin should have been returned", plugins.contains("com.salesforce.testrunner"));
 	}
 
 	private List<String> toList(JSONArray jsonArray) throws JSONException {
