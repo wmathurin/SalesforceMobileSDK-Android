@@ -108,7 +108,7 @@ public class SalesforceSDKManager {
     /**
      * Current version of this SDK.
      */
-    public static final String SDK_VERSION = "8.0.0";
+    public static final String SDK_VERSION = "8.3.0.dev";
 
     /**
      * Intent action meant for instances of SalesforceSDKManager residing in other processes
@@ -1005,11 +1005,12 @@ public class SalesforceSDKManager {
      * @return The user agent string to use for all requests.
      */
     public String getUserAgent(String qualifier) {
-        String appName = provideAppName();
-        String appTypeWithQualifier = getAppType() + qualifier;
-        return String.format("SalesforceMobileSDK/%s android mobile/%s (%s) %s/%s %s uid_%s ftr_%s",
+        final String appName = provideAppName();
+        final String appTypeWithQualifier = getAppType() + qualifier;
+        return String.format("SalesforceMobileSDK/%s android mobile/%s (%s) %s/%s %s uid_%s ftr_%s SecurityPatch/%s",
                 SDK_VERSION, Build.VERSION.RELEASE, Build.MODEL, appName, getAppVersion(),
-                appTypeWithQualifier, uid, TextUtils.join(".", features));
+                appTypeWithQualifier, uid, TextUtils.join(".", features),
+                Build.VERSION.SECURITY_PATCH);
     }
 
     /**
@@ -1097,6 +1098,16 @@ public class SalesforceSDKManager {
      */
     public static String encrypt(String data, String key) {
         return Encryptor.encrypt(data, key);
+    }
+
+    /**
+     * Returns the legacy encryption key. This should be called only as a means to migrate to the new key.
+     *
+     * @return Legacy encryption key.
+     * @deprecated Will be removed in Mobile SDK 10.0.
+     */
+    public static String getLegacyEncryptionKey() {
+        return SalesforceKeyGenerator.getLegacyEncryptionKey(INTERNAL_ENTROPY);
     }
 
     /**
@@ -1361,7 +1372,7 @@ public class SalesforceSDKManager {
         public void onReceive(Context context, Intent intent) {
             if (intent != null
                     && SalesforceSDKManager.CLEANUP_INTENT_ACTION.equals(intent.getAction())
-                    && !intent.getStringExtra(PROCESS_ID_KEY).equals(PROCESS_ID)) {
+                    && !PROCESS_ID.equals(intent.getStringExtra(PROCESS_ID_KEY))) {
                 UserAccount userAccount = null;
                 if (intent.hasExtra(USER_ACCOUNT)) {
                     userAccount = new UserAccount(intent.getBundleExtra(USER_ACCOUNT));
@@ -1398,7 +1409,7 @@ public class SalesforceSDKManager {
      */
     private Object getBuildConfigValue(Context context, String fieldName) {
         try {
-            Class<?> clazz = Class.forName(context.getPackageName() + ".BuildConfig");
+            Class<?> clazz = Class.forName(context.getClass().getPackage().getName() + ".BuildConfig");
             Field field = clazz.getField(fieldName);
             return field.get(null);
         } catch (Exception e) {

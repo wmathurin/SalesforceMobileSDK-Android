@@ -39,7 +39,7 @@ import com.salesforce.androidsdk.smartstore.store.QuerySpec.Order;
 import com.salesforce.androidsdk.smartstore.store.SmartStore;
 import com.salesforce.androidsdk.smartstore.store.SmartStore.Type;
 import com.salesforce.androidsdk.smartstore.store.SoupSpec;
-import com.salesforce.androidsdk.util.test.JSONTestHelper;
+import com.salesforce.androidsdk.util.JSONTestHelper;
 
 import net.sqlcipher.database.SQLiteDatabase;
 
@@ -122,7 +122,7 @@ public class SmartStoreTest extends SmartStoreTestCase {
 	 */
 	@Test
 	public void testSQLCipherVersion() {
-		Assert.assertEquals("Wrong sqlcipher version", "4.2.0 community", store.getSQLCipherVersion());
+		Assert.assertEquals("Wrong sqlcipher version", "4.4.0 community", store.getSQLCipherVersion());
 	}
 
 	/**
