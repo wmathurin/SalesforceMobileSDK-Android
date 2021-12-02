@@ -16,11 +16,11 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
-        targetSdkVersion 30
-        minSdkVersion 23
+        targetSdkVersion 31
+        minSdkVersion 24
     }
 
   buildTypes {
@@ -65,7 +65,7 @@ android {
 
 ext {
     PUBLISH_GROUP_ID = 'com.salesforce.mobilesdk'
-    PUBLISH_VERSION = '9.2.1'
+    PUBLISH_VERSION = '10.0.0'
     PUBLISH_ARTIFACT_ID = 'SalesforceAnalytics'
 }
 

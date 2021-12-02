@@ -11,34 +11,22 @@ dependencies {
     api project(':libs:SalesforceAnalytics')
     api 'com.squareup.okhttp3:okhttp:3.12.12'
     api 'com.google.firebase:firebase-messaging:20.1.0'
-    api 'androidx.core:core:1.6.0'
-
-    /*
-     * Don't upgrade browser library version until minApiVersion >= 24.
-     * This is because the latest version of this library has minVersion = 24.
-     */
-    api 'androidx.browser:browser:1.0.0'
+    api 'androidx.core:core:1.7.0'
+    api 'androidx.browser:browser:1.4.0'
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     androidTestImplementation 'androidx.test:runner:1.4.0'
     androidTestImplementation 'androidx.test:rules:1.4.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-
-
-    /*
-     * Provides backport of CompletableFuture
-     * Remove once minApiVersion >= 24
-     */
-    androidTestImplementation 'net.sourceforge.streamsupport:android-retrofuture:1.7.3'
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
-        targetSdkVersion 30
-        minSdkVersion 23
+        targetSdkVersion 31
+        minSdkVersion 24
     }
 
   buildTypes {
@@ -83,7 +71,7 @@ android {
 
 ext {
     PUBLISH_GROUP_ID = 'com.salesforce.mobilesdk'
-    PUBLISH_VERSION = '9.2.1'
+    PUBLISH_VERSION = '10.0.0'
     PUBLISH_ARTIFACT_ID = 'SalesforceSDK'
 }
 
