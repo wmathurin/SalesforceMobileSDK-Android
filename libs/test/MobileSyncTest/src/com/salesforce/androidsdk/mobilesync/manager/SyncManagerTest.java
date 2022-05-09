@@ -94,7 +94,7 @@ public class SyncManagerTest extends SyncManagerTestCase {
     @After
     public void tearDown() throws Exception {
         if (idToFields != null) {
-            deleteRecordsOnServer(idToFields.keySet(), Constants.ACCOUNT);
+            deleteRecordsByIdOnServer(idToFields.keySet(), Constants.ACCOUNT);
         }
     	dropAccountsSoup();
     	super.tearDown();
@@ -596,13 +596,13 @@ public class SyncManagerTest extends SyncManagerTestCase {
         checkDbExist(ACCOUNTS_SOUP, accountIds, Constants.ID);
 
         // Deletes 1 account on the server and verifies the ghost record is cleared from the soup.
-        deleteRecordsOnServer(new HashSet<>(Arrays.asList(accountIds[0])), Constants.ACCOUNT);
+        deleteRecordsByIdOnServer(new HashSet<>(Arrays.asList(accountIds[0])), Constants.ACCOUNT);
         tryCleanResyncGhosts(syncId);
         checkDbExist(ACCOUNTS_SOUP, new String[] { accountIds[1], accountIds[2]}, Constants.ID);
         checkDbDeleted(ACCOUNTS_SOUP, new String[] { accountIds[0]}, Constants.ID);
 
         // Deletes the remaining accounts on the server.
-        deleteRecordsOnServer(new HashSet<>(Arrays.asList(accountIds[1], accountIds[2])), Constants.ACCOUNT);
+        deleteRecordsByIdOnServer(new HashSet<>(Arrays.asList(accountIds[1], accountIds[2])), Constants.ACCOUNT);
     }
 
     /**
@@ -630,7 +630,7 @@ public class SyncManagerTest extends SyncManagerTestCase {
         checkDbSyncIdField(accountIdsSecondSubset, secondSyncId, ACCOUNTS_SOUP);
 
         // Deletes id0, id2, id5 on the server
-        deleteRecordsOnServer(new HashSet<>(Arrays.asList(accountIds[0], accountIds[2], accountIds[5])), Constants.ACCOUNT);
+        deleteRecordsByIdOnServer(new HashSet<>(Arrays.asList(accountIds[0], accountIds[2], accountIds[5])), Constants.ACCOUNT);
 
         // Cleaning ghosts of first sync (should only remove id0)
         tryCleanResyncGhosts(firstSyncId);
@@ -643,7 +643,7 @@ public class SyncManagerTest extends SyncManagerTestCase {
         checkDbDeleted(ACCOUNTS_SOUP, new String[] { accountIds[2], accountIds[5]}, Constants.ID);
 
         // Deletes the remaining accounts on the server.
-        deleteRecordsOnServer(new HashSet<>(Arrays.asList(accountIds[1], accountIds[3], accountIds[4])), Constants.ACCOUNT);
+        deleteRecordsByIdOnServer(new HashSet<>(Arrays.asList(accountIds[1], accountIds[3], accountIds[4])), Constants.ACCOUNT);
     }
 
     /**
@@ -666,12 +666,12 @@ public class SyncManagerTest extends SyncManagerTestCase {
         checkDbExist(ACCOUNTS_SOUP, accountIds, Constants.ID);
 
         // Deletes 1 account on the server and verifies the ghost record is cleared from the soup.
-        deleteRecordsOnServer(new HashSet<>(singletonList(accountIds[0])), Constants.ACCOUNT);
+        deleteRecordsByIdOnServer(new HashSet<>(singletonList(accountIds[0])), Constants.ACCOUNT);
         tryCleanResyncGhosts(syncId);
         checkDbDeleted(ACCOUNTS_SOUP, new String[] {accountIds[0]}, Constants.ID);
 
         // Deletes the remaining accounts on the server.
-        deleteRecordsOnServer(new HashSet<>(Arrays.asList(accountIds[1], accountIds[2])), Constants.ACCOUNT);
+        deleteRecordsByIdOnServer(new HashSet<>(Arrays.asList(accountIds[1], accountIds[2])), Constants.ACCOUNT);
     }
 
     /**
@@ -694,146 +694,12 @@ public class SyncManagerTest extends SyncManagerTestCase {
         checkDbExist(ACCOUNTS_SOUP, accountIds, Constants.ID);
 
         // Deletes 1 account on the server and verifies the ghost record is cleared from the soup.
-        deleteRecordsOnServer(new HashSet<String>(Arrays.asList(accountIds[0])), Constants.ACCOUNT);
+        deleteRecordsByIdOnServer(new HashSet<String>(Arrays.asList(accountIds[0])), Constants.ACCOUNT);
         tryCleanResyncGhosts(syncId);
         checkDbDeleted(ACCOUNTS_SOUP, new String[] {accountIds[0]}, Constants.ID);
 
         // Deletes the remaining accounts on the server.
-        deleteRecordsOnServer(new HashSet<String>(Arrays.asList(accountIds[0])), Constants.ACCOUNT);
-    }
-
-    /**
-     * Tests refresh-sync-down
-     * @throws Exception
-     */
-    @Test
-    public void testRefreshSyncDown() throws Exception {
-        // Setup has created records on the server
-        // Adding soup elements with just ids to soup
-        for (String id : idToFields.keySet()) {
-            JSONObject soupElement = new JSONObject();
-            soupElement.put(Constants.ID, id);
-            smartStore.create(ACCOUNTS_SOUP, soupElement);
-        }
-        // Running a refresh-sync-down for soup
-        final SyncDownTarget target = new RefreshSyncDownTarget(REFRESH_FIELDLIST, Constants.ACCOUNT, ACCOUNTS_SOUP);
-        trySyncDown(MergeMode.OVERWRITE, target, ACCOUNTS_SOUP, idToFields.size(), 1, null);
-        // Make sure the soup has the records with id and names
-        checkDb(idToFields, ACCOUNTS_SOUP);
-    }
-
-    /**
-     * Tests refresh-sync-down when they are more records in the table than can be enumerated in one
-     * soql call to the server
-     * @throws Exception
-     */
-    @Test
-    public void testRefreshSyncDownWithMultipleRoundTrips() throws Exception {
-        // Setup has created records on the server
-        // Adding soup elements with just ids to soup
-        for (String id : idToFields.keySet()) {
-            JSONObject soupElement = new JSONObject();
-            soupElement.put(Constants.ID, id);
-            smartStore.create(ACCOUNTS_SOUP, soupElement);
-        }
-        // Running a refresh-sync-down for soup with two ids per soql query (to force multiple round trips)
-        final RefreshSyncDownTarget target = new RefreshSyncDownTarget(REFRESH_FIELDLIST, Constants.ACCOUNT, ACCOUNTS_SOUP);
-        target.setCountIdsPerSoql(2);
-        trySyncDown(MergeMode.OVERWRITE, target, ACCOUNTS_SOUP, idToFields.size(), idToFields.size() / 2, null);
-
-        // Make sure the soup has the records with id and names
-        checkDb(idToFields, ACCOUNTS_SOUP);
-    }
-
-    /**
-     * Tests resync for a refresh-sync-down when they are more records in the table than can be enumerated
-     * in one soql call to the server
-     * @throws Exception
-     */
-    @Test
-    public void testRefreshReSyncWithMultipleRoundTrips() throws Exception {
-        // Setup has created records on the server
-        // Adding soup elements with just ids to soup
-        for (String id : idToFields.keySet()) {
-            JSONObject soupElement = new JSONObject();
-            soupElement.put(Constants.ID, id);
-            smartStore.create(ACCOUNTS_SOUP, soupElement);
-        }
-        // Running a refresh-sync-down for soup
-        final RefreshSyncDownTarget target = new RefreshSyncDownTarget(REFRESH_FIELDLIST, Constants.ACCOUNT, ACCOUNTS_SOUP);
-        target.setCountIdsPerSoql(1); //  to exercise continueFetch
-        long syncId = trySyncDown(MergeMode.OVERWRITE, target, ACCOUNTS_SOUP, idToFields.size(), 10, null);
-
-        // Check sync time stamp
-        SyncState sync = syncManager.getSyncStatus(syncId);
-        SyncOptions options = sync.getOptions();
-        long maxTimeStamp = sync.getMaxTimeStamp();
-        Assert.assertTrue("Wrong time stamp", maxTimeStamp > 0);
-
-        // Make sure the soup has the records with id and names
-        checkDb(idToFields, ACCOUNTS_SOUP);
-
-        // Make some remote change
-        Map<String, Map<String, Object>> idToFieldsUpdated = makeRemoteChanges(idToFields, Constants.ACCOUNT);
-
-        // Call reSync
-        SyncUpdateCallbackQueue queue = new SyncUpdateCallbackQueue();
-        syncManager.reSync(syncId, queue);
-
-        // Check status updates
-        checkStatus(queue.getNextSyncUpdate(), SyncState.Type.syncDown, syncId, target, options, SyncState.Status.RUNNING, 0, -1);
-        checkStatus(queue.getNextSyncUpdate(), SyncState.Type.syncDown, syncId, target, options, SyncState.Status.RUNNING, 0, idToFields.size()); // totalSize is off for resync of sync-down-target if not all records got updated
-        checkStatus(queue.getNextSyncUpdate(), SyncState.Type.syncDown, syncId, target, options, SyncState.Status.RUNNING, 10, idToFields.size());
-        checkStatus(queue.getNextSyncUpdate(), SyncState.Type.syncDown, syncId, target, options, SyncState.Status.RUNNING, 10, idToFields.size());
-        checkStatus(queue.getNextSyncUpdate(), SyncState.Type.syncDown, syncId, target, options, SyncState.Status.RUNNING, 20, idToFields.size());
-        checkStatus(queue.getNextSyncUpdate(), SyncState.Type.syncDown, syncId, target, options, SyncState.Status.RUNNING, 20, idToFields.size());
-        checkStatus(queue.getNextSyncUpdate(), SyncState.Type.syncDown, syncId, target, options, SyncState.Status.RUNNING, 20, idToFields.size());
-        checkStatus(queue.getNextSyncUpdate(), SyncState.Type.syncDown, syncId, target, options, SyncState.Status.RUNNING, 20, idToFields.size());
-        checkStatus(queue.getNextSyncUpdate(), SyncState.Type.syncDown, syncId, target, options, SyncState.Status.RUNNING, 20, idToFields.size());
-        checkStatus(queue.getNextSyncUpdate(), SyncState.Type.syncDown, syncId, target, options, SyncState.Status.RUNNING, 20, idToFields.size());
-        checkStatus(queue.getNextSyncUpdate(), SyncState.Type.syncDown, syncId, target, options, SyncState.Status.RUNNING, 20, idToFields.size());
-        checkStatus(queue.getNextSyncUpdate(), SyncState.Type.syncDown, syncId, target, options, SyncState.Status.RUNNING, 20, idToFields.size());
-        checkStatus(queue.getNextSyncUpdate(), SyncState.Type.syncDown, syncId, target, options, SyncState.Status.DONE, 100, idToFields.size());
-
-        // Check db
-        checkDb(idToFieldsUpdated, ACCOUNTS_SOUP);
-
-        // Check sync time stamp
-        Assert.assertTrue("Wrong time stamp", syncManager.getSyncStatus(syncId).getMaxTimeStamp() > maxTimeStamp);
-    }
-
-    /**
-     * Tests if ghost records are cleaned locally for a refresh target.
-     */
-    @Test
-    public void testCleanResyncGhostsForRefreshTarget() throws Exception {
-        // Setup has created records on the server
-        // Adding soup elements with just ids to soup
-        for (String id : idToFields.keySet()) {
-            JSONObject soupElement = new JSONObject();
-            soupElement.put(Constants.ID, id);
-            smartStore.create(ACCOUNTS_SOUP, soupElement);
-        }
-        // Running a refresh-sync-down for soup
-        final RefreshSyncDownTarget target = new RefreshSyncDownTarget(REFRESH_FIELDLIST, Constants.ACCOUNT, ACCOUNTS_SOUP);
-        long syncId = trySyncDown(MergeMode.OVERWRITE, target, ACCOUNTS_SOUP, idToFields.size(), 1, null);
-
-        // Make sure the soup has the records with id and names
-        checkDb(idToFields, ACCOUNTS_SOUP);
-
-        // Deletes 1 account on the server and verifies the ghost record is cleared from the soup.
-        String[] ids = idToFields.keySet().toArray(new String[0]);
-        String idDeleted = ids[0];
-        deleteRecordsOnServer(new HashSet<String>(Arrays.asList(idDeleted)), Constants.ACCOUNT);
-        tryCleanResyncGhosts(syncId);
-
-        // Map of id to names expected to be found in db
-        Map<String, Map<String, Object>> idToFieldsLeft = new HashMap<>(idToFields);
-        idToFieldsLeft.remove(idDeleted);
-
-        // Make sure the soup doesn't contain the record deleted on the server anymore
-        checkDb(idToFieldsLeft, ACCOUNTS_SOUP);
-        checkDbDeleted(ACCOUNTS_SOUP, new String[] {idDeleted}, Constants.ID);
+        deleteRecordsByIdOnServer(new HashSet<String>(Arrays.asList(accountIds[0])), Constants.ACCOUNT);
     }
 
     /**
