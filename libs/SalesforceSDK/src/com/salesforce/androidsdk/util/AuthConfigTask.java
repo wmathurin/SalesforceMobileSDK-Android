@@ -40,7 +40,11 @@ import okhttp3.HttpUrl;
  * not fetched for production and sandbox.
  *
  * @author bhariharan
+ *
+ * @deprecated This class will be rewritten to use a non-deprecated
+ * superclass in Mobile SDK 12.0.
  */
+@Deprecated
 public class AuthConfigTask extends AsyncTask<Void, Void, Void> {
 
     /**
@@ -71,15 +75,17 @@ public class AuthConfigTask extends AsyncTask<Void, Void, Void> {
         if (loginServer.equals(LoginServerManager.PRODUCTION_LOGIN_URL) ||
                 loginServer.equals(LoginServerManager.SANDBOX_LOGIN_URL) ||
                 !URLUtil.isHttpsUrl(loginServer) || HttpUrl.parse(loginServer) == null) {
-            SalesforceSDKManager.getInstance().setBrowserLoginEnabled(false);
+            SalesforceSDKManager.getInstance().setBrowserLoginEnabled(false, false);
             return null;
         }
         final AuthConfigUtil.MyDomainAuthConfig authConfig = AuthConfigUtil.getMyDomainAuthConfig(loginServer);
         boolean browserLoginEnabled = false;
+        boolean shareBrowserSessionEnabled = false;
         if (authConfig != null) {
             browserLoginEnabled = authConfig.isBrowserLoginEnabled();
+            shareBrowserSessionEnabled = authConfig.isShareBrowserSessionEnabled();
         }
-        SalesforceSDKManager.getInstance().setBrowserLoginEnabled(browserLoginEnabled);
+        SalesforceSDKManager.getInstance().setBrowserLoginEnabled(browserLoginEnabled, shareBrowserSessionEnabled);
         return null;
     }
 

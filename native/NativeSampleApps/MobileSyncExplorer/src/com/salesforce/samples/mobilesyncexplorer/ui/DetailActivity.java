@@ -26,6 +26,9 @@
  */
 package com.salesforce.samples.mobilesyncexplorer.ui;
 
+import static com.salesforce.androidsdk.R.style.SalesforceSDK;
+import static com.salesforce.androidsdk.R.style.SalesforceSDK_Dark;
+
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
@@ -75,7 +78,7 @@ public class DetailActivity extends SalesforceActivity implements LoaderManager.
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		boolean isDarkTheme = SalesforceSDKManager.getInstance().isDarkTheme();
-		setTheme(isDarkTheme ? R.style.SalesforceSDK_Dark : R.style.SalesforceSDK);
+		setTheme(isDarkTheme ? SalesforceSDK_Dark : SalesforceSDK);
 		// This makes the navigation bar visible on light themes.
 		SalesforceSDKManager.getInstance().setViewNavigationVisibility(this);
 
@@ -83,8 +86,8 @@ public class DetailActivity extends SalesforceActivity implements LoaderManager.
 		final Intent launchIntent = getIntent();
 		if (launchIntent != null) {
 			objectId = launchIntent.getStringExtra(MainActivity.OBJECT_ID_KEY);
-			getActionBar().setTitle(launchIntent.getStringExtra(MainActivity.OBJECT_NAME_KEY));
-			getActionBar().setSubtitle(launchIntent.getStringExtra(MainActivity.OBJECT_TITLE_KEY));
+			getSupportActionBar().setTitle(launchIntent.getStringExtra(MainActivity.OBJECT_NAME_KEY));
+			getSupportActionBar().setSubtitle(launchIntent.getStringExtra(MainActivity.OBJECT_TITLE_KEY));
 		}
 		deleteConfirmationDialog = new DeleteDialogFragment();
 	}
@@ -112,6 +115,10 @@ public class DetailActivity extends SalesforceActivity implements LoaderManager.
 	    logoutItem.setVisible(false);
 	    final MenuItem addItem = menu.findItem(R.id.action_add);
 	    addItem.setVisible(false);
+	    final MenuItem inspectDbItem = menu.findItem(R.id.action_inspect_db);
+	    inspectDbItem.setVisible(false);
+	    final MenuItem switchUserItem = menu.findItem(R.id.action_switch_user);
+	    switchUserItem.setVisible(false);
 	    final MenuItem refreshItem = menu.findItem(R.id.action_refresh);
 	    refreshItem.setIcon(R.drawable.ic_action_save);
 	    return super.onCreateOptionsMenu(menu);
@@ -162,7 +169,7 @@ public class DetailActivity extends SalesforceActivity implements LoaderManager.
 		}
 		else {
 			// it's a delete
-			deleteConfirmationDialog.show(getFragmentManager(), "DeleteDialog");
+			deleteConfirmationDialog.show(getSupportFragmentManager(), "DeleteDialog");
 		}
 	}
 

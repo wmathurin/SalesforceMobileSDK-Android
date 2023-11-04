@@ -48,12 +48,15 @@ import android.view.accessibility.AccessibilityManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.window.OnBackInvokedDispatcher;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.os.BuildCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.salesforce.androidsdk.R;
@@ -99,6 +102,14 @@ public class ScreenLockActivity extends FragmentActivity {
         } catch (PackageManager.NameNotFoundException e) {
             SalesforceSDKLogger.e(TAG, "Unable to retrieve host app icon.  NameNotFoundException: " + e.getMessage());
             appIcon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sf__salesforce_logo, null));
+        }
+
+        // TODO:  Remove this when min API > 33
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                    () -> { /* purposefully blank */ }
+            );
         }
 
         presentAuth();
@@ -165,11 +176,17 @@ public class ScreenLockActivity extends FragmentActivity {
     }
 
     private BiometricPrompt.PromptInfo getPromptInfo() {
+        boolean hasFaceUnlock = false;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            hasFaceUnlock = getPackageManager().hasSystemFeature(PackageManager.FEATURE_FACE) ||
+                    (getPackageManager().hasSystemFeature(PackageManager.FEATURE_IRIS));
+        }
+
         return new BiometricPrompt.PromptInfo.Builder()
                 .setTitle(getString(R.string.sf__screen_lock_title, appName))
                 .setSubtitle(getString(R.string.sf__screen_lock_subtitle, appName))
                 .setAllowedAuthenticators(getAuthenticators())
-                .setConfirmationRequired(false)
+                .setConfirmationRequired(hasFaceUnlock)
                 .build();
     }
 

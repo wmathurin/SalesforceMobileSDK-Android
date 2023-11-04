@@ -50,18 +50,23 @@ public class RestExplorerApp extends Application {
 		 */
 		RestExplorerSDKManager.initNative(getApplicationContext(), ExplorerActivity.class);
 
+		/**
+		 * Let's use the default browser for advanced authentication
+		 */
+		RestExplorerSDKManager.getInstance().setCustomTabBrowser(null);
+
 		/*
          * Uncomment the following line to enable IDP login flow. This will allow the user to
-         * either authenticate using the current app or use a designated IDP app for login.
-         * Replace 'idpAppURIScheme' with the URI scheme of the IDP app meant to be used.
+         * either authenticate using the current app or use the designated IDP app for login.
+         * Replace 'com.salesforce.samples.salesforceandroididptemplateapp' with the package name
+         * of the IDP app meant to be used.
          */
-        // SalesforceSDKManager.getInstance().setIDPAppURIScheme(idpAppURIScheme);
+         SalesforceSDKManager.getInstance().setIDPAppPackageName("com.salesforce.samples.salesforceandroididptemplateapp");
 
 		/*
 		 * Un-comment the line below to enable push notifications in this app.
 		 * Replace 'pnInterface' with your implementation of 'PushNotificationInterface'.
-		 * Add your Google package ID in 'bootconfig.xml', as the value
-		 * for the key 'androidPushNotificationClientId'.
+		 * Add your Firebase 'google-services.json' file to the 'app' folder of your project.
 		 */
 		// SalesforceSDKManager.getInstance().setPushNotificationReceiver(pnInterface);
 	}
