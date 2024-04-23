@@ -32,6 +32,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.salesforce.androidsdk.accounts.UserAccount
 import com.salesforce.androidsdk.accounts.UserAccountManager
+import com.salesforce.androidsdk.analytics.security.Encryptor
 import com.salesforce.androidsdk.app.Features.FEATURE_PUSH_NOTIFICATIONS
 import com.salesforce.androidsdk.app.SalesforceSDKManager
 import com.salesforce.androidsdk.auth.HttpAccess.DEFAULT
@@ -245,6 +246,12 @@ open class PushService {
             }
 
             getRestClient(account)?.let { restClient ->
+                val apiVersion = ApiVersionStrings.getVersionNumber(SalesforceSDKManager.getInstance().appContext)
+                // TODO remove once MSDK default api version is 61 or greater
+                if (apiVersion.compareTo("v61.0") >= 0) {
+                    fields[CIPHER_NAME] = Encryptor.CipherMode.RSA_OAEP_SHA256.name
+                }
+
                 var status = REGISTRATION_STATUS_FAILED
                 val response = onSendRegisterPushNotificationRequest(fields, restClient)
                 var id: String? = null
@@ -287,13 +294,11 @@ open class PushService {
         get() {
             val keyStoreWrapper = KeyStoreWrapper.getInstance()
 
-            var rsaPublicKey: String? = null
-            val name = SalesforceKeyGenerator.getUniqueId(PUSH_NOTIFICATION_KEY_NAME)
-            val sanitizedName = name.replace("[^A-Za-z0-9]".toRegex(), "")
-            if (sanitizedName.isNotEmpty()) {
-                rsaPublicKey = keyStoreWrapper.getRSAPublicString(sanitizedName)
+            var publicKey: String? = null
+            if (pushNotificationKeyName.isNotEmpty()) {
+                publicKey = keyStoreWrapper.getRSAPublicString(pushNotificationKeyName)
             }
-            return rsaPublicKey
+            return publicKey
         }
 
     /**
@@ -355,7 +360,7 @@ open class PushService {
 
     private fun getRestClient(
         account: UserAccount
-    ) = SalesforceSDKManager.getInstance().clientManager?.let { clientManager ->
+    ) = SalesforceSDKManager.getInstance().clientManager.let { clientManager ->
 
         /*
          * The reason we can't directly call 'peekRestClient()' here is because
@@ -422,9 +427,14 @@ open class PushService {
         private const val RSA_PUBLIC_KEY = "RsaPublicKey"
         private const val CONNECTION_TOKEN = "ConnectionToken"
         private const val APPLICATION_BUNDLE = "ApplicationBundle"
+        private const val CIPHER_NAME = "CipherName"
         private const val FIELD_ID = "id"
         private const val NOT_ENABLED = "not_enabled"
         const val PUSH_NOTIFICATION_KEY_NAME = "PushNotificationKey"
+        val pushNotificationKeyName = SalesforceKeyGenerator
+            .getUniqueId(PUSH_NOTIFICATION_KEY_NAME)
+            .replace("[^A-Za-z0-9]".toRegex(), "")
+
         protected const val REGISTRATION_STATUS_SUCCEEDED = 0
         protected const val REGISTRATION_STATUS_FAILED = 1
         protected const val UNREGISTRATION_STATUS_SUCCEEDED = 2
