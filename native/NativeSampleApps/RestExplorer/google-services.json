@@ -1,0 +1,251 @@
+{
+  "project_info": {
+    "project_number": "414855140220",
+    "firebase_url": "https://mobile-apps-firebase-test.firebaseio.com",
+    "project_id": "mobile-apps-firebase-test",
+    "storage_bucket": "mobile-apps-firebase-test.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414855140220:android:fb60dffbc67d414bd44af9",
+        "android_client_info": {
+          "package_name": "com.salesforce.androidhybridlocal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "414855140220-m7rvgse8lvljejs5gk5bldd1e1k35m0v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDh4Wg9m3Vgdhsgh1ZQc026-Eq-yckEPAw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "414855140220-m7rvgse8lvljejs5gk5bldd1e1k35m0v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414855140220:android:b8175beac9e722dad44af9",
+        "android_client_info": {
+          "package_name": "com.salesforce.androidnative"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "414855140220-m7rvgse8lvljejs5gk5bldd1e1k35m0v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDh4Wg9m3Vgdhsgh1ZQc026-Eq-yckEPAw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "414855140220-m7rvgse8lvljejs5gk5bldd1e1k35m0v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414855140220:android:ee8f449374e49c41d44af9",
+        "android_client_info": {
+          "package_name": "com.salesforce.androidnativekotlin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "414855140220-m7rvgse8lvljejs5gk5bldd1e1k35m0v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDh4Wg9m3Vgdhsgh1ZQc026-Eq-yckEPAw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "414855140220-m7rvgse8lvljejs5gk5bldd1e1k35m0v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414855140220:android:6755000a90f7434bd44af9",
+        "android_client_info": {
+          "package_name": "com.salesforce.androidreactnative"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "414855140220-m7rvgse8lvljejs5gk5bldd1e1k35m0v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDh4Wg9m3Vgdhsgh1ZQc026-Eq-yckEPAw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "414855140220-m7rvgse8lvljejs5gk5bldd1e1k35m0v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414855140220:android:eed27b014779e550",
+        "android_client_info": {
+          "package_name": "com.salesforce.native_java"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "414855140220-u8g0fgk7qic4mj4ktjh5mmlsklqtaeg6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.salesforce.native_java",
+            "certificate_hash": "2a017c6568851a3eb220a8fe81a7371c8a765936"
+          }
+        },
+        {
+          "client_id": "414855140220-m7rvgse8lvljejs5gk5bldd1e1k35m0v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDh4Wg9m3Vgdhsgh1ZQc026-Eq-yckEPAw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "414855140220-m7rvgse8lvljejs5gk5bldd1e1k35m0v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414855140220:android:3085aa9826e0a63bd44af9",
+        "android_client_info": {
+          "package_name": "com.salesforce.samples.mobilesyncexplorer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "414855140220-m7rvgse8lvljejs5gk5bldd1e1k35m0v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDh4Wg9m3Vgdhsgh1ZQc026-Eq-yckEPAw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "414855140220-m7rvgse8lvljejs5gk5bldd1e1k35m0v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414855140220:android:24eea2687dda1682d44af9",
+        "android_client_info": {
+          "package_name": "com.salesforce.samples.restexplorer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "414855140220-m7rvgse8lvljejs5gk5bldd1e1k35m0v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDh4Wg9m3Vgdhsgh1ZQc026-Eq-yckEPAw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "414855140220-m7rvgse8lvljejs5gk5bldd1e1k35m0v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414855140220:android:0ef25169d8d20a61d44af9",
+        "android_client_info": {
+          "package_name": "com.sfdc.native_java"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "414855140220-m7rvgse8lvljejs5gk5bldd1e1k35m0v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDh4Wg9m3Vgdhsgh1ZQc026-Eq-yckEPAw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "414855140220-m7rvgse8lvljejs5gk5bldd1e1k35m0v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

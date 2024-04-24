@@ -29,10 +29,13 @@ package com.salesforce.samples.restexplorer;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.salesforce.androidsdk.app.SalesforceSDKManager;
+import com.salesforce.androidsdk.push.PushNotificationInterface;
 import com.salesforce.androidsdk.ui.LoginActivity;
 
 import java.util.Map;
@@ -70,7 +73,20 @@ public class RestExplorerApp extends Application {
 		 * Replace 'pnInterface' with your implementation of 'PushNotificationInterface'.
 		 * Add your Firebase 'google-services.json' file to the 'app' folder of your project.
 		 */
-		// SalesforceSDKManager.getInstance().setPushNotificationReceiver(pnInterface);
+		SalesforceSDKManager.getInstance().setPushNotificationReceiver(new PushNotificationReceiver());
+	}
+
+	static class PushNotificationReceiver implements PushNotificationInterface {
+
+		@Override
+		public void onPushMessageReceived(Map<String, String> data) {
+			Log.i("PUSH_NOTIFICATION", "data-->" + data) ;
+		}
+
+		@Override
+		public FirebaseMessaging supplyFirebaseMessaging() {
+			return null;
+		}
 	}
 
 	static class RestExplorerSDKManager extends SalesforceSDKManager {

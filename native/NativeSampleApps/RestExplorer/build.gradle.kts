@@ -3,6 +3,7 @@
 plugins {
     android
     `kotlin-android`
+    id("com.google.gms.google-services")
 }
 
 dependencies {

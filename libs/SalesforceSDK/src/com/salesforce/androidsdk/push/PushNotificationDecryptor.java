@@ -28,6 +28,7 @@ package com.salesforce.androidsdk.push;
 
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 
 import com.google.firebase.messaging.RemoteMessage;
 import com.salesforce.androidsdk.analytics.security.Encryptor;
@@ -116,6 +117,7 @@ class PushNotificationDecryptor {
         }
         final String decryptedData = Encryptor.decryptBytes(encryptedPayload, key, iv);
         if (decryptedData != null) {
+            Log.i("PUSH_NOTIFICATION", "decrypted-->" + decryptedData);
             data.put(CONTENT_KEY, decryptedData);
         }
         return data;

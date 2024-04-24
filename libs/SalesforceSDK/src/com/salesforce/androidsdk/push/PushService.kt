@@ -27,6 +27,7 @@
 package com.salesforce.androidsdk.push
 
 import android.content.Intent
+import android.util.Log
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
@@ -214,6 +215,7 @@ open class PushService {
         status: Int,
         userAccount: UserAccount?
     ) {
+        Log.i("PUSH_NOTIFICATION", "onPushNotificationRegistrationStatus --> " + status)
         // Intentionally Blank.
     }
 
@@ -263,6 +265,8 @@ open class PushService {
                  * are not enabled for this connected app, which means we
                  * should not attempt to re-register a few minutes later.
                  */
+                Log.i("PUSH_NOTIFICATION", "registration fields --> " + fields)
+                Log.i("PUSH_NOTIFICATION", "registration response --> " + response.asString())
                 when (response.statusCode) {
                     HTTP_CREATED -> {
                         response.asJSONObject()?.let { jsonObject ->

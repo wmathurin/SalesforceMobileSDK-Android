@@ -29,6 +29,7 @@ package com.salesforce.androidsdk.analytics.security;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 
 import com.salesforce.androidsdk.analytics.util.SalesforceAnalyticsLogger;
 
@@ -45,7 +46,6 @@ import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.MGF1ParameterSpec;
 
 import javax.crypto.Cipher;
@@ -469,7 +469,13 @@ public class Encryptor {
     public static byte[] decryptWithRSAMultiCipherNodes(PrivateKey privateKey, String data) {
         byte[] result =  decryptWithPrivateKey(privateKey, data, CipherMode.RSA_OAEP_SHA256, /* logErrorOnFailure */ false);
         if (result == null) {
+            Log.i("PUSH_NOTIFICATION", "Failed to decrypt with --> " + CipherMode.RSA_OAEP_SHA256);
             result = decryptWithPrivateKey(privateKey, data, CipherMode.RSA_PKCS1, /* logErrorOnFailure */ true);
+            if (result != null) {
+                Log.i("PUSH_NOTIFICATION", "Succeeded to decrypt with --> " + CipherMode.RSA_PKCS1);
+            }
+        } else {
+            Log.i("PUSH_NOTIFICATION", "Succeeded to decrypt with --> " + CipherMode.RSA_OAEP_SHA256);
         }
         return result;
     }
@@ -573,14 +579,17 @@ public class Encryptor {
         try {
             final Cipher cipherInstance = getBestCipher(cipherMode);
             initRSACipher(cipherInstance, Cipher.DECRYPT_MODE, privateKey, cipherMode);
+
             byte[] decodedBytes = Base64.decode(data.getBytes(),Base64.NO_WRAP | Base64.NO_PADDING);
-            return cipherInstance.doFinal(decodedBytes);
+            byte[] decryptedBytes = cipherInstance.doFinal(decodedBytes);
+            return decryptedBytes;
         } catch (Exception e) {
             if (logErrorOnFailure) {
                 SalesforceAnalyticsLogger.e(null, TAG, "Failed to decrypt with " + cipherMode, e);
             } else {
                 SalesforceAnalyticsLogger.w(null, TAG, "Failed to decrypt with " + cipherMode);
             }
+            Log.i("PUSH_NOTIFICATION", "Failed to decrypt with --> " + cipherMode);
         }
         return null;
     }
