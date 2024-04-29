@@ -36,6 +36,8 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import androidx.annotation.Nullable;
+
 import com.salesforce.androidsdk.app.Features;
 import com.salesforce.androidsdk.app.SalesforceSDKManager;
 import com.salesforce.androidsdk.auth.AuthenticatorService;
@@ -331,9 +333,9 @@ public class UserAccountManager {
 		BiometricAuthenticationManager bioAuthManager =
 				(BiometricAuthenticationManager) SalesforceSDKManager.getInstance().getBiometricAuthenticationManager();
 		ScreenLockManager screenLockManager = (ScreenLockManager) SalesforceSDKManager.getInstance().getScreenLockManager();
-		if (bioAuthManager.isEnabled()) {
+		if (bioAuthManager != null && bioAuthManager.isEnabled()) {
 			bioAuthManager.lock();
-		} else if (screenLockManager.isEnabled()) {
+		} else if (screenLockManager != null && screenLockManager.isEnabled()) {
 			screenLockManager.lock();
 		}
 	}
@@ -413,7 +415,7 @@ public class UserAccountManager {
 	 * @param account Account object.
 	 * @return UserAccount object.
 	 */
-	public UserAccount buildUserAccount(Account account) {
+	public @Nullable UserAccount buildUserAccount(Account account) {
 		if (account == null) {
 			return null;
 		}

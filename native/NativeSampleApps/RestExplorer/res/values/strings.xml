@@ -121,5 +121,5 @@
     <string name="encoding">UTF-8</string>
     <string name="account_type">com.salesforce.samples.restexplorer.login</string>
 
-	<string name="api_version">v60.0</string>
+	<string name="api_version">v61.0</string>
 </resources>
