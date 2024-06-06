@@ -1396,6 +1396,11 @@ open class OAuthWebviewHelper : KeyChainAliasCallback {
         }
     }
 
+    fun loginWithFrontdoorBridgeUrl(frontdoorBridgeUrl: String, pkceCodeVerifier: String) {
+        codeVerifier = pkceCodeVerifier
+        webView?.loadUrl(frontdoorBridgeUrl)
+    }
+
     companion object {
 
         /**
