@@ -660,7 +660,7 @@ open class OAuthWebviewHelper : KeyChainAliasCallback {
                     )
 
                     else -> when {
-                        instance.useWebServerAuthentication -> onWebServerFlowComplete(params["code"])
+                        codeVerifier?.isNotEmpty() == true -> onWebServerFlowComplete(params["code"])
                         else -> onAuthFlowComplete(TokenEndpointResponse(params))
                     }
                 }
@@ -1397,6 +1397,9 @@ open class OAuthWebviewHelper : KeyChainAliasCallback {
     }
 
     fun loginWithFrontdoorBridgeUrl(frontdoorBridgeUrl: String, pkceCodeVerifier: String) {
+        val uri = URI(frontdoorBridgeUrl)
+        loginOptions.loginUrl = "${uri.scheme}://${uri.host}"
+        d(TAG, "loginUrl-->${loginOptions.loginUrl}")
         codeVerifier = pkceCodeVerifier
         webView?.loadUrl(frontdoorBridgeUrl)
     }
