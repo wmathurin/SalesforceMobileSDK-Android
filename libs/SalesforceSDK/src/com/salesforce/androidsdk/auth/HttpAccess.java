@@ -102,11 +102,7 @@ public class HttpAccess {
      * and user agent interceptor for an authenticated client.
      */
     public OkHttpClient.Builder getOkHttpClientBuilder() {
-        if (okHttpBuilder == null) {
-            okHttpBuilder = createNewClientBuilder();
-        }
-
-        return okHttpBuilder;
+        return createNewClientBuilder();
     }
 
     /**
@@ -115,11 +111,7 @@ public class HttpAccess {
      * and user agent interceptor for an unauthenticated client.
      */
     public OkHttpClient.Builder getUnauthenticatedOkHttpBuilder() {
-        if (unauthenticatedOkHttpBuilder == null) {
-            unauthenticatedOkHttpBuilder = createNewClientBuilder();
-        }
-
-        return unauthenticatedOkHttpBuilder;
+        return createNewClientBuilder();
     }
 
     /**
@@ -162,11 +154,18 @@ public class HttpAccess {
         ConnectionSpec connectionSpec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
                 .tlsVersions(TlsVersion.TLS_1_1, TlsVersion.TLS_1_2)
                 .build();
-        return new OkHttpClient.Builder()
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectionSpecs(Collections.singletonList(connectionSpec))
                 .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
                 .addNetworkInterceptor(new UserAgentInterceptor());
+
+        OkHttpClientBuilderCustomizer customizer = SalesforceSDKManager.getInstance().getOkHttpClientBuilderCustomizer();
+        if (customizer != null) {
+            customizer.customizeBuilder(builder);
+        }
+        return builder;
     }
 
     /**
@@ -204,5 +203,9 @@ public class HttpAccess {
                     .build();
             return chain.proceed(requestWithUserAgent);
         }
+    }
+
+    public static interface OkHttpClientBuilderCustomizer {
+        void customizeBuilder(OkHttpClient.Builder builder);
     }
 }

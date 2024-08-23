@@ -178,6 +178,9 @@ open class SalesforceSDKManager protected constructor(
     /** The Android context */
     val appContext: Context = context
 
+    /** To customize all OkHttpClient.Builder used in the application */
+    var okHttpClientBuilderCustomizer: HttpAccess.OkHttpClientBuilderCustomizer? = null;
+
     /** Login options associated with the app */
     private var loginOptionsInternal: LoginOptions? = null
 
