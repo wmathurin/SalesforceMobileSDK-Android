@@ -23,6 +23,7 @@ plugins {
 dependencies {
     api(project(":libs:MobileSync"))
     api("com.facebook.react:react-android:0.79.3")
+    
     implementation("androidx.core:core-ktx:1.16.0")
     androidTestImplementation("androidx.test:runner:1.6.2")
     androidTestImplementation("androidx.test:rules:1.6.1")
@@ -47,6 +48,9 @@ android {
     defaultConfig {
         minSdk = 28
     }
+
+    // TurboModule support configuration
+    ndkVersion = "26.1.10909125"
 
     buildTypes {
         debug {
@@ -93,6 +97,18 @@ android {
         renderScript = true
         aidl = true
         buildConfig = true
+    }
+
+    // C++ compilation for TurboModule support
+    externalNativeBuild {
+        cmake {
+            version = "3.22.1"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     val convertCodeCoverage: TaskProvider<JacocoReport> = tasks.register<JacocoReport>("convertedCodeCoverage") {

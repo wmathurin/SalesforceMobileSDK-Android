@@ -26,7 +26,7 @@
  */
 package com.salesforce.androidsdk.reactnative.bridge;
 
-import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -47,45 +47,35 @@ public class SalesforceOauthReactBridge extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void authenticate(ReadableMap args,
-                             Callback successCallback, Callback errorCallback) {
+    public void authenticate(Promise promise) {
         final SalesforceReactActivity currentActivity = (SalesforceReactActivity) getCurrentActivity();
         if (currentActivity != null) {
-            currentActivity.authenticate(successCallback, errorCallback);
+            currentActivity.authenticate(promise);
         }
         else {
-            if (errorCallback != null) {
-                errorCallback.invoke("SalesforceReactActivity not found");
-            }
-        }
-    }
-
-
-    @ReactMethod
-    public void getAuthCredentials(ReadableMap args,
-                                   Callback successCallback, Callback errorCallback) {
-        final SalesforceReactActivity currentActivity = (SalesforceReactActivity) getCurrentActivity();
-        if (currentActivity != null) {
-            currentActivity.getAuthCredentials(successCallback, errorCallback);
-        }
-        else {
-            if (errorCallback != null) {
-                errorCallback.invoke("SalesforceReactActivity not found");
-            }
+            ReactBridgeHelper.reject(promise, "SalesforceReactActivity not found");
         }
     }
 
     @ReactMethod
-    public void logoutCurrentUser(ReadableMap args,
-                                  Callback successCallback, Callback errorCallback) {
+    public void getAuthCredentials(Promise promise) {
         final SalesforceReactActivity currentActivity = (SalesforceReactActivity) getCurrentActivity();
         if (currentActivity != null) {
-            currentActivity.logout(successCallback);
+            currentActivity.getAuthCredentials(promise);
         }
         else {
-            if (errorCallback != null) {
-                errorCallback.invoke("SalesforceReactActivity not found");
-            }
+            ReactBridgeHelper.reject(promise, "SalesforceReactActivity not found");
+        }
+    }
+
+    @ReactMethod
+    public void logoutCurrentUser(Promise promise) {
+        final SalesforceReactActivity currentActivity = (SalesforceReactActivity) getCurrentActivity();
+        if (currentActivity != null) {
+            currentActivity.logout(promise);
+        }
+        else {
+            ReactBridgeHelper.reject(promise, "SalesforceReactActivity not found");
         }
     }
 }

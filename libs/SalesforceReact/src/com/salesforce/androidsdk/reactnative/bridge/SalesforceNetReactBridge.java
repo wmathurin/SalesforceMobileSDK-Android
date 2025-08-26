@@ -30,7 +30,7 @@ import android.util.Base64;
 
 import androidx.annotation.NonNull;
 
-import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -51,6 +51,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 
 import okhttp3.MediaType;
@@ -84,13 +85,14 @@ public class SalesforceNetReactBridge extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void sendRequest(ReadableMap args, final Callback successCallback, final Callback errorCallback) {
+    public void sendRequest(String endPoint, String path, String method,
+                           ReadableMap queryParams, ReadableMap headerParams, ReadableMap fileParams,
+                           Boolean returnBinary, Boolean doesNotRequireAuthentication, final Promise promise) {
         try {
-            // Prepare request
-            final RestRequest request = prepareRestRequest(args);
-            final boolean returnBinary = args.hasKey(RETURN_BINARY) && args.getBoolean(RETURN_BINARY);
-            final boolean doesNotRequireAuth = args.hasKey(DOES_NOT_REQUIRE_AUTHENTICATION)
-                    && args.getBoolean(DOES_NOT_REQUIRE_AUTHENTICATION);
+            // Prepare request from individual parameters
+            final RestRequest request = prepareRestRequest(endPoint, path, method, queryParams, headerParams, fileParams);
+            final boolean returnBinaryFlag = returnBinary != null && returnBinary;
+            final boolean doesNotRequireAuth = doesNotRequireAuthentication != null && doesNotRequireAuthentication;
 
             // Sending request
             final RestClient restClient = getRestClient(doesNotRequireAuth);
@@ -118,20 +120,20 @@ public class SalesforceNetReactBridge extends ReactContextBaseJavaModule {
                             responseObject.put("body", parsedResponse(response));
                             final JSONObject errorObject = new JSONObject();
                             errorObject.put("response", responseObject);
-                            errorCallback.invoke(errorObject.toString());
+                            ReactBridgeHelper.reject(promise, errorObject.toString());
                         }
 
                         // Binary response
-                        else if (returnBinary) {
+                        else if (returnBinaryFlag) {
                             JSONObject result = new JSONObject();
                             result.put(CONTENT_TYPE, response.getContentType());
                             result.put(ENCODED_BODY, Base64.encodeToString(response.asBytes(), Base64.DEFAULT));
-                            successCallback.invoke(result.toString());
+                            ReactBridgeHelper.resolve(promise, result.toString());
                         }
 
                         // Other cases
                         else {
-                            successCallback.invoke(response.asString());
+                            ReactBridgeHelper.resolve(promise, response.asString());
                         }
                     } catch (Exception e) {
                         SalesforceReactLogger.e(TAG, "sendRequest failed", e);
@@ -147,7 +149,7 @@ public class SalesforceNetReactBridge extends ReactContextBaseJavaModule {
                     } catch (JSONException jsonException) {
                         SalesforceReactLogger.e(TAG, "Error creating error object", jsonException);
                     }
-                    errorCallback.invoke(errorObject.toString());
+                    ReactBridgeHelper.reject(promise, errorObject.toString());
                 }
             });
         } catch (Exception exception) {
@@ -157,7 +159,7 @@ public class SalesforceNetReactBridge extends ReactContextBaseJavaModule {
             } catch (JSONException jsonException) {
                 SalesforceReactLogger.e(TAG, "Error creating error object", jsonException);
             }
-            errorCallback.invoke(errorObject.toString());
+            ReactBridgeHelper.reject(promise, errorObject.toString());
         }
     }
 
@@ -199,34 +201,32 @@ public class SalesforceNetReactBridge extends ReactContextBaseJavaModule {
     }
 
     @NonNull
-    private RestRequest prepareRestRequest(ReadableMap args) throws UnsupportedEncodingException, URISyntaxException {
+    private RestRequest prepareRestRequest(String endPoint, String path, String method,
+                                         ReadableMap queryParams, ReadableMap headerParams, ReadableMap fileParams) throws UnsupportedEncodingException, URISyntaxException {
 
-        // Parse args
-        RestRequest.RestMethod method = RestRequest.RestMethod.valueOf(args.getString(METHOD_KEY));
-        String endPoint = !args.hasKey(END_POINT_KEY) || args.isNull(END_POINT_KEY) ? "" : args.getString(END_POINT_KEY);
-        String path = args.getString(PATH_KEY);
-        ReadableMap queryParams = args.getMap(QUERY_PARAMS_KEY);
-        ReadableMap headerParams = args.getMap(HEADER_PARAMS_KEY);
-        ReadableMap fileParams = args.getMap(FILE_PARAMS_KEY);
+        // Parse parameters
+        RestRequest.RestMethod restMethod = RestRequest.RestMethod.valueOf(method);
+        String endPointValue = endPoint != null ? endPoint : "";
+        String pathValue = path != null ? path : "";
 
         // Preparing request
-        Map<String, String> additionalHeaders = ReactBridgeHelper.toJavaStringStringMap(headerParams);
-        Map<String, Object> queryParamsMap = ReactBridgeHelper.toJavaMap(queryParams);
-        Map<String, Map<String, String>> fileParamsMap = ReactBridgeHelper.toJavaStringMapMap(fileParams);
+        Map<String, String> additionalHeaders = headerParams != null ? ReactBridgeHelper.toJavaStringStringMap(headerParams) : new HashMap<>();
+        Map<String, Object> queryParamsMap = queryParams != null ? ReactBridgeHelper.toJavaMap(queryParams) : new HashMap<>();
+        Map<String, Map<String, String>> fileParamsMap = fileParams != null ? ReactBridgeHelper.toJavaStringMapMap(fileParams) : new HashMap<>();
         String urlParams = "";
         RequestBody requestBody = null;
-        if (method == RestRequest.RestMethod.DELETE || method == RestRequest.RestMethod.GET
-                || method == RestRequest.RestMethod.HEAD) {
+        if (restMethod == RestRequest.RestMethod.DELETE || restMethod == RestRequest.RestMethod.GET
+                || restMethod == RestRequest.RestMethod.HEAD) {
             urlParams = buildQueryString(queryParamsMap);
         } else {
             requestBody = buildRequestBody(queryParamsMap, fileParamsMap);
         }
         String separator = urlParams.isEmpty()
                 ? ""
-                : path.contains("?")
-                    ? (path.endsWith("&") ? "" : "&")
+                : pathValue.contains("?")
+                    ? (pathValue.endsWith("&") ? "" : "&")
                     : "?";
-        return new RestRequest(method, endPoint + path + separator + urlParams, requestBody, additionalHeaders);
+        return new RestRequest(restMethod, endPointValue + pathValue + separator + urlParams, requestBody, additionalHeaders);
     }
 
     /**

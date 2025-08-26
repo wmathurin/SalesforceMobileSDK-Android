@@ -129,8 +129,14 @@ public class SalesforceReactSDKManager extends MobileSyncSDKManager {
 
     /**
      * Call this method when setting up ReactInstanceManager
+     * 
+     * This ReactPackage provides Salesforce SDK modules that are compatible with
+     * React Native's New Architecture (TurboModules) only.
+     * All bridge methods use Promise-based APIs for TurboModule support.
+     * 
+     * Note: Legacy React Native architecture (Callback-based) is no longer supported.
      *
-     * @return ReactPackage for this application
+     * @return ReactPackage for TurboModule-only application
      */
     public ReactPackage getReactPackage() {
         return new ReactPackage() {
@@ -141,6 +147,7 @@ public class SalesforceReactSDKManager extends MobileSyncSDKManager {
                     @NonNull ReactApplicationContext reactContext
             ) {
                 List<NativeModule> modules = new ArrayList<>();
+                // All bridges support Promise-based TurboModule APIs
                 modules.add(new SalesforceOauthReactBridge(reactContext));
                 modules.add(new SalesforceNetReactBridge(reactContext));
                 modules.add(new SmartStoreReactBridge(reactContext));

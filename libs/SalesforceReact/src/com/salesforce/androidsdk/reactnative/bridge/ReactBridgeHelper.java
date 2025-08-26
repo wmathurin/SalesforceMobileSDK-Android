@@ -26,7 +26,7 @@
  */
 package com.salesforce.androidsdk.reactnative.bridge;
 
-import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
@@ -40,34 +40,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ReactBridgeHelper  {
-
-    public static void invoke(Callback callback, JSONObject json) {
-        // XXX it would be better to user a NativeMap
-        //     for now we serialize the object and do a JSON.parse(result) on the javascript side
-        callback.invoke(json == null ? null : json.toString());
-    }
-
-    public static void invoke(Callback callback, JSONArray json) {
-        // XXX it would be better to user a NativeArray
-        //     for now we serialize the object and do a JSON.parse(result) on the javascript side
-        callback.invoke(json == null ? null : json.toString());
-    }
-
-    public static void invoke(Callback callback, String value) {
-        // XXX we need to turn "xyz" into "\"xyz\"" so that JSON.parse() returns "xyz"
-        callback.invoke("\"" + value + "\"");
-    }
-
-    public static void invoke(Callback callback, boolean value) {
-        // XXX we need to turn true|false into "true"|"false" so that JSON.parse() returns true|false
-        callback.invoke("" + value);
-    }
-
-    public static void invoke(Callback callback, int value) {
-        // XXX we need to turn 123 into "123" so that JSON.parse() returns 123
-        callback.invoke("" + value);
-    }
-
 
     public static Map<String, Object> toJavaMap(ReadableMap map) {
         Map<String, Object> result = new HashMap<>();
@@ -173,6 +145,44 @@ public class ReactBridgeHelper  {
             }
         }
         return result;
+    }
+
+    // Promise-based helper methods for TurboModules
+    
+    public static void resolve(Promise promise, JSONObject json) {
+        // For TurboModules, we can pass the raw JSON string
+        promise.resolve(json == null ? null : json.toString());
+    }
+
+    public static void resolve(Promise promise, JSONArray json) {
+        // For TurboModules, we can pass the raw JSON string
+        promise.resolve(json == null ? null : json.toString());
+    }
+
+    public static void resolve(Promise promise, String value) {
+        // For TurboModules, we need to return the actual string, not quoted
+        promise.resolve(value);
+    }
+
+    public static void resolve(Promise promise, boolean value) {
+        promise.resolve(value);
+    }
+
+    public static void resolve(Promise promise, int value) {
+        promise.resolve(value);
+    }
+
+    public static void resolve(Promise promise) {
+        // For void success cases
+        promise.resolve(null);
+    }
+
+    public static void reject(Promise promise, String error) {
+        promise.reject(new Exception(error));
+    }
+
+    public static void reject(Promise promise, Throwable error) {
+        promise.reject(error);
     }
 
 

@@ -26,7 +26,7 @@
  */
 package com.salesforce.androidsdk.reactnative.bridge;
 
-import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -62,184 +62,155 @@ public class MobileSyncReactBridge extends ReactContextBaseJavaModule {
 
     /**
      * Native implementation of syncUp
-     * @param args
-     * @param successCallback
-     * @param errorCallback
+     * @param target
+     * @param soupName
+     * @param options
+     * @param syncName
+     * @param storeConfig
+     * @param promise
      */
     @ReactMethod
-    public void syncUp(ReadableMap args,
-                       final Callback successCallback, final Callback errorCallback) {
-        // Parse args
-        JSONObject target = new JSONObject(ReactBridgeHelper.toJavaMap(args.getMap(TARGET)));
-        String soupName = args.getString(SOUP_NAME);
-        JSONObject options = new JSONObject(ReactBridgeHelper.toJavaMap(args.getMap(OPTIONS)));
-        String syncName = args.hasKey(SYNC_NAME) ? args.getString(SYNC_NAME) : null;
+    public void syncUp(ReadableMap target, String soupName, ReadableMap options, String syncName, ReadableMap storeConfig, final Promise promise) {
         try {
-            final SyncManager syncManager = getSyncManager(args);
-            syncManager.syncUp(SyncUpTarget.fromJSON(target), SyncOptions.fromJSON(options), soupName, syncName, new SyncManager.SyncUpdateCallback() {
+            // Parse parameters
+            JSONObject targetJson = new JSONObject(ReactBridgeHelper.toJavaMap(target));
+            JSONObject optionsJson = new JSONObject(ReactBridgeHelper.toJavaMap(options));
+            final SyncManager syncManager = getSyncManager(storeConfig);
+            
+            syncManager.syncUp(SyncUpTarget.fromJSON(targetJson), SyncOptions.fromJSON(optionsJson), soupName, syncName, new SyncManager.SyncUpdateCallback() {
                 @Override
                 public void onUpdate(SyncState sync) {
-                    handleSyncUpdate(sync, successCallback, errorCallback);
+                    handleSyncUpdate(sync, promise);
                 }
             });
         } catch (Exception e) {
             SalesforceReactLogger.e(TAG, "syncUp call failed", e);
-            errorCallback.invoke(e.toString());
+            ReactBridgeHelper.reject(promise, e.toString());
         }
     }
 
     /**
      * Native implementation of syncDown
-     * @param args
-     * @param successCallback
-     * @param errorCallback
+     * @param target
+     * @param soupName
+     * @param options
+     * @param syncName
+     * @param storeConfig
+     * @param promise
      */
     @ReactMethod
-    public void syncDown(ReadableMap args,
-                         final Callback successCallback, final Callback errorCallback) {
-        // Parse args
-        JSONObject target = new JSONObject(ReactBridgeHelper.toJavaMap(args.getMap(TARGET)));
-        String soupName = args.getString(SOUP_NAME);
-        JSONObject options = new JSONObject(ReactBridgeHelper.toJavaMap(args.getMap(OPTIONS)));
-        String syncName = args.hasKey(SYNC_NAME) ? args.getString(SYNC_NAME) : null;
+    public void syncDown(ReadableMap target, String soupName, ReadableMap options, String syncName, ReadableMap storeConfig, final Promise promise) {
         try {
-            final SyncManager syncManager = getSyncManager(args);
-            syncManager.syncDown(SyncDownTarget.fromJSON(target), SyncOptions.fromJSON(options), soupName, syncName, new SyncManager.SyncUpdateCallback() {
+            // Parse parameters
+            JSONObject targetJson = new JSONObject(ReactBridgeHelper.toJavaMap(target));
+            JSONObject optionsJson = new JSONObject(ReactBridgeHelper.toJavaMap(options));
+            final SyncManager syncManager = getSyncManager(storeConfig);
+            
+            syncManager.syncDown(SyncDownTarget.fromJSON(targetJson), SyncOptions.fromJSON(optionsJson), soupName, syncName, new SyncManager.SyncUpdateCallback() {
                 @Override
                 public void onUpdate(SyncState sync) {
-                    handleSyncUpdate(sync, successCallback, errorCallback);
+                    handleSyncUpdate(sync, promise);
                 }
             });
         } catch (Exception e) {
             SalesforceReactLogger.e(TAG, "syncDown call failed", e);
-            errorCallback.invoke(e.toString());
+            ReactBridgeHelper.reject(promise, e.toString());
         }
     }
 
     /**
      * Native implementation of getSyncStatus
-     * @param args
-     * @param successCallback
-     * @param errorCallback
+     * @param syncId
+     * @param storeConfig
+     * @param promise
      */
     @ReactMethod
-    public void getSyncStatus(ReadableMap args,
-                              final Callback successCallback, final Callback errorCallback) {
+    public void getSyncStatus(int syncId, ReadableMap storeConfig, final Promise promise) {
         try {
-            SyncState sync;
-            final SyncManager syncManager = getSyncManager(args);
-            if (args.hasKey(SYNC_ID) && !args.isNull(SYNC_ID)) {
-                sync = syncManager.getSyncStatus(args.getInt(SYNC_ID));
-            }
-            else if (args.hasKey(SYNC_NAME) && !args.isNull(SYNC_NAME)) {
-                sync = syncManager.getSyncStatus(args.getString(SYNC_NAME));
-            }
-            else {
-                throw new SyncManager.MobileSyncException("neither " + SYNC_ID + " nor " + SYNC_NAME + " were specified");
-            }
-            ReactBridgeHelper.invoke(successCallback, sync == null ? null : sync.asJSON());
+            final SyncManager syncManager = getSyncManager(storeConfig);
+            SyncState sync = syncManager.getSyncStatus(syncId);
+            ReactBridgeHelper.resolve(promise, sync == null ? null : sync.asJSON());
         } catch (Exception e) {
-            SalesforceReactLogger.e(TAG, "getSyncStatusByName call failed", e);
-            errorCallback.invoke(e.toString());
+            SalesforceReactLogger.e(TAG, "getSyncStatus call failed", e);
+            ReactBridgeHelper.reject(promise, e.toString());
         }
     }
 
     /**
      * Native implementation of deleteSync
-     * @param args
-     * @param successCallback
-     * @param errorCallback
+     * @param syncId
+     * @param storeConfig
+     * @param promise
      */
     @ReactMethod
-    public void deleteSync(ReadableMap args,
-                               final Callback successCallback, final Callback errorCallback) {
+    public void deleteSync(int syncId, ReadableMap storeConfig, final Promise promise) {
         try {
-            final SyncManager syncManager = getSyncManager(args);
-            if (args.hasKey(SYNC_ID) && !args.isNull(SYNC_ID)) {
-                syncManager.deleteSync(args.getInt(SYNC_ID));
-            }
-            else if (args.hasKey(SYNC_NAME) && !args.isNull(SYNC_NAME)) {
-                syncManager.deleteSync(args.getString(SYNC_NAME));
-            }
-            else {
-                throw new SyncManager.MobileSyncException("neither " + SYNC_ID + " nor " + SYNC_NAME + " were specified");
-            }
-            successCallback.invoke();
+            final SyncManager syncManager = getSyncManager(storeConfig);
+            syncManager.deleteSync(syncId);
+            ReactBridgeHelper.resolve(promise, "Sync deleted");
         } catch (Exception e) {
-            SalesforceReactLogger.e(TAG, "deleteSyncById call failed", e);
-            errorCallback.invoke(e.toString());
+            SalesforceReactLogger.e(TAG, "deleteSync call failed", e);
+            ReactBridgeHelper.reject(promise, e.toString());
         }
     }
 
     /**
      * Native implementation of reSync
-     * @param args
-     * @param successCallback
-     * @param errorCallback
+     * @param syncId
+     * @param storeConfig
+     * @param promise
      */
     @ReactMethod
-    public void reSync(ReadableMap args,
-                       final Callback successCallback, final Callback errorCallback) {
+    public void reSync(int syncId, ReadableMap storeConfig, final Promise promise) {
         try {
-            final SyncManager syncManager = getSyncManager(args);
+            final SyncManager syncManager = getSyncManager(storeConfig);
             SyncManager.SyncUpdateCallback callback = new SyncManager.SyncUpdateCallback() {
                 @Override
                 public void onUpdate(SyncState sync) {
-                    handleSyncUpdate(sync, successCallback, errorCallback);
+                    handleSyncUpdate(sync, promise);
                 }
             };
 
-            if (args.hasKey(SYNC_ID) && !args.isNull(SYNC_ID)) {
-                syncManager.reSync(args.getInt(SYNC_ID), callback);
-            }
-            else if (args.hasKey(SYNC_NAME) && !args.isNull(SYNC_NAME)) {
-                syncManager.reSync(args.getString(SYNC_NAME), callback);
-            }
-            else {
-                throw new SyncManager.MobileSyncException("neither " + SYNC_ID + " nor " + SYNC_NAME + " were specified");
-            }
+            syncManager.reSync(syncId, callback);
         } catch (Exception e) {
             SalesforceReactLogger.e(TAG, "reSync call failed", e);
-            errorCallback.invoke(e.toString());
+            ReactBridgeHelper.reject(promise, e.toString());
         }
     }
 
     /**
      * Native implementation of cleanResyncGhosts
-     * @param args
-     * @param successCallback
-     * @param errorCallback
+     * @param syncId
+     * @param storeConfig
+     * @param promise
      */
     @ReactMethod
-    public void cleanResyncGhosts(ReadableMap args,
-                       final Callback successCallback, final Callback errorCallback) {
-        // Parse args
-        long syncId = args.getInt(SYNC_ID);
+    public void cleanResyncGhosts(int syncId, ReadableMap storeConfig, final Promise promise) {
         try {
-            final SyncManager syncManager = getSyncManager(args);
+            final SyncManager syncManager = getSyncManager(storeConfig);
             syncManager.cleanResyncGhosts(syncId, new SyncManager.CleanResyncGhostsCallback() {
                 @Override
                 public void onSuccess(int numRecords) {
-                    successCallback.invoke(numRecords);
+                    ReactBridgeHelper.resolve(promise, "Cleaned " + numRecords + " ghost records");
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    errorCallback.invoke(e.toString());
+                    ReactBridgeHelper.reject(promise, e.toString());
                 }
             });
         } catch (Exception e) {
             SalesforceReactLogger.e(TAG, "cleanResyncGhosts call failed", e);
-            errorCallback.invoke(e.toString());
+            ReactBridgeHelper.reject(promise, e.toString());
         }
     }
 
     /**
      * Sync update handler
      * @param sync
-     * @param errorCallback
+     * @param promise
      */
-    private void handleSyncUpdate(final SyncState sync, Callback successCallback, Callback errorCallback) {
+    private void handleSyncUpdate(final SyncState sync, Promise promise) {
         try {
             switch (sync.getStatus()) {
                 case NEW:
@@ -247,11 +218,11 @@ public class MobileSyncReactBridge extends ReactContextBaseJavaModule {
                 case RUNNING:
                     break;
                 case DONE:
-                    ReactBridgeHelper.invoke(successCallback, sync.asJSON());
+                    ReactBridgeHelper.resolve(promise, sync.asJSON());
                     break;
                 case FAILED:
                     //Return sync to React Native with the error message in the JSON
-                    ReactBridgeHelper.invoke(errorCallback, sync.asJSON());
+                    ReactBridgeHelper.reject(promise, sync.asJSON().toString());
                     break;
             }
         } catch (Exception e) {
@@ -261,11 +232,11 @@ public class MobileSyncReactBridge extends ReactContextBaseJavaModule {
 
     /**
      * Return sync manager to use
-     * @param args Arguments passed to the bridge
+     * @param storeConfig Store configuration
      * @return
      */
-    private SyncManager getSyncManager(ReadableMap args) throws Exception {
-        final SmartStore smartStore = SmartStoreReactBridge.getSmartStore(args);
+    private SyncManager getSyncManager(ReadableMap storeConfig) throws Exception {
+        final SmartStore smartStore = SmartStoreReactBridge.getSmartStore(storeConfig);
         final SyncManager syncManager = SyncManager.getInstance(null, null, smartStore);
         return syncManager;
     }

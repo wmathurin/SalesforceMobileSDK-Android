@@ -26,4 +26,4 @@
  */
 package com.salesforce.androidsdk.auth;
 
-class LegacyAuthenticatorService extends AuthenticatorService { }
+public class LegacyAuthenticatorService extends AuthenticatorService { }

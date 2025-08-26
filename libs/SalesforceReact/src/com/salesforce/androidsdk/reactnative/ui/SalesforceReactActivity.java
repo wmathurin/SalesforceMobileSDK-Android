@@ -35,7 +35,7 @@ import android.widget.Toast;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
-import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.salesforce.androidsdk.reactnative.R;
 import com.salesforce.androidsdk.reactnative.app.SalesforceReactSDKManager;
 import com.salesforce.androidsdk.reactnative.bridge.ReactBridgeHelper;
@@ -169,7 +169,7 @@ public abstract class SalesforceReactActivity extends ReactActivity implements S
             public void authenticatedRestClient(RestClient client) {
                 if (client == null) {
                     SalesforceReactLogger.i(TAG, "login callback triggered with null client");
-                    logout(null);
+                    logout((Promise) null);
                 } else {
                     SalesforceReactLogger.i(TAG, "login callback triggered with actual client");
                     SalesforceReactActivity.this.restartReactNativeApp();
@@ -181,30 +181,29 @@ public abstract class SalesforceReactActivity extends ReactActivity implements S
     /**
      * Method called from bridge to logout.
      *
-     * @param successCallback Success callback.
+     * @param promise Promise to resolve.
      */
-    public void logout(final Callback successCallback) {
+    public void logout(final Promise promise) {
         SalesforceReactLogger.i(TAG, "logout called");
         SalesforceReactSDKManager.getInstance().logout(this);
-        if (successCallback != null) {
-            ReactBridgeHelper.invoke(successCallback, "Logout complete");
+        if (promise != null) {
+            ReactBridgeHelper.resolve(promise, "Logout complete");
         }
     }
 
     /**
      * Method called from bridge to authenticate.
      *
-     * @param successCallback Success callback.
-     * @param errorCallback Error callback.
+     * @param promise Promise to resolve.
      */
-    public void authenticate(final Callback successCallback, final Callback errorCallback) {
+    public void authenticate(final Promise promise) {
         SalesforceReactLogger.i(TAG, "authenticate called");
         clientManager.getRestClient(this, new RestClientCallback() {
 
             @Override
             public void authenticatedRestClient(RestClient client) {
                 SalesforceReactActivity.this.setRestClient(client);
-                getAuthCredentials(successCallback, errorCallback);
+                getAuthCredentials(promise);
             }
         });
     }
@@ -212,19 +211,14 @@ public abstract class SalesforceReactActivity extends ReactActivity implements S
     /**
      * Method called from bridge to get auth credentials.
      *
-     * @param successCallback Success callback.
-     * @param errorCallback Error callback.
+     * @param promise Promise to resolve.
      */
-    public void getAuthCredentials(Callback successCallback, Callback errorCallback) {
+    public void getAuthCredentials(Promise promise) {
         SalesforceReactLogger.i(TAG, "getAuthCredentials called");
         if (client != null) {
-            if (successCallback != null) {
-                ReactBridgeHelper.invoke(successCallback, client.getJSONCredentials());
-            }
+            ReactBridgeHelper.resolve(promise, client.getJSONCredentials());
         } else {
-            if (errorCallback != null) {
-                errorCallback.invoke("Not authenticated");
-            }
+            ReactBridgeHelper.reject(promise, "Not authenticated");
         }
     }
 

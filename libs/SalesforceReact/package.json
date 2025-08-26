@@ -11,7 +11,7 @@
     "jsc-android": "^250231.0.0",
     "react": "19.0.0",
     "react-native": "0.79.3",
-    "react-native-force": "git+https://github.com/forcedotcom/SalesforceMobileSDK-ReactNative.git#dev"
+    "react-native-force": "git+https://github.com/wmathurin/SalesforceMobileSDK-ReactNative.git#turbomodules"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -38,5 +38,16 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "codegenConfig": {
+    "name": "SalesforceReactSpec",
+    "type": "modules",
+    "jsSrcsDir": "node_modules/react-native-force/src/specs",
+    "android": {
+      "javaPackageName": "com.salesforce.androidsdk.reactnative.generated"
+    },
+    "ios": {
+      "moduleName": "SalesforceReactSpec"
+    }
   }
 }
