@@ -66,9 +66,9 @@ public class KeyValueEncryptedFileStore implements KeyValueStore {
     public static final String VERSION_FILE_NAME = "version";
     public static final String KEY_VALUE_STORES = "keyvaluestores";
 
-    private String encryptionKey;
-    private int kvVersion;
-    private final File storeDir;
+    protected String encryptionKey;
+    protected int kvVersion;
+    protected final File storeDir;
 
     /**
      * Constructor
@@ -362,6 +362,13 @@ public class KeyValueEncryptedFileStore implements KeyValueStore {
     }
 
     /**
+     * @return encryption key (for subclass access)
+     */
+    protected String getEncryptionKey() {
+        return encryptionKey;
+    }
+
+    /**
      * Change encryption key
      * All files are read/decrypted with old key and encrypted/written back with new key
      * @param newEncryptionKey
@@ -405,11 +412,11 @@ public class KeyValueEncryptedFileStore implements KeyValueStore {
         return SalesforceKeyGenerator.getSHA256Hash(key);
     }
 
-    private File getKeyFile(String key) {
+    protected File getKeyFile(String key) {
         return new File(storeDir, encodeKey(key) + KEY_SUFFIX);
     }
 
-    private File getValueFile(String key) {
+    protected File getValueFile(String key) {
         String valueFileName = kvVersion == 1 ? encodeKey(key) : encodeKey(key) + VALUE_SUFFIX;
         return new File(storeDir, valueFileName);
     }
@@ -418,7 +425,7 @@ public class KeyValueEncryptedFileStore implements KeyValueStore {
         return new File(storeDir, VERSION_FILE_NAME);
     }
 
-    private boolean isKeyValid(String key, String operation) {
+    protected boolean isKeyValid(String key, String operation) {
         if (TextUtils.isEmpty(key)) {
             SmartStoreLogger.w(TAG, operation + ": Invalid key supplied: " + key);
             return false;
@@ -489,6 +496,7 @@ public class KeyValueEncryptedFileStore implements KeyValueStore {
             }
         }
     }
+
 
     void writeVersion(int kvVersion) {
         try {

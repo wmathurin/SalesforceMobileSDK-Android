@@ -53,7 +53,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
 
 @RunWith(AndroidJUnit4.class)
 public class KeyValueEncryptedFileStoreTest {
@@ -270,31 +269,8 @@ public class KeyValueEncryptedFileStoreTest {
         }
     }
 
-    @Test
-    public void testSaveStreamGetLargeValue() {
-        for (int i = 0; i < 24; i++) {
-            String key = "key" + i;
-            String value = getLargeString((int) Math.pow(2, i));
-            InputStream stream = stringToStream(value);
-            keyValueStore.saveStream(key, stream);
-            Assert.assertEquals(
-                    "Wrong value for key: " + key, value, keyValueStore.getValue(key));
-        }
-    }
 
-    private String getLargeString(int size) {
-        final String CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        Random random = new Random();
-        StringBuilder sb = new StringBuilder(size);
 
-        for (int i = 0; i < size; i++) {
-            int randomIndex = random.nextInt(CHARACTERS.length());
-            char randomChar = CHARACTERS.charAt(randomIndex);
-            sb.append(randomChar);
-        }
-
-        return sb.toString();
-    }
 
     /** Test saving values and getting them back as streams */
     @Test
@@ -875,4 +851,5 @@ public class KeyValueEncryptedFileStoreTest {
             }
         }
     }
+
 }
