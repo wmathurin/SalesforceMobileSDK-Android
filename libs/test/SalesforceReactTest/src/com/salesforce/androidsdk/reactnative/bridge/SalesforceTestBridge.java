@@ -26,9 +26,11 @@
  */
 package com.salesforce.androidsdk.reactnative.bridge;
 
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.salesforce.androidsdk.reactnative.bridge.ReactBridgeHelper;
 import com.salesforce.androidsdk.reactnative.util.TestResult;
 
 public class SalesforceTestBridge extends ReactContextBaseJavaModule {
@@ -45,8 +47,9 @@ public class SalesforceTestBridge extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void markTestCompleted() {
+    public void markTestCompleted(Promise promise) {
         TestResult.recordTestResult(TestResult.success());
+        ReactBridgeHelper.resolve(promise, "Test completed successfully");
     }
 
 }
