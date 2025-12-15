@@ -26,6 +26,8 @@
  */
 package com.salesforce.androidsdk.ui
 
+import android.Manifest
+import android.os.Build
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.BottomAppBar
@@ -39,6 +41,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -51,6 +54,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
+import androidx.test.rule.GrantPermissionRule
 import com.salesforce.androidsdk.R
 import com.salesforce.androidsdk.ui.components.DefaultBottomAppBar
 import com.salesforce.androidsdk.ui.components.DefaultLoadingIndicator
@@ -67,6 +71,14 @@ class LoginViewActivityTest {
 
     @get:Rule
     val androidComposeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    // TODO: Remove if when min SDK version is 33
+    @get:Rule
+    val permissionRule: GrantPermissionRule = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        GrantPermissionRule.grant(Manifest.permission.POST_NOTIFICATIONS)
+    } else {
+        GrantPermissionRule.grant()
+    }
 
     @Test
     fun topAppBar_Default_DisplaysCorrectly() {
@@ -118,11 +130,10 @@ class LoginViewActivityTest {
 
     @Test
     fun topAppBar_ChangeServerButton_OpensServerPicker() {
-        var showPicker: MutableState<Boolean>? = null
+        val showPicker = mutableStateOf(false)
         androidComposeTestRule.setContent {
-            showPicker = remember { mutableStateOf(false) }
             DefaultTopAppBarTestWrapper(
-                showServerPicker = showPicker!!
+                showServerPicker = showPicker
             )
         }
 
@@ -143,10 +154,10 @@ class LoginViewActivityTest {
 
         menu.performClick()
         changeServerButton.assertIsDisplayed()
-        Assert.assertFalse("Picker should not be shown yet.", showPicker!!.value)
+        Assert.assertFalse("Picker should not be shown yet.", showPicker.value)
 
         changeServerButton.performClick()
-        Assert.assertTrue("Picker should be shown.", showPicker!!.value)
+        Assert.assertTrue("Picker should be shown.", showPicker.value)
     }
 
     @Test
@@ -284,8 +295,10 @@ class LoginViewActivityTest {
 
     @Test
     fun loginView_DefaultComponents_DisplayCorrectly() {
+        val dynamicBackgroundColor = mutableStateOf(White)
         androidComposeTestRule.setContent {
             LoginViewTestWrapper(
+                dynamicBackgroundColor = dynamicBackgroundColor,
                 topAppBar = {
                     DefaultTopAppBarTestWrapper(shouldShowBackButton = true)
                 },
@@ -317,8 +330,10 @@ class LoginViewActivityTest {
 
     @Test
     fun loginView_Loading_DisplayCorrectly() {
+        val dynamicBackgroundColor = mutableStateOf(White)
         androidComposeTestRule.setContent {
             LoginViewTestWrapper(
+                dynamicBackgroundColor = dynamicBackgroundColor,
                 topAppBar = {
                     DefaultTopAppBarTestWrapper(shouldShowBackButton = true)
                 },
@@ -371,8 +386,10 @@ class LoginViewActivityTest {
             )
         }
 
+        val dynamicBackgroundColor = mutableStateOf(White)
         androidComposeTestRule.setContent {
             LoginViewTestWrapper(
+                dynamicBackgroundColor = dynamicBackgroundColor,
                 topAppBar = customTopAppBar,
                 loading = true,
                 loadingIndicator = customLoadingIndicator,
@@ -394,7 +411,7 @@ class LoginViewActivityTest {
      */
     @Composable
     private fun DefaultTopAppBarTestWrapper(
-        backgroundColor: Color = Color.White,
+        backgroundColor: Color = White,
         titleText: String = DEFAULT_URL,
         titleTextColor: Color = Color.Black,
         showServerPicker: MutableState<Boolean> = remember { mutableStateOf(false) },
@@ -415,7 +432,7 @@ class LoginViewActivityTest {
      */
     @Composable
     private fun DefaultBottomAppBarTestWrapper(
-        backgroundColor: MutableState<Color> = mutableStateOf(Color.White),
+        backgroundColor: MutableState<Color> = mutableStateOf(White),
         button: LoginViewModel.BottomBarButton? = null,
         loading: Boolean = false,
         showButton: Boolean = true,
@@ -428,6 +445,7 @@ class LoginViewActivityTest {
      */
     @Composable
     private fun LoginViewTestWrapper(
+        dynamicBackgroundColor: MutableState<Color>,
         loginUrlData: LiveData<String> = liveData { DEFAULT_URL },
         topAppBar: @Composable () -> Unit = { DefaultTopAppBarTestWrapper() },
         webView: WebView = WebView(LocalContext.current),
@@ -436,6 +454,6 @@ class LoginViewActivityTest {
         bottomAppBar: @Composable () -> Unit = { DefaultBottomAppBarTestWrapper() },
         showServerPicker: MutableState<Boolean> = mutableStateOf(false),
     ) {
-        LoginView(loginUrlData, topAppBar, webView, loading, loadingIndicator, bottomAppBar, showServerPicker)
+        LoginView(dynamicBackgroundColor, loginUrlData, topAppBar, webView, loading, loadingIndicator, bottomAppBar, showServerPicker)
     }
 }

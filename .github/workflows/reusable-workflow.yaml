@@ -34,7 +34,6 @@ jobs:
         if: ${{ inputs.lib == 'SalesforceHybrid' }}
         run: |
           npm install -g cordova
-          cordova telemetry off
       - name: React Native Dependencies
         if: ${{ inputs.lib  == 'SalesforceReact' }}
         run: npm install -g typescript
@@ -46,7 +45,8 @@ jobs:
         uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: "8.10.1"
+          # This is the actual Gradle version (not AGP), which can be found in the gradle-wrapper.properties file.
+          gradle-version: "8.14.3"
           add-job-summary: on-failure
           add-job-summary-as-pr-comment: on-failure
       - name: Run Lint
@@ -74,6 +74,27 @@ jobs:
           credentials_json: '${{ secrets.GCLOUD_SERVICE_KEY }}'
       - uses: 'google-github-actions/setup-gcloud@v2'
         if: success() || failure()
+      - name: Validate Shard Config
+        if: success() || failure()
+        run: |
+          SHARD_CONFIG=".github/test-shards/${{ inputs.lib }}.json"
+          if [ -f "$SHARD_CONFIG" ]; then
+            # Extract sorted class names from non-remaining shards (strip "class " prefix)
+            CLASSES=$(jq -r '[.shards[] | select(.name != "remaining") | .targets[] | select(startswith("class ")) | ltrimstr("class ")] | sort | .[]' "$SHARD_CONFIG")
+            
+            # Extract sorted notClass names from remaining shard (strip "notClass " prefix)
+            NOT_CLASSES=$(jq -r '[.shards[] | select(.name == "remaining") | .targets[] | select(startswith("notClass ")) | ltrimstr("notClass ")] | sort | .[]' "$SHARD_CONFIG")
+            
+            if [ "$CLASSES" != "$NOT_CLASSES" ]; then
+              echo "::error::Shard config mismatch in $SHARD_CONFIG - classes in shards must exactly match notClass entries in remaining shard"
+              echo "Difference:"
+              diff <(echo "$CLASSES") <(echo "$NOT_CLASSES") || true
+              exit 1
+            fi
+            echo "✓ Shard config valid for ${{ inputs.lib }} ($(echo "$CLASSES" | wc -l | tr -d ' ') classes)"
+          else
+            echo "No shard config for ${{ inputs.lib }}, skipping validation"
+          fi
       - name: Run Tests
         continue-on-error: true
         if: success() || failure()
@@ -88,15 +109,30 @@ jobs:
 
           if $IS_PR ; then
             LEVELS_TO_TEST=$PR_API_VERSION
-            RETRIES=2
+            RETRIES=1
+          fi
+
+          # Build test-targets-for-shard arguments from config file
+          SHARD_CONFIG=".github/test-shards/${{ inputs.lib }}.json"
+          SHARD_ARGS=()
+          if [ -f "$SHARD_CONFIG" ]; then
+            NUM_SHARDS=$(jq '.shards | length' "$SHARD_CONFIG")
+            for i in $(seq 0 $((NUM_SHARDS - 1))); do
+              # Join targets with semicolons for this shard
+              TARGETS=$(jq -r ".shards[$i].targets | join(\";\")" "$SHARD_CONFIG")
+              SHARD_ARGS+=("--test-targets-for-shard=\"${TARGETS}\"")
+            done
+          else
+            SHARD_ARGS=("")
           fi
 
           mkdir firebase_results
+          gcloud components install beta --quiet
           for LEVEL in $LEVELS_TO_TEST
             do
               GCLOUD_RESULTS_DIR=${{ inputs.lib }}-api-${LEVEL}-build-${{github.run_number}}
 
-              gcloud firebase test android run \
+              eval gcloud beta firebase test android run \
                 --project mobile-apps-firebase-test \
                 --type instrumentation \
                 --app "native/NativeSampleApps/RestExplorer/build/outputs/apk/debug/RestExplorer-debug.apk" \
@@ -106,7 +142,8 @@ jobs:
                 --directories-to-pull=/sdcard \
                 --results-dir=${GCLOUD_RESULTS_DIR} \
                 --results-history-name=${{ inputs.lib }} \
-                --timeout=20m --no-auto-google-login --no-record-video --no-performance-metrics \
+                --timeout=30m --no-auto-google-login --no-record-video --no-performance-metrics \
+                "${SHARD_ARGS[@]}" \
                 --num-flaky-test-attempts=${RETRIES} || true
             done
       - name: Copy Test Results
@@ -127,17 +164,25 @@ jobs:
           for LEVEL in $LEVELS_TO_TEST
             do
               GCLOUD_RESULTS_DIR=${{ inputs.lib }}-api-${LEVEL}-build-${{github.run_number}}
+              BUCKET_PATH="gs://test-lab-w87i9sz6q175u-kwp8ium6js0zw/${GCLOUD_RESULTS_DIR}"
 
-              gsutil ls gs://test-lab-w87i9sz6q175u-kwp8ium6js0zw/${GCLOUD_RESULTS_DIR} > /dev/null 2>&1
+              gsutil ls ${BUCKET_PATH} > /dev/null 2>&1
               if [ $? == 0 ] ; then
-                mkdir firebase_${LEVEL}
-                gsutil -m cp -r -U "`gsutil ls gs://test-lab-w87i9sz6q175u-kwp8ium6js0zw/${GCLOUD_RESULTS_DIR} | tail -1`*" ./firebase_${LEVEL}/
-                mv firebase_${LEVEL}/test_result_1.xml firebase_results/api_${LEVEL}_test_result.xml
+                # Copy XML file for test reporting
+                if gsutil ls "${BUCKET_PATH}/*test_results_merged.xml" > /dev/null 2>&1; then
+                  # Sharded runs produce test_results_merged.xml at top level
+                  gsutil cp "${BUCKET_PATH}/*test_results_merged.xml" firebase_results/api_${LEVEL}_test_result.xml
+                else
+                  gsutil cp "${BUCKET_PATH}/*/test_result_1.xml" firebase_results/api_${LEVEL}_test_result.xml
+                fi
+
+                # Copy all shard data for code coverage (only needed for one level)
+                if [ "$LEVEL" == "$PR_API_VERSION" ] ; then
+                  mkdir -p firebase
+                  gsutil -m cp -r -U "${BUCKET_PATH}/*" ./firebase/
+                fi
               fi
             done
-
-            # Move one result to the directory expected for code coverge.
-            mv firebase_${PR_API_VERSION} firebase
       - name: Test Report
         uses: mikepenz/action-junit-report@v5
         if: success() || failure()

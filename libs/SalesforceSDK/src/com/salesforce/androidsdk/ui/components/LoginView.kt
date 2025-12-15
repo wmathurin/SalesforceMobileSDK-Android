@@ -29,6 +29,7 @@ package com.salesforce.androidsdk.ui.components
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Configuration
+import android.os.Build
 import android.webkit.WebView
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -36,19 +37,24 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -106,8 +112,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.salesforce.androidsdk.R.string.sf__back_button_content_description
-import com.salesforce.androidsdk.R.string.sf__clear_cookies
 import com.salesforce.androidsdk.R.string.sf__clear_cache
+import com.salesforce.androidsdk.R.string.sf__clear_cookies
 import com.salesforce.androidsdk.R.string.sf__launch_idp
 import com.salesforce.androidsdk.R.string.sf__loading_indicator
 import com.salesforce.androidsdk.R.string.sf__more_options
@@ -190,6 +196,7 @@ fun LoginView() {
     }
 
     LoginView(
+        dynamicBackgroundColor = viewModel.dynamicBackgroundColor,
         loginUrlData = viewModel.loginUrl,
         topAppBar = topAppBar,
         webView = activity.webView,
@@ -202,6 +209,7 @@ fun LoginView() {
 
 @Composable
 internal fun LoginView(
+    dynamicBackgroundColor: MutableState<Color>,
     loginUrlData: LiveData<String>,
     topAppBar: @Composable () -> Unit,
     webView: WebView,
@@ -217,21 +225,27 @@ internal fun LoginView(
     )
 
     Scaffold(
-        topBar = topAppBar,
         bottomBar = bottomAppBar,
+        contentWindowInsets = WindowInsets.safeDrawing,
+        topBar = topAppBar,
     ) { innerPadding ->
-        if (loading) {
-            loadingIndicator()
-        }
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Load the WebView as a composable
+            AndroidView(
+                modifier = Modifier
+                    .background(dynamicBackgroundColor.value)
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .applyImePaddingConditionally()
+                    .graphicsLayer(alpha = alpha),
+                factory = { webView },
+                update = { it.loadUrl(loginUrl.value ?: "") },
+            )
 
-        // Load the WebView as a composable
-        AndroidView(
-            modifier = Modifier
-                .padding(innerPadding)
-                .graphicsLayer(alpha = alpha),
-            factory = { webView },
-            update = { it.loadUrl(loginUrl.value ?: "") },
-        )
+            if (loading) {
+                loadingIndicator()
+            }
+        }
 
         if (showServerPicker.value) {
             PickerBottomSheet(PickerStyle.LoginServerPicker)
@@ -467,6 +481,15 @@ private tailrec fun Context.getActivity(): FragmentActivity? = when (this) {
     is ContextWrapper -> baseContext.getActivity()
     else -> null
 }
+
+@Composable
+private fun Modifier.applyImePaddingConditionally() : Modifier =
+    // TODO:  Remove when min API is > 29
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        windowInsetsPadding(WindowInsets.ime)
+    } else {
+        this
+    }
 
 // Note: the light and dark previews should look the same.
 @Preview

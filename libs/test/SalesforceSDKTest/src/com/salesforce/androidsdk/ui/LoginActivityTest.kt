@@ -36,6 +36,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.salesforce.androidsdk.app.SalesforceSDKManager
 import com.salesforce.androidsdk.ui.LoginActivity.Companion.EXTRA_KEY_LOGIN_HINT
 import com.salesforce.androidsdk.ui.LoginActivity.Companion.EXTRA_KEY_LOGIN_HOST
+import com.salesforce.androidsdk.ui.LoginActivity.Companion.SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CALLBACK_URL
+import com.salesforce.androidsdk.ui.LoginActivity.Companion.SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CLIENT_ID
+import com.salesforce.androidsdk.ui.LoginActivity.Companion.SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CLIENT_VERSION
+import com.salesforce.androidsdk.ui.LoginActivity.Companion.SALESFORCE_WELCOME_DISCOVERY_URL_PATH
+import com.salesforce.androidsdk.ui.LoginActivity.Companion.isSalesforceWelcomeDiscoveryMobileUrl
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -184,6 +189,98 @@ class LoginActivityTest {
                 assertTrue(activity.webView.settings.domStorageEnabled)
                 assertTrue(activity.webView.settings.javaScriptEnabled)
                 assertEquals(expectedUserAgent, activity.webView.settings.userAgentString)
+            }
+        }
+    }
+
+    @Test
+    fun testIsWelcomeDiscoveryUri() {
+        val supportWelcomeDiscovery = SalesforceSDKManager.getInstance().supportsWelcomeDiscovery
+        SalesforceSDKManager.getInstance().supportsWelcomeDiscovery = false
+
+        val validUrl = "https://welcome.salesforce.com$SALESFORCE_WELCOME_DISCOVERY_URL_PATH?$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CLIENT_ID=X&$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CLIENT_VERSION=Y&$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CALLBACK_URL=Z"
+
+        assertFalse(isSalesforceWelcomeDiscoveryMobileUrl(validUrl.toUri()))
+
+        SalesforceSDKManager.getInstance().supportsWelcomeDiscovery = true
+
+        val nonHierarchicalUri = "mailto:test@example.com"
+
+        val incorrectPathUrl = "https://welcome.salesforce.com/other/path?$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CLIENT_ID=X&$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CLIENT_VERSION=Y&$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CALLBACK_URL=Z"
+        val emptyPathUrl = "https://welcome.salesforce.com?/$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CLIENT_ID=X&$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CLIENT_VERSION=Y&$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CALLBACK_URL=Z"
+        val missingPathUrl = "https://welcome.salesforce.com?$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CLIENT_ID=X&$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CLIENT_VERSION=Y&$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CALLBACK_URL=Z"
+
+        val missingClientIdUrl = "https://welcome.salesforce.com$SALESFORCE_WELCOME_DISCOVERY_URL_PATH?$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CLIENT_VERSION=Y&$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CALLBACK_URL=Z"
+        val missingClientVersionUrl = "https://welcome.salesforce.com$SALESFORCE_WELCOME_DISCOVERY_URL_PATH?$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CLIENT_ID=X&$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CALLBACK_URL=Z"
+        val missingCallbackUrl = "https://welcome.salesforce.com$SALESFORCE_WELCOME_DISCOVERY_URL_PATH?$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CLIENT_ID=X&$SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CLIENT_VERSION=Y"
+
+        val otherUrl = "https://login.salesforce.com"
+
+        assertTrue("Valid URI should return true", isSalesforceWelcomeDiscoveryMobileUrl(validUrl.toUri()))
+
+        assertFalse("Non-hierarchical URI should return false", isSalesforceWelcomeDiscoveryMobileUrl(nonHierarchicalUri.toUri()))
+
+        assertFalse("Incorrect path URI should return false", isSalesforceWelcomeDiscoveryMobileUrl(incorrectPathUrl.toUri()))
+        assertFalse("Empty path URI should return false", isSalesforceWelcomeDiscoveryMobileUrl(emptyPathUrl.toUri()))
+        assertFalse("Missing path URI should return false", isSalesforceWelcomeDiscoveryMobileUrl(missingPathUrl.toUri()))
+
+        assertFalse("Missing client id parameter should return false", isSalesforceWelcomeDiscoveryMobileUrl(missingClientIdUrl.toUri()))
+
+        assertFalse("Missing client version parameter should return false", isSalesforceWelcomeDiscoveryMobileUrl(missingClientVersionUrl.toUri()))
+
+        assertFalse("Missing callback URL parameter should return false", isSalesforceWelcomeDiscoveryMobileUrl(missingCallbackUrl.toUri()))
+
+        assertFalse("Non-welcome URL should return false", isSalesforceWelcomeDiscoveryMobileUrl(otherUrl.toUri()))
+
+        SalesforceSDKManager.getInstance().supportsWelcomeDiscovery = supportWelcomeDiscovery
+    }
+
+    @Test
+    fun loginActivity_ReloadsWebview_OnResumeWithLoginOptionChanges() {
+        // Set loginDevMenuReload to false initially
+        SalesforceSDKManager.getInstance().loginDevMenuReload = false
+        
+        launch<LoginActivity>(
+            Intent(
+                getApplicationContext(),
+                LoginActivity::class.java
+            )
+        ).use { activityScenario ->
+            // Get the initial login URL
+            var initialUrl: String? = null
+            activityScenario.onActivity { activity ->
+                initialUrl = activity.viewModel.loginUrl.value
+            }
+            
+            // Pause the activity (simulating going to dev menu)
+            activityScenario.moveToState(androidx.lifecycle.Lifecycle.State.STARTED)
+            
+            // Simulate changing login options in dev menu
+            activityScenario.onActivity { _ ->
+                SalesforceSDKManager.getInstance().loginDevMenuReload = true
+            }
+            
+            // Resume the activity
+            activityScenario.moveToState(androidx.lifecycle.Lifecycle.State.RESUMED)
+            
+            // Verify the webview was reloaded (URL should be regenerated)
+            activityScenario.onActivity { activity ->
+                // The reload flag should be reset to false
+                assertFalse(
+                    "loginDevMenuReload should be reset to false after reload",
+                    SalesforceSDKManager.getInstance().loginDevMenuReload
+                )
+                
+                // For Web Server Flow, the URL changes each time due to code challenge
+                // Verify that reloadWebView was called by checking the URL changed
+                val newUrl = activity.viewModel.loginUrl.value
+                if (SalesforceSDKManager.getInstance().useWebServerAuthentication) {
+                    // Web Server Flow generates a new code challenge each time
+                    assertTrue(
+                        "Login URL should have changed after reload for Web Server Flow",
+                        newUrl != initialUrl
+                    )
+                }
             }
         }
     }
