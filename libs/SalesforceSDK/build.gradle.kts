@@ -24,6 +24,7 @@ dependencies {
     api("androidx.browser:browser:1.10.0")
     api("androidx.work:work-runtime-ktx:2.11.2")
 
+    implementation("com.google.android.play:integrity:1.6.0")
     implementation("com.google.accompanist:accompanist-drawablepainter:0.37.3")
     implementation("com.google.android.material:material:1.13.0")  // remove this when all XML is gone
     implementation("androidx.appcompat:appcompat:1.7.1")
