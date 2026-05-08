@@ -73,6 +73,7 @@ import com.salesforce.androidsdk.security.SalesforceKeyGenerator.getSHA256Hash
 import com.salesforce.androidsdk.ui.LoginActivity.Companion.ABOUT_BLANK
 import com.salesforce.androidsdk.ui.LoginActivity.Companion.isSalesforceWelcomeDiscoveryUrlPath
 import com.salesforce.androidsdk.util.SalesforceSDKLogger.e
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Job
@@ -80,7 +81,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.net.URI
-import kotlin.coroutines.CoroutineContext
 
 open class LoginViewModel(val bootConfig: BootConfig) : ViewModel() {
 
@@ -446,7 +446,7 @@ open class LoginViewModel(val bootConfig: BootConfig) : ViewModel() {
      * Generates an OAuth authorization URL for token migration given a login
      * [server] and [migrationOAuthConfig].
      */
-    internal suspend fun generateMigrationAuthorizationPath (
+    internal suspend fun generateMigrationAuthorizationPath(
         server: String,
         migrationOAuthConfig: OAuthConfig,
         sdkManager: SalesforceSDKManager = SalesforceSDKManager.getInstance(),
@@ -527,6 +527,7 @@ open class LoginViewModel(val bootConfig: BootConfig) : ViewModel() {
                 val attestation = createAppAttestation(challenge) ?: return@run
                 additionalParams[ATTESTATION] = attestation
             }
+
 
             val webServerAuthorizationUrl = OAuth2.getAuthorizationUrl(
                 /* useWebServerAuthentication = */ true,
