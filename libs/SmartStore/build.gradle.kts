@@ -12,7 +12,7 @@ plugins {
 dependencies {
     api(project(":libs:SalesforceSDK"))
     api("androidx.sqlite:sqlite:2.6.2")
-    api("net.zetetic:sqlcipher-android:4.15.0")
+    api("net.zetetic:sqlcipher-android:4.16.0")
     implementation("androidx.core:core-ktx:1.18.0")
     androidTestImplementation("androidx.test:runner:1.7.0")
     androidTestImplementation("androidx.test:rules:1.7.0")

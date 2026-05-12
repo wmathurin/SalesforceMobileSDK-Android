@@ -178,7 +178,9 @@ When creating the PR:
 
 Recent SQLCipher updates in the project:
 
-- **4.10.0** - Current version (PR #2744)
+- **4.16.0** - SQLite 3.53.1, LibTomCrypt 1.18.2 (2026-05-12)
+- **4.15.0** - Previous version
+- **4.10.0** - Previous version (PR #2744)
 - **4.9.0** - Previous version (PR #2717)
 - **4.7.2** - Introduced `onCorruption()` API change (PR #2698)
 - **4.6.1** - Stable version (PR #2605)
