@@ -29,10 +29,10 @@ package com.salesforce.samples.authflowtester
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.salesforce.samples.authflowtester.testUtility.AuthFlowTest
-import com.salesforce.samples.authflowtester.testUtility.KnownAppConfig.ECA_OPAQUE
 import com.salesforce.samples.authflowtester.testUtility.KnownAppConfig.ECA_JWT
-import com.salesforce.samples.authflowtester.testUtility.ScopeSelection.SUBSET
+import com.salesforce.samples.authflowtester.testUtility.KnownAppConfig.ECA_OPAQUE
 import com.salesforce.samples.authflowtester.testUtility.ScopeSelection.ALL
+import com.salesforce.samples.authflowtester.testUtility.ScopeSelection.SUBSET
 import org.junit.Test
 import org.junit.runner.RunWith
 

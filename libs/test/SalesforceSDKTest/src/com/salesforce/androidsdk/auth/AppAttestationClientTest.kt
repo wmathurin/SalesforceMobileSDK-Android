@@ -45,6 +45,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
@@ -267,7 +268,7 @@ class AppAttestationClientTest {
     }
 
     @Test
-    fun appAttestationClient_fetchMobileAppAttestationChallenge_OnSuccess_ReturnsChallenge() {
+    fun appAttestationClient_fetchMobileAppAttestationChallenge_OnSuccess_ReturnsChallenge() = runTest {
 
         val requestSlot = slot<RestRequest>()
         val restClient = createRestClientReturning(
@@ -279,6 +280,8 @@ class AppAttestationClientTest {
         val result = appAttestationClient.fetchMobileAppAttestationChallenge()
 
         assertEquals(TEST_CHALLENGE_VALUE, result)
+        verify(exactly = 1) { restClient.sendSync(any()) }
+        assertTrue("Request slot should have captured a request", requestSlot.isCaptured)
         val requestedPath = requestSlot.captured.path
         assertTrue(
             "Request URL should target the attestation challenge endpoint at '$TEST_API_HOST_NAME' but was '$requestedPath'.",
@@ -292,7 +295,6 @@ class AppAttestationClientTest {
             "Request URL should contain 'consumerKey=$TEST_REMOTE_ACCESS_CONSUMER_KEY' but was '$requestedPath'.",
             requestedPath.contains("consumerKey=$TEST_REMOTE_ACCESS_CONSUMER_KEY"),
         )
-        verify(exactly = 1) { restClient.sendSync(any()) }
     }
 
     @Test
@@ -304,7 +306,9 @@ class AppAttestationClientTest {
         val appAttestationClient = createAppAttestationClientForTest(restClient = restClient)
 
         assertThrows(AppAttestationChallengeApiException::class.java) {
-            appAttestationClient.fetchMobileAppAttestationChallenge()
+            runBlocking {
+                appAttestationClient.fetchMobileAppAttestationChallenge()
+            }
         }
     }
 
@@ -317,9 +321,55 @@ class AppAttestationClientTest {
         val appAttestationClient = createAppAttestationClientForTest(restClient = restClient)
 
         assertThrows(AppAttestationChallengeApiException::class.java) {
-            appAttestationClient.fetchMobileAppAttestationChallenge()
+            runBlocking {
+                appAttestationClient.fetchMobileAppAttestationChallenge()
+            }
         }
     }
+
+    @Test
+    fun appAttestationClient_fetchMobileAppAttestationChallenge_WhenApiHostNameIsNull_ReturnsNull() = runTest {
+
+        val appAttestationClient = createAppAttestationClientForTest(apiHostName = null)
+
+        val result = appAttestationClient.fetchMobileAppAttestationChallenge()
+
+        assertNull(result)
+    }
+
+    @Test
+    fun appAttestationClient_fetchMobileAppAttestationChallenge_WhenRemoteConsumerKeyIsNull_ReturnsNull() = runTest {
+
+        val appAttestationClient = createAppAttestationClientForTest(
+            remoteAccessConsumerKeyProvider = RemoteAccessConsumerKeyProvider { null }
+        )
+
+        val result = appAttestationClient.fetchMobileAppAttestationChallenge()
+
+        assertNull(result)
+    }
+
+    // region Blocking Wrapper Test
+
+    /**
+     * Tests the blocking wrapper delegates to the suspend function correctly.
+     * Functionality is fully covered by the suspend function tests.
+     */
+    @Test
+    fun appAttestationClient_fetchMobileAppAttestationChallengeBlocking_DelegatesToSuspendFunction() {
+
+        val restClient = createRestClientReturning(
+            restResponse = createRestResponse(body = TEST_CHALLENGE_VALUE, success = true),
+        )
+        val appAttestationClient = createAppAttestationClientForTest(restClient = restClient)
+
+        val result = appAttestationClient.fetchMobileAppAttestationChallengeBlocking()
+
+        assertEquals(TEST_CHALLENGE_VALUE, result)
+        verify(exactly = 1) { restClient.sendSync(any()) }
+    }
+
+    // endregion Blocking Wrapper Test
 
     @Test
     fun oAuthAuthorizationAttestation_encode_returnsSuccessfully() {
@@ -356,15 +406,16 @@ class AppAttestationClientTest {
     private fun createAppAttestationClientForTest(
         restClient: RestClient = createSuccessfulRestClientForChallenge(),
         integrityManager: StandardIntegrityManager = createMockIntegrityManagerWithInertProviderTask(),
+        apiHostName: String? = TEST_API_HOST_NAME,
+        remoteAccessConsumerKeyProvider: RemoteAccessConsumerKeyProvider = RemoteAccessConsumerKeyProvider { TEST_REMOTE_ACCESS_CONSUMER_KEY },
     ): AppAttestationClient = AppAttestationClient(
-        apiHostName = TEST_API_HOST_NAME,
         context = mockk<Context>(relaxed = true),
         deviceId = TEST_DEVICE_ID,
         googleCloudProjectId = TEST_GOOGLE_CLOUD_PROJECT_ID,
         integrityManager = integrityManager,
-        remoteAccessConsumerKey = TEST_REMOTE_ACCESS_CONSUMER_KEY,
+        remoteAccessConsumerKeyProvider = remoteAccessConsumerKeyProvider,
         restClient = restClient,
-    )
+    ).also { it.apiHostName = apiHostName }
 
     private fun createSuccessfulRestClientForChallenge(): RestClient = createRestClientReturning(
         restResponse = createRestResponse(body = TEST_CHALLENGE_VALUE, success = true),

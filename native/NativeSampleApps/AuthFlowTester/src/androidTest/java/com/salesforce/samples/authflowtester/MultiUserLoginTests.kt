@@ -30,20 +30,20 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.salesforce.samples.authflowtester.testUtility.AuthFlowTest
 import com.salesforce.samples.authflowtester.testUtility.KnownAppConfig
-import com.salesforce.samples.authflowtester.testUtility.KnownAppConfig.CA_OPAQUE
-import com.salesforce.samples.authflowtester.testUtility.KnownAppConfig.ECA_OPAQUE
-import com.salesforce.samples.authflowtester.testUtility.KnownAppConfig.ECA_JWT
-import com.salesforce.samples.authflowtester.testUtility.KnownAppConfig.BEACON_OPAQUE
 import com.salesforce.samples.authflowtester.testUtility.KnownAppConfig.BEACON_JWT
+import com.salesforce.samples.authflowtester.testUtility.KnownAppConfig.BEACON_OPAQUE
+import com.salesforce.samples.authflowtester.testUtility.KnownAppConfig.CA_OPAQUE
+import com.salesforce.samples.authflowtester.testUtility.KnownAppConfig.ECA_JWT
+import com.salesforce.samples.authflowtester.testUtility.KnownAppConfig.ECA_OPAQUE
 import com.salesforce.samples.authflowtester.testUtility.KnownLoginHostConfig
 import com.salesforce.samples.authflowtester.testUtility.KnownLoginHostConfig.REGULAR_AUTH
 import com.salesforce.samples.authflowtester.testUtility.KnownUserConfig
 import com.salesforce.samples.authflowtester.testUtility.ScopeSelection
 import com.salesforce.samples.authflowtester.testUtility.ScopeSelection.ALL
-import com.salesforce.samples.authflowtester.testUtility.ScopeSelection.SUBSET
 import com.salesforce.samples.authflowtester.testUtility.ScopeSelection.EMPTY
-import org.junit.Assert.assertNotEquals
+import com.salesforce.samples.authflowtester.testUtility.ScopeSelection.SUBSET
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 
