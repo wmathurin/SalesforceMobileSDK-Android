@@ -15,6 +15,7 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.20")
         classpath("org.jetbrains.kotlin:compose-compiler-gradle-plugin:2.3.21")
         classpath("org.jacoco:org.jacoco.core:0.8.14")
+        classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.9.20")
     }
 }
 
@@ -31,4 +32,17 @@ allprojects {
             languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0)
         }
     }
+}
+
+apply(plugin = "org.jetbrains.dokka")
+
+subprojects {
+    if (path.startsWith(":libs:")) {
+        apply(plugin = "org.jetbrains.dokka")
+    }
+}
+
+tasks.named<org.jetbrains.dokka.gradle.DokkaMultiModuleTask>("dokkaHtmlMultiModule") {
+    moduleName.set("SalesforceSDK 14.0 API")
+    outputDirectory.set(rootDir.resolve("doc"))
 }
