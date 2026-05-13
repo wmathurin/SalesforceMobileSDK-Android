@@ -1,0 +1,183 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>SfapApiClient</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../../index.html">
+                            SalesforceSDK 14.0 API
+                    </a>            </div>
+            <div class="library-version">14.0.0
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":libs:SalesforceSDK:dokkaHtmlPartial/release">androidJvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="SalesforceSDK::com.salesforce.androidsdk.rest/SfapApiClient///PointingToDeclaration//1930946404">
+  <div class="breadcrumbs"><a href="../../index.html">SalesforceSDK</a><span class="delimiter">/</span><a href="../index.html">com.salesforce.androidsdk.rest</a><span class="delimiter">/</span><span class="current">SfapApiClient</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Sfap</span><wbr><span>Api</span><wbr><span><span>Client</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">SfapApiClient</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">apiHostName<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">modelName<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">restClient<span class="token operator">: </span><a href="../-rest-client/index.html">RestClient</a></span></span><span class="token punctuation">)</span></div><p class="paragraph">Provides REST client methods for a variety of <code class="lang-kotlin">sfap_api</code> endpoints.</p><ul><li><p class="paragraph"><code class="lang-kotlin">chat-generations</code></p></li><li><p class="paragraph"><code class="lang-kotlin">embeddings</code></p></li><li><p class="paragraph"><code class="lang-kotlin">feedback</code></p></li><li><p class="paragraph"><code class="lang-kotlin">generations</code></p></li></ul><p class="paragraph">See https://developer.salesforce.com/docs/einstein/genai/guide/access-models-api-with-rest.html</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>api</span><wbr><span>Host</span><wbr><span><span>Name</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The Salesforce <code class="lang-kotlin">sfap_api</code> hostname</p></div></div></div></div><div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>model</span><wbr><span><span>Name</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The model name to request from.  For possible values, see https://developer.salesforce.com/docs/einstein/genai/guide/api-names.html. Note that the <code class="lang-kotlin">embeddings</code> endpoint requires an embeddings-enabled model such as <code class="lang-kotlin">sfdc_ai__DefaultOpenAITextEmbeddingAda_002</code>.  Also note that submitting to the <code class="lang-kotlin">feedback</code> endpoint does not require value for this parameter</p></div></div></div></div><div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>rest</span><wbr><span><span>Client</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The REST client to use</p></div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="1517801349%2FConstructors%2F1930946404" anchor-label="SfapApiClient" id="1517801349%2FConstructors%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sfap-api-client.html"><span>Sfap</span><wbr><span>Api</span><wbr><span><span>Client</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1517801349%2FConstructors%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">apiHostName<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">modelName<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">restClient<span class="token operator">: </span><a href="../-rest-client/index.html">RestClient</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="-199626710%2FClasslikes%2F1930946404" anchor-label="Companion" id="-199626710%2FClasslikes%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-199626710%2FClasslikes%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-796368451%2FFunctions%2F1930946404" anchor-label="fetchGeneratedChat" id="-796368451%2FFunctions%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="fetch-generated-chat.html"><span>fetch</span><wbr><span>Generated</span><wbr><span><span>Chat</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-796368451%2FFunctions%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="fetch-generated-chat.html"><span class="token function">fetchGeneratedChat</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">requestBody<span class="token operator">: </span><a href="../-sfap-api-chat-generations-request-body/index.html">SfapApiChatGenerationsRequestBody</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-sfap-api-chat-generations-response-body/index.html">SfapApiChatGenerationsResponseBody</a></div><div class="brief "><p class="paragraph">Fetches generated chat responses from the <code class="lang-kotlin">sfap_api</code> <code class="lang-kotlin">chat-generations</code> endpoint.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="769282310%2FFunctions%2F1930946404" anchor-label="fetchGeneratedEmbeddings" id="769282310%2FFunctions%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="fetch-generated-embeddings.html"><span>fetch</span><wbr><span>Generated</span><wbr><span><span>Embeddings</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="769282310%2FFunctions%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="fetch-generated-embeddings.html"><span class="token function">fetchGeneratedEmbeddings</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">requestBody<span class="token operator">: </span><a href="../-sfap-api-embeddings-request-body/index.html">SfapApiEmbeddingsRequestBody</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-sfap-api-embeddings-response-body/index.html">SfapApiEmbeddingsResponseBody</a></div><div class="brief "><p class="paragraph">Submit a request to the <code class="lang-kotlin">sfap_api</code> <code class="lang-kotlin">embeddings</code> endpoint.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1414767537%2FFunctions%2F1930946404" anchor-label="fetchGeneratedText" id="-1414767537%2FFunctions%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="fetch-generated-text.html"><span>fetch</span><wbr><span>Generated</span><wbr><span><span>Text</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1414767537%2FFunctions%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="fetch-generated-text.html"><span class="token function">fetchGeneratedText</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">prompt<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-sfap-api-generations-response-body/index.html">SfapApiGenerationsResponseBody</a></div><div class="brief "><p class="paragraph">Fetches generated text from the <code class="lang-kotlin">sfap_api</code> "generations" endpoint.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1155657403%2FFunctions%2F1930946404" anchor-label="submitGeneratedTextFeedback" id="1155657403%2FFunctions%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="submit-generated-text-feedback.html"><span>submit</span><wbr><span>Generated</span><wbr><span>Text</span><wbr><span><span>Feedback</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1155657403%2FFunctions%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="submit-generated-text-feedback.html"><span class="token function">submitGeneratedTextFeedback</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">requestBody<span class="token operator">: </span><a href="../-sfap-api-feedback-request-body/index.html">SfapApiFeedbackRequestBody</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-sfap-api-feedback-response-body/index.html">SfapApiFeedbackResponseBody</a></div><div class="brief "><p class="paragraph">Submits feedback for previously generated text from the <code class="lang-kotlin">sfap_api</code> endpoints to the <code class="lang-kotlin">sfap_api</code> <code class="lang-kotlin">feedback</code> endpoint.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2026 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

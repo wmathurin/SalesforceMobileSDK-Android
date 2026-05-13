@@ -1,0 +1,397 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>ClientManager</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../../index.html">
+                            SalesforceSDK 14.0 API
+                    </a>            </div>
+            <div class="library-version">14.0.0
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":libs:SalesforceSDK:dokkaHtmlPartial/release">androidJvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="SalesforceSDK::com.salesforce.androidsdk.rest/ClientManager///PointingToDeclaration//1930946404">
+  <div class="breadcrumbs"><a href="../../index.html">SalesforceSDK</a><span class="delimiter">/</span><a href="../index.html">com.salesforce.androidsdk.rest</a><span class="delimiter">/</span><span class="current">ClientManager</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Client</span><wbr><span><span>Manager</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="index.html">ClientManager</a></div><p class="paragraph">ClientManager is a factory class for RestClient which stores OAuth credentials in the AccountManager. If no account is found, it kicks off the login flow which creates a new account if successful.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-264885424%2FConstructors%2F1930946404" anchor-label="ClientManager" id="-264885424%2FConstructors%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-client-manager.html"><span>Client</span><wbr><span><span>Manager</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-264885424%2FConstructors%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/content/Context.html">Context</a><span class="token punctuation">, </span></span><span class="parameter ">accountType<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">revokedTokenShouldLogout<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief ">Construct a ClientManager using a custom account type.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="1533874572%2FClasslikes%2F1930946404" anchor-label="AccMgrAuthTokenProvider" id="1533874572%2FClasslikes%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-acc-mgr-auth-token-provider/index.html"><span>Acc</span><wbr><span>Mgr</span><wbr><span>Auth</span><wbr><span>Token</span><wbr><span><span>Provider</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1533874572%2FClasslikes%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="-acc-mgr-auth-token-provider/index.html">AccMgrAuthTokenProvider</a> : <a href="../-rest-client/-auth-token-provider/index.html">RestClient.AuthTokenProvider</a></div><div class="brief ">AuthTokenProvider implementation that calls out to the AccountManager to get a new access token.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-371056122%2FClasslikes%2F1930946404" anchor-label="AccountInfoNotFoundException" id="-371056122%2FClasslikes%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-account-info-not-found-exception/index.html"><span>Account</span><wbr><span>Info</span><wbr><span>Not</span><wbr><span>Found</span><wbr><span><span>Exception</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-371056122%2FClasslikes%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="-account-info-not-found-exception/index.html">AccountInfoNotFoundException</a> : <a href="https://developer.android.com/reference/kotlin/java/lang/RuntimeException.html">RuntimeException</a></div><div class="brief ">Exception thrown when no account could be found (during a <a href="peek-rest-client.html">peekRestClient</a> call)</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-238898521%2FClasslikes%2F1930946404" anchor-label="RestClientCallback" id="-238898521%2FClasslikes%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-rest-client-callback/index.html"><span>Rest</span><wbr><span>Client</span><wbr><span><span>Callback</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-238898521%2FClasslikes%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-rest-client-callback/index.html">RestClientCallback</a></div><div class="brief ">RestClientCallback interface.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-1218514013%2FProperties%2F1930946404" anchor-label="ACCESS_TOKEN_REFRESH_INTENT" id="-1218514013%2FProperties%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-c-c-e-s-s_-t-o-k-e-n_-r-e-f-r-e-s-h_-i-n-t-e-n-t.html"><span><span>ACCESS_TOKEN_REFRESH_INTENT</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1218514013%2FProperties%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-c-c-e-s-s_-t-o-k-e-n_-r-e-f-r-e-s-h_-i-n-t-e-n-t.html">ACCESS_TOKEN_REFRESH_INTENT</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token operator"> = </span><span class="token string">"access_token_refeshed"</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-426022494%2FProperties%2F1930946404" anchor-label="ACCESS_TOKEN_REVOKE_INTENT" id="-426022494%2FProperties%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-c-c-e-s-s_-t-o-k-e-n_-r-e-v-o-k-e_-i-n-t-e-n-t.html"><span><span>ACCESS_TOKEN_REVOKE_INTENT</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-426022494%2FProperties%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-c-c-e-s-s_-t-o-k-e-n_-r-e-v-o-k-e_-i-n-t-e-n-t.html">ACCESS_TOKEN_REVOKE_INTENT</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token operator"> = </span><span class="token string">"access_token_revoked"</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1263271702%2FProperties%2F1930946404" anchor-label="accountManager" id="1263271702%2FProperties%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="account-manager.html"><span>account</span><wbr><span><span>Manager</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1263271702%2FProperties%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="account-manager.html">accountManager</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/accounts/AccountManager.html">AccountManager</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2035256035%2FProperties%2F1930946404" anchor-label="accountType" id="-2035256035%2FProperties%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="account-type.html"><span>account</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2035256035%2FProperties%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="account-type.html">accountType</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-213099874%2FProperties%2F1930946404" anchor-label="INSTANCE_URL_UPDATE_INTENT" id="-213099874%2FProperties%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-i-n-s-t-a-n-c-e_-u-r-l_-u-p-d-a-t-e_-i-n-t-e-n-t.html"><span><span>INSTANCE_URL_UPDATE_INTENT</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-213099874%2FProperties%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="-i-n-s-t-a-n-c-e_-u-r-l_-u-p-d-a-t-e_-i-n-t-e-n-t.html">INSTANCE_URL_UPDATE_INTENT</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token operator"> = </span><span class="token string">"instance_url_updated"</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="891834792%2FFunctions%2F1930946404" anchor-label="createNewAccount" id="891834792%2FFunctions%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="create-new-account.html"><span>create</span><wbr><span>New</span><wbr><span><span>Account</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="891834792%2FFunctions%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="create-new-account.html"><span class="token function">createNewAccount</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">userAccount<span class="token operator">: </span><a href="../../com.salesforce.androidsdk.accounts/-user-account/index.html">UserAccount</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/os/Bundle.html">Bundle</a></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="create-new-account.html"><span class="token function"><strike>createNewAccount</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">accountName<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">username<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">refreshToken<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">authToken<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">instanceUrl<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">loginUrl<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">idUrl<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">clientId<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">orgId<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">userId<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">communityId<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">communityUrl<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">firstName<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">lastName<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">displayName<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">email<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">photoUrl<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">thumbnailUrl<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">additionalOauthValues<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/util/Map.html">Map</a><span class="token operator">&lt;</span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">lightningDomain<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">lightningSid<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">vfDomain<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">vfSid<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">contentDomain<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">contentSid<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">csrfToken<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">nativeLogin<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/Boolean.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">language<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">locale<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/os/Bundle.html">Bundle</a></div><div class="brief ">Creates a new account and returns the parameters as a Bundle.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-329291201%2FFunctions%2F1930946404" anchor-label="getAccount" id="-329291201%2FFunctions%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-account.html"><span>get</span><wbr><span><span>Account</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-329291201%2FFunctions%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="get-account.html"><span class="token function">getAccount</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/accounts/Account.html">Account</a></div><div class="brief ">Returns the user account that is currently active.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-279091368%2FFunctions%2F1930946404" anchor-label="getAccountByName" id="-279091368%2FFunctions%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-account-by-name.html"><span>get</span><wbr><span>Account</span><wbr><span>By</span><wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-279091368%2FFunctions%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="get-account-by-name.html"><span class="token function">getAccountByName</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/accounts/Account.html">Account</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-51837848%2FFunctions%2F1930946404" anchor-label="getAccounts" id="-51837848%2FFunctions%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-accounts.html"><span>get</span><wbr><span><span>Accounts</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-51837848%2FFunctions%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="get-accounts.html"><span class="token function">getAccounts</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://developer.android.com/reference/kotlin/android/accounts/Account.html">Account</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1024634482%2FFunctions%2F1930946404" anchor-label="getRestClient" id="-1024634482%2FFunctions%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-rest-client.html"><span>get</span><wbr><span>Rest</span><wbr><span><span>Client</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1024634482%2FFunctions%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="get-rest-client.html"><span class="token function">getRestClient</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">activityContext<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/app/Activity.html">Activity</a><span class="token punctuation">, </span></span><span class="parameter ">restClientCallback<span class="token operator">: </span><a href="-rest-client-callback/index.html">ClientManager.RestClientCallback</a></span></span><span class="token punctuation">)</span></div><div class="brief ">Method to create a RestClient asynchronously.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1147878346%2FFunctions%2F1930946404" anchor-label="getUnauthenticatedRestClient" id="-1147878346%2FFunctions%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-unauthenticated-rest-client.html"><span>get</span><wbr><span>Unauthenticated</span><wbr><span>Rest</span><wbr><span><span>Client</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1147878346%2FFunctions%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="get-unauthenticated-rest-client.html"><span class="token function">getUnauthenticatedRestClient</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">activityContext<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/app/Activity.html">Activity</a><span class="token punctuation">, </span></span><span class="parameter ">restClientCallback<span class="token operator">: </span><a href="-rest-client-callback/index.html">ClientManager.RestClientCallback</a></span></span><span class="token punctuation">)</span></div><div class="brief ">Method to created an unauthenticated RestClient asynchronously</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="411608321%2FFunctions%2F1930946404" anchor-label="invalidateToken" id="411608321%2FFunctions%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="invalidate-token.html"><span>invalidate</span><wbr><span><span>Token</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="411608321%2FFunctions%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="invalidate-token.html"><span class="token function">invalidateToken</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">lastNewAuthToken<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief ">Invalidate current auth token.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-454334051%2FFunctions%2F1930946404" anchor-label="peekRestClient" id="-454334051%2FFunctions%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="peek-rest-client.html"><span>peek</span><wbr><span>Rest</span><wbr><span><span>Client</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-454334051%2FFunctions%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="peek-rest-client.html"><span class="token function">peekRestClient</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-rest-client/index.html">RestClient</a></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="peek-rest-client.html"><span class="token function">peekRestClient</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">acc<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/accounts/Account.html">Account</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-rest-client/index.html">RestClient</a></div><br><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="peek-rest-client.html"><span class="token function">peekRestClient</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">user<span class="token operator">: </span><a href="../../com.salesforce.androidsdk.accounts/-user-account/index.html">UserAccount</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-rest-client/index.html">RestClient</a></div><div class="brief ">Method to create RestClient synchronously.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2082392394%2FFunctions%2F1930946404" anchor-label="peekUnauthenticatedRestClient" id="2082392394%2FFunctions%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="peek-unauthenticated-rest-client.html"><span>peek</span><wbr><span>Unauthenticated</span><wbr><span>Rest</span><wbr><span><span>Client</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2082392394%2FFunctions%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="peek-unauthenticated-rest-client.html"><span class="token function">peekUnauthenticatedRestClient</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-rest-client/index.html">RestClient</a></div><div class="brief ">Method to create an unauthenticated RestClient.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1693745015%2FFunctions%2F1930946404" anchor-label="removeAccount" id="1693745015%2FFunctions%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remove-account.html"><span>remove</span><wbr><span><span>Account</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1693745015%2FFunctions%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="remove-account.html"><span class="token function">removeAccount</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">acc<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/accounts/Account.html">Account</a></span></span><span class="token punctuation">)</span></div><div class="brief ">Removes the user account from the account manager.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="772764678%2FFunctions%2F1930946404" anchor-label="removeAccounts" id="772764678%2FFunctions%2F1930946404" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceSDK:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceSDK:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remove-accounts.html"><span>remove</span><wbr><span><span>Accounts</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="772764678%2FFunctions%2F1930946404"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceSDK:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="remove-accounts.html"><span class="token function">removeAccounts</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">accounts<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://developer.android.com/reference/kotlin/android/accounts/Account.html">Account</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Remove all of the accounts passed in.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2026 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

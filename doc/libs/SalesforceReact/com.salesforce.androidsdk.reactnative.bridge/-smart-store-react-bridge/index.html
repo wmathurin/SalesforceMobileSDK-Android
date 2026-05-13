@@ -1,0 +1,558 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>SmartStoreReactBridge</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../../index.html">
+                            SalesforceSDK 14.0 API
+                    </a>            </div>
+            <div class="library-version">14.0.0
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":libs:SalesforceReact:dokkaHtmlPartial/release">androidJvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="SalesforceReact::com.salesforce.androidsdk.reactnative.bridge/SmartStoreReactBridge///PointingToDeclaration//593226367">
+  <div class="breadcrumbs"><a href="../../index.html">SalesforceReact</a><span class="delimiter">/</span><a href="../index.html">com.salesforce.androidsdk.reactnative.bridge</a><span class="delimiter">/</span><span class="current">SmartStoreReactBridge</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Smart</span><wbr><span>Store</span><wbr><span>React</span><wbr><span><span>Bridge</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="index.html">SmartStoreReactBridge</a> : <span data-unresolved-link="com.facebook.react.bridge/ReactContextBaseJavaModule///PointingToDeclaration/">ReactContextBaseJavaModule</span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-73544730%2FConstructors%2F593226367" anchor-label="SmartStoreReactBridge" id="-73544730%2FConstructors%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-smart-store-react-bridge.html"><span>Smart</span><wbr><span>Store</span><wbr><span>React</span><wbr><span><span>Bridge</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-73544730%2FConstructors%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">reactContext<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReactApplicationContext///PointingToDeclaration/">ReactApplicationContext</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="58767996%2FProperties%2F593226367" anchor-label="METHOD_TYPE_ASYNC" id="58767996%2FProperties%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-salesforce-net-react-bridge/index.html#58767996%2FProperties%2F593226367"><span><span>METHOD_TYPE_ASYNC</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="58767996%2FProperties%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-salesforce-net-react-bridge/index.html#58767996%2FProperties%2F593226367">METHOD_TYPE_ASYNC</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token operator"> = </span><span class="token string">"async"</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1389074947%2FProperties%2F593226367" anchor-label="METHOD_TYPE_PROMISE" id="-1389074947%2FProperties%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-salesforce-net-react-bridge/index.html#-1389074947%2FProperties%2F593226367"><span><span>METHOD_TYPE_PROMISE</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1389074947%2FProperties%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-salesforce-net-react-bridge/index.html#-1389074947%2FProperties%2F593226367">METHOD_TYPE_PROMISE</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token operator"> = </span><span class="token string">"promise"</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="443483271%2FProperties%2F593226367" anchor-label="METHOD_TYPE_SYNC" id="443483271%2FProperties%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-salesforce-net-react-bridge/index.html#443483271%2FProperties%2F593226367"><span><span>METHOD_TYPE_SYNC</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="443483271%2FProperties%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-salesforce-net-react-bridge/index.html#443483271%2FProperties%2F593226367">METHOD_TYPE_SYNC</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token operator"> = </span><span class="token string">"sync"</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-1452173899%2FFunctions%2F593226367" anchor-label="alterSoup" id="-1452173899%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="alter-soup.html"><span>alter</span><wbr><span><span>Soup</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1452173899%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="alter-soup.html"><span class="token function">alterSoup</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of alterSoup</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1450247358%2FFunctions%2F593226367" anchor-label="canOverrideExistingModule" id="1450247358%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-salesforce-net-react-bridge/index.html#1450247358%2FFunctions%2F593226367"><span>can</span><wbr><span>Override</span><wbr><span>Existing</span><wbr><span><span>Module</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1450247358%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../-salesforce-net-react-bridge/index.html#1450247358%2FFunctions%2F593226367"><span class="token function">canOverrideExistingModule</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1107233556%2FFunctions%2F593226367" anchor-label="clearSoup" id="-1107233556%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="clear-soup.html"><span>clear</span><wbr><span><span>Soup</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1107233556%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="clear-soup.html"><span class="token function">clearSoup</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of clearSoup</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-134859658%2FFunctions%2F593226367" anchor-label="closeCursor" id="-134859658%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="close-cursor.html"><span>close</span><wbr><span><span>Cursor</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-134859658%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="close-cursor.html"><span class="token function">closeCursor</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of closeCursor</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-303849632%2FFunctions%2F593226367" anchor-label="getAllGlobalStores" id="-303849632%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-all-global-stores.html"><span>get</span><wbr><span>All</span><wbr><span>Global</span><wbr><span><span>Stores</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-303849632%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="get-all-global-stores.html"><span class="token function">getAllGlobalStores</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of getAllGlobalStores</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1667722397%2FFunctions%2F593226367" anchor-label="getAllStores" id="1667722397%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-all-stores.html"><span>get</span><wbr><span>All</span><wbr><span><span>Stores</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1667722397%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="get-all-stores.html"><span class="token function">getAllStores</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of getAllStores</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-811590032%2FFunctions%2F593226367" anchor-label="getConstants" id="-811590032%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-salesforce-net-react-bridge/index.html#-811590032%2FFunctions%2F593226367"><span>get</span><wbr><span><span>Constants</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-811590032%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../-salesforce-net-react-bridge/index.html#-811590032%2FFunctions%2F593226367"><span class="token function">getConstants</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/util/Map.html">Map</a><span class="token operator">&lt;</span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-491681894%2FFunctions%2F593226367" anchor-label="getDatabaseSize" id="-491681894%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-database-size.html"><span>get</span><wbr><span>Database</span><wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-491681894%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="get-database-size.html"><span class="token function">getDatabaseSize</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of getDatabaseSize</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1175514536%2FFunctions%2F593226367" anchor-label="getName" id="1175514536%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-name.html"><span>get</span><wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1175514536%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="get-name.html"><span class="token function">getName</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="738998646%2FFunctions%2F593226367" anchor-label="getSmartStore" id="738998646%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-smart-store.html"><span>get</span><wbr><span>Smart</span><wbr><span><span>Store</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="738998646%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="get-smart-store.html"><span class="token function">getSmartStore</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../../libs/SmartStore/com.salesforce.androidsdk.smartstore.store/-smart-store/index.html">SmartStore</a></div><div class="brief ">Return smartstore to use</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1862774725%2FFunctions%2F593226367" anchor-label="getSoupIndexSpecs" id="-1862774725%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-soup-index-specs.html"><span>get</span><wbr><span>Soup</span><wbr><span>Index</span><wbr><span><span>Specs</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1862774725%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="get-soup-index-specs.html"><span class="token function">getSoupIndexSpecs</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of getSoupIndexSpecs</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1561828263%2FFunctions%2F593226367" anchor-label="initialize" id="-1561828263%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-salesforce-net-react-bridge/index.html#-1561828263%2FFunctions%2F593226367"><span><span>initialize</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1561828263%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../-salesforce-net-react-bridge/index.html#-1561828263%2FFunctions%2F593226367"><span class="token function">initialize</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="108668174%2FFunctions%2F593226367" anchor-label="invalidate" id="108668174%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-salesforce-net-react-bridge/index.html#108668174%2FFunctions%2F593226367"><span><span>invalidate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="108668174%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../-salesforce-net-react-bridge/index.html#108668174%2FFunctions%2F593226367"><span class="token function">invalidate</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2000884937%2FFunctions%2F593226367" anchor-label="moveCursorToPageIndex" id="2000884937%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="move-cursor-to-page-index.html"><span>move</span><wbr><span>Cursor</span><wbr><span>To</span><wbr><span>Page</span><wbr><span><span>Index</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2000884937%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="move-cursor-to-page-index.html"><span class="token function">moveCursorToPageIndex</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of moveCursorToPageIndex</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1186672224%2FFunctions%2F593226367" anchor-label="onCatalystInstanceDestroy" id="-1186672224%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-salesforce-net-react-bridge/index.html#-1186672224%2FFunctions%2F593226367"><span>on</span><wbr><span>Catalyst</span><wbr><span>Instance</span><wbr><span><span>Destroy</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1186672224%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../-salesforce-net-react-bridge/index.html#-1186672224%2FFunctions%2F593226367"><span class="token function">onCatalystInstanceDestroy</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1082721177%2FFunctions%2F593226367" anchor-label="querySoup" id="-1082721177%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="query-soup.html"><span>query</span><wbr><span><span>Soup</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1082721177%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="query-soup.html"><span class="token function">querySoup</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of querySoup</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1716861094%2FFunctions%2F593226367" anchor-label="registerSoup" id="-1716861094%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="register-soup.html"><span>register</span><wbr><span><span>Soup</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1716861094%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="register-soup.html"><span class="token function">registerSoup</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of registerSoup</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="40002046%2FFunctions%2F593226367" anchor-label="reIndexSoup" id="40002046%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="re-index-soup.html"><span>re</span><wbr><span>Index</span><wbr><span><span>Soup</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="40002046%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="re-index-soup.html"><span class="token function">reIndexSoup</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of reIndexSoup</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1681906086%2FFunctions%2F593226367" anchor-label="removeAllGlobalStores" id="-1681906086%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remove-all-global-stores.html"><span>remove</span><wbr><span>All</span><wbr><span>Global</span><wbr><span><span>Stores</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1681906086%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="remove-all-global-stores.html"><span class="token function">removeAllGlobalStores</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of removeAllGlobalStores</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1224001769%2FFunctions%2F593226367" anchor-label="removeAllStores" id="-1224001769%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remove-all-stores.html"><span>remove</span><wbr><span>All</span><wbr><span><span>Stores</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1224001769%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="remove-all-stores.html"><span class="token function">removeAllStores</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of removeAllStores</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1874029829%2FFunctions%2F593226367" anchor-label="removeFromSoup" id="1874029829%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remove-from-soup.html"><span>remove</span><wbr><span>From</span><wbr><span><span>Soup</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1874029829%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="remove-from-soup.html"><span class="token function">removeFromSoup</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of removeFromSoup</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-648473797%2FFunctions%2F593226367" anchor-label="removeSoup" id="-648473797%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remove-soup.html"><span>remove</span><wbr><span><span>Soup</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-648473797%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="remove-soup.html"><span class="token function">removeSoup</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of removeSoup</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1881979835%2FFunctions%2F593226367" anchor-label="removeStore" id="-1881979835%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remove-store.html"><span>remove</span><wbr><span><span>Store</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1881979835%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="remove-store.html"><span class="token function">removeStore</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of removeStore</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-188642747%2FFunctions%2F593226367" anchor-label="retrieveSoupEntries" id="-188642747%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="retrieve-soup-entries.html"><span>retrieve</span><wbr><span>Soup</span><wbr><span><span>Entries</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-188642747%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="retrieve-soup-entries.html"><span class="token function">retrieveSoupEntries</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of retrieveSoupEntries</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-171564174%2FFunctions%2F593226367" anchor-label="runSmartQuery" id="-171564174%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="run-smart-query.html"><span>run</span><wbr><span>Smart</span><wbr><span><span>Query</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-171564174%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="run-smart-query.html"><span class="token function">runSmartQuery</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of runSmartSql</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1487714349%2FFunctions%2F593226367" anchor-label="soupExists" id="-1487714349%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="soup-exists.html"><span>soup</span><wbr><span><span>Exists</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1487714349%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="soup-exists.html"><span class="token function">soupExists</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of soupExists</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1649875442%2FFunctions%2F593226367" anchor-label="upsertSoupEntries" id="1649875442%2FFunctions%2F593226367" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":libs:SalesforceReact:dokkaHtmlPartial/release" data-filterable-set=":libs:SalesforceReact:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="upsert-soup-entries.html"><span>upsert</span><wbr><span>Soup</span><wbr><span><span>Entries</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1649875442%2FFunctions%2F593226367"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":libs:SalesforceReact:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="upsert-soup-entries.html"><span class="token function">upsertSoupEntries</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/ReadableMap///PointingToDeclaration/">ReadableMap</span><span class="token punctuation">, </span></span><span class="parameter ">successCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span><span class="token punctuation">, </span></span><span class="parameter ">errorCallback<span class="token operator">: </span><span data-unresolved-link="com.facebook.react.bridge/Callback///PointingToDeclaration/">Callback</span></span></span><span class="token punctuation">)</span></div><div class="brief ">Native implementation of upsertSoupEntries</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2026 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
