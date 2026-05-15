@@ -46,6 +46,8 @@ class RTRLoginTests : AuthFlowTest() {
     // region ECA JWT RTR Tests
 
     // Login with ECA JWT RTR using hybrid auth token flow.
+    // Expected to fail until W-22512846 (Enable Named JWTs for Hybrid Flows) is resolved.
+    // The server currently returns invalid_grant when RTR is used with JWT tokens in hybrid flow.
     @Test
     fun testECAJwtRtr_Hybrid() {
         loginAndValidate(knownAppConfig = ECA_JWT_RTR)
