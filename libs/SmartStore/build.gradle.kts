@@ -7,6 +7,7 @@ plugins {
     `kotlin-android`
     `publish-module`
     jacoco
+    id("org.jetbrains.dokka")
 }
 
 dependencies {

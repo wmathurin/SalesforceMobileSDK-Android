@@ -15,7 +15,7 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.20")
         classpath("org.jetbrains.kotlin:compose-compiler-gradle-plugin:2.3.21")
         classpath("org.jacoco:org.jacoco.core:0.8.14")
-        classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.9.20")
+        classpath("org.jetbrains.dokka:dokka-gradle-plugin:2.0.0")
     }
 }
 
@@ -36,13 +36,22 @@ allprojects {
 
 apply(plugin = "org.jetbrains.dokka")
 
-subprojects {
-    if (path.startsWith(":libs:")) {
-        apply(plugin = "org.jetbrains.dokka")
+extensions.configure<org.jetbrains.dokka.gradle.DokkaExtension> {
+    dokkaPublications.named("html") {
+        outputDirectory.set(rootDir.resolve("doc"))
     }
 }
 
-tasks.named<org.jetbrains.dokka.gradle.DokkaMultiModuleTask>("dokkaHtmlMultiModule") {
-    moduleName.set("SalesforceSDK 14.0 API")
-    outputDirectory.set(rootDir.resolve("doc"))
+dependencies {
+    add("dokka", project(":libs:SalesforceAnalytics"))
+    add("dokka", project(":libs:SalesforceSDK"))
+    add("dokka", project(":libs:SmartStore"))
+    add("dokka", project(":libs:MobileSync"))
+    add("dokka", project(":libs:SalesforceHybrid"))
+    add("dokka", project(":libs:SalesforceReact"))
+}
+
+tasks.register<Jar>("javadocJar") {
+    from(tasks.named("dokkaGeneratePublicationHtml"))
+    archiveClassifier.set("javadoc")
 }
