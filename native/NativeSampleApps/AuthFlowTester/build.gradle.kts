@@ -96,10 +96,10 @@ android { // TODO: This cannot be resolved until newDSL=true
 
 configurations.all {
     resolutionStrategy {
-        force("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.3")
-        force("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.6.3")
-        force("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-        force("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.6.3")
+        force("org.jetbrains.kotlinx:kotlinx-serialization-core:1.11.0")
+        force("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.11.0")
+        force("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+        force("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.11.0")
         force("androidx.test:runner:1.7.0")
         force("androidx.test:rules:1.6.1")
         force("androidx.test.espresso:espresso-core:3.7.0")
