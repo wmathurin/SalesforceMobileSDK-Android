@@ -31,6 +31,7 @@ import androidx.test.filters.LargeTest
 import com.salesforce.samples.authflowtester.testUtility.AuthFlowTest
 import com.salesforce.samples.authflowtester.testUtility.KnownAppConfig.ECA_JWT_RTR
 import com.salesforce.samples.authflowtester.testUtility.KnownAppConfig.ECA_OPAQUE_RTR
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -48,9 +49,11 @@ class RTRLoginTests : AuthFlowTest() {
     // Login with ECA JWT RTR using hybrid auth token flow.
     // Expected to fail until W-22512846 (Enable Named JWTs for Hybrid Flows) is resolved.
     // The server currently returns invalid_grant when RTR is used with JWT tokens in hybrid flow.
+    @Ignore("Won't pass until server completes W-22512846")
     @Test
     fun testECAJwtRtr_Hybrid() {
         loginAndValidate(knownAppConfig = ECA_JWT_RTR)
+        assertRevokeAndRefreshWorks(isRtr = true)
         assertRevokeAndRefreshWorks(isRtr = true)
     }
 
@@ -58,6 +61,7 @@ class RTRLoginTests : AuthFlowTest() {
     @Test
     fun testECAJwtRtr_NoHybrid() {
         loginAndValidate(knownAppConfig = ECA_JWT_RTR, useHybridAuthToken = false)
+        assertRevokeAndRefreshWorks(isRtr = true)
         assertRevokeAndRefreshWorks(isRtr = true)
     }
 
@@ -70,12 +74,14 @@ class RTRLoginTests : AuthFlowTest() {
     fun testECAOpaqueRtr_Hybrid() {
         loginAndValidate(knownAppConfig = ECA_OPAQUE_RTR)
         assertRevokeAndRefreshWorks(isRtr = true)
+        assertRevokeAndRefreshWorks(isRtr = true)
     }
 
     // Login with ECA Opaque RTR without hybrid auth token.
     @Test
     fun testECAOpaqueRtr_NoHybrid() {
         loginAndValidate(knownAppConfig = ECA_OPAQUE_RTR, useHybridAuthToken = false)
+        assertRevokeAndRefreshWorks(isRtr = true)
         assertRevokeAndRefreshWorks(isRtr = true)
     }
 
