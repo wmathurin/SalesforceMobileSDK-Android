@@ -10,6 +10,7 @@ plugins {
     kotlin("plugin.serialization") version "2.3.20"
     kotlin("plugin.parcelize")
     kotlin("plugin.compose")
+    id("org.jetbrains.dokka")
 }
 
 dependencies {
