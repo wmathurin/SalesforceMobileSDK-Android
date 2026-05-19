@@ -186,6 +186,7 @@ classDiagram
     }
     
     class SalesforceReactActivity {
+        <<abstract>>
         -client: RestClient
         -clientManager: ClientManager
         -delegate: SalesforceActivityDelegate

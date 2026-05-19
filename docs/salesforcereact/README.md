@@ -69,12 +69,20 @@ graph TB
 
 ## Dependencies
 
-SalesforceReact depends on:
+SalesforceReact has an `api` dependency on `MobileSync`, which transitively pulls in:
 
-- **SalesforceSDK**: Core authentication and REST client functionality
-- **SmartStore**: Encrypted local storage
-- **MobileSync**: Data synchronization
-- **React Native**: JavaScript runtime and bridge infrastructure
+```
+SalesforceReact
+  └── MobileSync
+       └── SmartStore
+            └── SalesforceSDK
+                 └── SalesforceAnalytics
+```
+
+**External dependencies**:
+- **React Native**: JavaScript runtime and bridge infrastructure (currently `react-android:0.79.3`; alignment to `0.81.5` planned)
+
+**Note on Language**: The bridge modules are currently written in Java. Per project guidelines, new code should be Kotlin and a Kotlin migration is planned; existing Java files remain for now.
 
 ## Getting Started
 
@@ -116,31 +124,47 @@ public class MainActivity extends SalesforceReactActivity {
 
 ### JavaScript Usage
 
-Access native functionality from JavaScript:
+Access native functionality from JavaScript. The SDK uses **callback-based** APIs (`success`, `error`):
 
 ```javascript
 import { oauth, net, smartstore, mobilesync } from 'react-native-force';
 
 // Authenticate
-const credentials = await oauth.authenticate();
+oauth.authenticate(
+  (credentials) => { /* success */ },
+  (error) => { /* error */ }
+);
 
-// Make REST call
-const response = await net.sendRequest({
-    method: 'GET',
-    path: '/services/data/v60.0/sobjects/Account'
-});
+// Make REST call - net.sendRequest uses callbacks
+net.sendRequest(
+  '/services/data',
+  '/v60.0/sobjects/Account',
+  (response) => { /* success */ },
+  (error) => { /* error */ }
+);
 
-// Store data locally
-await smartstore.registerSoup('accounts', [{path: 'Id', type: 'string'}]);
-await smartstore.upsertSoupEntries('accounts', accounts, 'Id');
+// Register soup
+smartstore.registerSoup(
+  false, // isGlobalStore
+  'accounts',
+  [{path: 'Id', type: 'string'}],
+  (soupName) => { /* success */ },
+  (error) => { /* error */ }
+);
 
-// Sync data
-const syncId = await mobilesync.syncDown({
-    target: {type: 'soql', query: 'SELECT Id, Name FROM Account'},
-    soupName: 'accounts',
-    options: {mergeMode: 'OVERWRITE'}
-});
+// Sync down
+mobilesync.syncDown(
+  false, // isGlobalStore
+  {type: 'soql', query: 'SELECT Id, Name FROM Account'},
+  'accounts',
+  {mergeMode: 'OVERWRITE'},
+  null, // syncName
+  (syncResult) => { /* success */ },
+  (error) => { /* error */ }
+);
 ```
+
+For Promise-based wrappers, use `forceUtil.promiser` from `react-native-force`.
 
 ## Key Components
 
@@ -163,12 +187,14 @@ Base activity for React Native apps that:
 
 ### Bridge Modules
 
-Four bridge modules expose native functionality:
+Four `@ReactMethod`-bearing bridge modules expose native functionality:
 
 1. **SalesforceOauthReactBridge**: Authentication and credentials
 2. **SmartStoreReactBridge**: Local database operations
 3. **MobileSyncReactBridge**: Data synchronization
 4. **SalesforceNetReactBridge**: REST API calls
+
+A fifth class, **`ReactBridgeHelper`**, is a utility used by the bridge modules to convert between React Native types (`ReadableMap`, `ReadableArray`) and Java/JSON.
 
 ## Authentication Flow
 
