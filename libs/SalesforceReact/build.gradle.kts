@@ -23,7 +23,7 @@ plugins {
 
 dependencies {
     api(project(":libs:MobileSync"))
-    api(libs.react.android) // TODO: This update should happen in a dedicated work item. ECJ20260423
+    api(libs.react.android)
     implementation(libs.androidx.core.ktx)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.rules)
