@@ -35,20 +35,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 
 import com.facebook.react.ReactPackage;
-import com.facebook.react.bridge.NativeModule;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.uimanager.ViewManager;
 import com.salesforce.androidsdk.mobilesync.app.MobileSyncSDKManager;
-import com.salesforce.androidsdk.reactnative.bridge.MobileSyncReactBridge;
-import com.salesforce.androidsdk.reactnative.bridge.SalesforceNetReactBridge;
-import com.salesforce.androidsdk.reactnative.bridge.SalesforceOauthReactBridge;
-import com.salesforce.androidsdk.reactnative.bridge.SmartStoreReactBridge;
 import com.salesforce.androidsdk.reactnative.ui.SalesforceReactActivity;
 import com.salesforce.androidsdk.ui.LoginActivity;
 import com.salesforce.androidsdk.util.EventsObservable;
 import com.salesforce.androidsdk.util.EventsObservable.EventType;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -134,29 +126,7 @@ public class SalesforceReactSDKManager extends MobileSyncSDKManager {
      * @return ReactPackage for this application
      */
     public ReactPackage getReactPackage() {
-        return new ReactPackage() {
-
-            @NonNull
-            @Override
-            public List<NativeModule> createNativeModules(
-                    @NonNull ReactApplicationContext reactContext
-            ) {
-                List<NativeModule> modules = new java.util.ArrayList<>();
-                modules.add(new SalesforceOauthReactBridge(reactContext));
-                modules.add(new SalesforceNetReactBridge(reactContext));
-                modules.add(new SmartStoreReactBridge(reactContext));
-                modules.add(new MobileSyncReactBridge(reactContext));
-                return modules;
-            }
-
-            @NonNull
-            @Override
-            public List<ViewManager> createViewManagers(
-                    @NonNull ReactApplicationContext reactContext
-            ) {
-                return Collections.emptyList();
-            }
-        };
+        return new SalesforceReactPackage();
     }
 
     @NonNull
