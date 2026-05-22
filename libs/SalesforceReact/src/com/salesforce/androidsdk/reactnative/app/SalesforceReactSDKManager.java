@@ -34,12 +34,9 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 
-import com.facebook.react.BaseReactPackage;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.module.model.ReactModuleInfo;
-import com.facebook.react.module.model.ReactModuleInfoProvider;
 import com.facebook.react.uimanager.ViewManager;
 import com.salesforce.androidsdk.mobilesync.app.MobileSyncSDKManager;
 import com.salesforce.androidsdk.reactnative.bridge.MobileSyncReactBridge;
@@ -52,7 +49,6 @@ import com.salesforce.androidsdk.util.EventsObservable;
 import com.salesforce.androidsdk.util.EventsObservable.EventType;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -138,42 +134,19 @@ public class SalesforceReactSDKManager extends MobileSyncSDKManager {
      * @return ReactPackage for this application
      */
     public ReactPackage getReactPackage() {
-        return new BaseReactPackage() {
-
-            @Override
-            public NativeModule getModule(
-                    @NonNull String name,
-                    @NonNull ReactApplicationContext reactContext
-            ) {
-                switch (name) {
-                    case "SalesforceOauthReactBridge":
-                        return new SalesforceOauthReactBridge(reactContext);
-                    case "SalesforceNetReactBridge":
-                        return new SalesforceNetReactBridge(reactContext);
-                    case "SmartStoreReactBridge":
-                        return new SmartStoreReactBridge(reactContext);
-                    case "MobileSyncReactBridge":
-                        return new MobileSyncReactBridge(reactContext);
-                    default:
-                        return null;
-                }
-            }
+        return new ReactPackage() {
 
             @NonNull
             @Override
-            public ReactModuleInfoProvider getReactModuleInfoProvider() {
-                return () -> {
-                    Map<String, ReactModuleInfo> map = new HashMap<>();
-                    map.put("SalesforceOauthReactBridge", new ReactModuleInfo(
-                            "SalesforceOauthReactBridge", "SalesforceOauthReactBridge", false, false, false, true));
-                    map.put("SalesforceNetReactBridge", new ReactModuleInfo(
-                            "SalesforceNetReactBridge", "SalesforceNetReactBridge", false, false, false, true));
-                    map.put("SmartStoreReactBridge", new ReactModuleInfo(
-                            "SmartStoreReactBridge", "SmartStoreReactBridge", false, false, false, true));
-                    map.put("MobileSyncReactBridge", new ReactModuleInfo(
-                            "MobileSyncReactBridge", "MobileSyncReactBridge", false, false, false, true));
-                    return map;
-                };
+            public List<NativeModule> createNativeModules(
+                    @NonNull ReactApplicationContext reactContext
+            ) {
+                List<NativeModule> modules = new java.util.ArrayList<>();
+                modules.add(new SalesforceOauthReactBridge(reactContext));
+                modules.add(new SalesforceNetReactBridge(reactContext));
+                modules.add(new SmartStoreReactBridge(reactContext));
+                modules.add(new MobileSyncReactBridge(reactContext));
+                return modules;
             }
 
             @NonNull
