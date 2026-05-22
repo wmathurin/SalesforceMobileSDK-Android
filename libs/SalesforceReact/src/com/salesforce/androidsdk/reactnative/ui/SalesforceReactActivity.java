@@ -60,21 +60,22 @@ public abstract class SalesforceReactActivity extends ReactActivity implements S
     AlertDialog overlayPermissionRequiredDialog;
 
     /**
-     * Pending callbacks for authentication requests from the React Native bridge.
+     * Pending callback for authentication requests from the React Native bridge.
      *
      * When authenticate() is called from JavaScript:
-     * - These callbacks are stored in pending variables
-     * - They are invoked once authentication completes (either immediately if already
+     * - This callback is stored in a pending variable
+     * - It is invoked once authentication completes (either immediately if already
      *   authenticated, or after OAuth flow completes)
-     * - Two code paths can invoke these: authenticatedRestClient() callback (always runs)
+     * - Two code paths can invoke it: authenticatedRestClient() callback (always runs)
      *   or onResume() (only runs after OAuth pause/resume cycle)
-     * - Whichever path runs first invokes the callbacks and clears these to null
+     * - Whichever path runs first invokes the callback and clears it to null
      * - The other path sees null and does nothing, preventing double invocation
+     *
+     * Uses single-callback pattern: callback(null, result) for success, callback(error) for error.
      *
      * See authenticate() and onResume(RestClient) for the coordination logic.
      */
-    private Callback pendingAuthSuccessCallback;
-    private Callback pendingAuthErrorCallback;
+    private Callback pendingAuthCallback;
 
     protected SalesforceReactActivity() {
         super();
@@ -131,22 +132,21 @@ public abstract class SalesforceReactActivity extends ReactActivity implements S
         else {
             SalesforceReactLogger.i(TAG, "onResume - already logged in");
 
-            // If we have pending auth callbacks (from deferred authentication via authenticate()),
-            // invoke them now. This handles the OAuth flow scenario where the activity was paused
+            // If we have a pending auth callback (from deferred authentication via authenticate()),
+            // invoke it now. This handles the OAuth flow scenario where the activity was paused
             // for login and is now resuming.
             //
             // NOTE: This works in coordination with authenticate()'s authenticatedRestClient callback.
             // In the OAuth flow, there's a race condition between onResume() and authenticatedRestClient().
-            // Whichever runs first will find pending callbacks non-null, invoke them, and set them to null.
-            // The other will find them null and do nothing. This ensures callbacks are invoked exactly once.
+            // Whichever runs first will find pending callback non-null, invoke it, and set it to null.
+            // The other will find it null and do nothing. This ensures the callback is invoked exactly once.
             //
-            // For the "already authenticated" scenario, authenticatedRestClient() invokes callbacks
+            // For the "already authenticated" scenario, authenticatedRestClient() invokes the callback
             // immediately without any pause/resume cycle, so this code is never reached.
-            if (pendingAuthSuccessCallback != null) {
-                SalesforceReactLogger.i(TAG, "onResume - invoking pending auth callbacks");
-                getAuthCredentials(pendingAuthSuccessCallback, pendingAuthErrorCallback);
-                pendingAuthSuccessCallback = null;
-                pendingAuthErrorCallback = null;
+            if (pendingAuthCallback != null) {
+                SalesforceReactLogger.i(TAG, "onResume - invoking pending auth callback");
+                getAuthCredentials(pendingAuthCallback);
+                pendingAuthCallback = null;
             }
         }
     }
@@ -216,46 +216,41 @@ public abstract class SalesforceReactActivity extends ReactActivity implements S
     /**
      * Method called from bridge to logout.
      *
-     * @param successCallback Success callback.
+     * @param callback Single callback: callback(null, result) on success.
      */
-    public void logout(final Callback successCallback) {
+    public void logout(final Callback callback) {
         SalesforceReactLogger.i(TAG, "logout called");
         SalesforceReactSDKManager.getInstance().logout(this);
-        if (successCallback != null) {
-            ReactBridgeHelper.invoke(successCallback, "Logout complete");
+        if (callback != null) {
+            ReactBridgeHelper.invokeSuccess(callback, "Logout complete");
         }
     }
 
     /**
      * Method called from bridge to authenticate.
      *
-     * @param successCallback Success callback.
-     * @param errorCallback Error callback.
+     * @param callback Single callback: callback(null, result) on success, callback(error) on error.
      */
-    public void authenticate(final Callback successCallback, final Callback errorCallback) {
+    public void authenticate(final Callback callback) {
         SalesforceReactLogger.i(TAG, "authenticate called");
 
-        // Store callbacks in pending variables to handle both authentication scenarios:
+        // Store callback in pending variable to handle both authentication scenarios:
         //
         // SCENARIO 1: Already authenticated (no OAuth needed)
         //   - getRestClient() callback is invoked immediately on the same thread
-        //   - authenticatedRestClient() below invokes callbacks immediately
+        //   - authenticatedRestClient() below invokes callback immediately
         //   - Activity does NOT pause/resume, so onResume() is NOT called again
-        //   - Callbacks are successfully invoked ✓
+        //   - Callback is successfully invoked ✓
         //
         // SCENARIO 2: OAuth required (activity will pause/resume)
         //   - getRestClient() starts OAuth flow
         //   - Activity pauses (goes to login screen)
         //   - User completes OAuth, activity resumes
         //   - Either authenticatedRestClient() or onResume() runs first (race condition)
-        //   - Whichever runs first invokes callbacks and clears pending variables
-        //   - The other sees null pending variables and does nothing
-        //   - Callbacks are successfully invoked exactly once ✓
-        //
-        // The key fix: authenticatedRestClient() must ALWAYS invoke and clear callbacks,
-        // not defer to onResume(), because onResume() is NOT called when already authenticated.
-        pendingAuthSuccessCallback = successCallback;
-        pendingAuthErrorCallback = errorCallback;
+        //   - Whichever runs first invokes callback and clears pending variable
+        //   - The other sees null pending variable and does nothing
+        //   - Callback is successfully invoked exactly once ✓
+        pendingAuthCallback = callback;
 
         clientManager.getRestClient(this, new RestClientCallback() {
 
@@ -264,15 +259,10 @@ public abstract class SalesforceReactActivity extends ReactActivity implements S
                 SalesforceReactLogger.i(TAG, "authenticatedRestClient callback invoked");
                 SalesforceReactActivity.this.setRestClient(client);
 
-                // Invoke callbacks immediately now that we have a RestClient.
-                // For Scenario 1 (already authenticated): This happens immediately, no pause/resume.
-                // For Scenario 2 (OAuth required): This may happen before or after onResume().
-                // In both cases, we invoke callbacks and clear pending variables to prevent double invocation.
-                if (pendingAuthSuccessCallback != null) {
-                    SalesforceReactLogger.i(TAG, "authenticatedRestClient - invoking pending callbacks");
-                    getAuthCredentials(pendingAuthSuccessCallback, pendingAuthErrorCallback);
-                    pendingAuthSuccessCallback = null;
-                    pendingAuthErrorCallback = null;
+                if (pendingAuthCallback != null) {
+                    SalesforceReactLogger.i(TAG, "authenticatedRestClient - invoking pending callback");
+                    getAuthCredentials(pendingAuthCallback);
+                    pendingAuthCallback = null;
                 }
             }
         });
@@ -281,18 +271,17 @@ public abstract class SalesforceReactActivity extends ReactActivity implements S
     /**
      * Method called from bridge to get auth credentials.
      *
-     * @param successCallback Success callback.
-     * @param errorCallback Error callback.
+     * @param callback Single callback: callback(null, result) on success, callback(error) on error.
      */
-    public void getAuthCredentials(Callback successCallback, Callback errorCallback) {
+    public void getAuthCredentials(Callback callback) {
         SalesforceReactLogger.i(TAG, "getAuthCredentials called");
         if (client != null) {
-            if (successCallback != null) {
-                ReactBridgeHelper.invoke(successCallback, client.getJSONCredentials());
+            if (callback != null) {
+                ReactBridgeHelper.invokeSuccess(callback, client.getJSONCredentials());
             }
         } else {
-            if (errorCallback != null) {
-                errorCallback.invoke("Not authenticated");
+            if (callback != null) {
+                ReactBridgeHelper.invokeError(callback, "Not authenticated");
             }
         }
     }

@@ -21,6 +21,10 @@ plugins {
     id("org.jetbrains.dokka")
 }
 
+kotlin {
+    jvmToolchain(17)
+}
+
 dependencies {
     api(project(":libs:MobileSync"))
     api(libs.react.android)

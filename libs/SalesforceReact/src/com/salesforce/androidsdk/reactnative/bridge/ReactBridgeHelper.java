@@ -41,33 +41,42 @@ import java.util.Map;
 
 public class ReactBridgeHelper  {
 
-    public static void invoke(Callback callback, JSONObject json) {
-        // XXX it would be better to user a NativeMap
-        //     for now we serialize the object and do a JSON.parse(result) on the javascript side
-        callback.invoke(json == null ? null : json.toString());
+    /**
+     * Invokes callback with success result using single-callback pattern: callback(null, result)
+     */
+    public static void invokeSuccess(Callback callback, JSONObject json) {
+        callback.invoke(null, json == null ? null : json.toString());
     }
 
-    public static void invoke(Callback callback, JSONArray json) {
-        // XXX it would be better to user a NativeArray
-        //     for now we serialize the object and do a JSON.parse(result) on the javascript side
-        callback.invoke(json == null ? null : json.toString());
+    public static void invokeSuccess(Callback callback, JSONArray json) {
+        callback.invoke(null, json == null ? null : json.toString());
     }
 
-    public static void invoke(Callback callback, String value) {
-        // XXX we need to turn "xyz" into "\"xyz\"" so that JSON.parse() returns "xyz"
-        callback.invoke("\"" + value + "\"");
+    public static void invokeSuccess(Callback callback, String value) {
+        callback.invoke(null, "\"" + value + "\"");
     }
 
-    public static void invoke(Callback callback, boolean value) {
-        // XXX we need to turn true|false into "true"|"false" so that JSON.parse() returns true|false
-        callback.invoke("" + value);
+    public static void invokeSuccess(Callback callback, boolean value) {
+        callback.invoke(null, "" + value);
     }
 
-    public static void invoke(Callback callback, int value) {
-        // XXX we need to turn 123 into "123" so that JSON.parse() returns 123
-        callback.invoke("" + value);
+    public static void invokeSuccess(Callback callback, int value) {
+        callback.invoke(null, "" + value);
     }
 
+    /**
+     * Invokes callback with no result (void success): callback(null)
+     */
+    public static void invokeSuccess(Callback callback) {
+        callback.invoke(null, "null");
+    }
+
+    /**
+     * Invokes callback with error: callback(errorMessage)
+     */
+    public static void invokeError(Callback callback, String error) {
+        callback.invoke(error);
+    }
 
     public static Map<String, Object> toJavaMap(ReadableMap map) {
         Map<String, Object> result = new HashMap<>();
@@ -82,7 +91,7 @@ public class ReactBridgeHelper  {
                     result.put(key, map.getBoolean(key));
                     break;
                 case Number:
-                    result.put(key, map.getDouble(key)); // XXX what about integers
+                    result.put(key, map.getDouble(key));
                     break;
                 case String:
                     result.put(key, map.getString(key));
@@ -108,7 +117,6 @@ public class ReactBridgeHelper  {
                     result.put(key, map.getString(key));
                     break;
                 default:
-                    // Only expected strings
                     break;
             }
         }
@@ -125,7 +133,6 @@ public class ReactBridgeHelper  {
                     result.put(key, toJavaStringStringMap(map.getMap(key)));
                     break;
                 default:
-                    // Only expected maps
                     break;
             }
         }
@@ -141,7 +148,6 @@ public class ReactBridgeHelper  {
                     result.add(i, array.getString(i));
                     break;
                 default:
-                    // Only expected strings
                     break;
             }
         }
@@ -159,7 +165,7 @@ public class ReactBridgeHelper  {
                     result.add(i, array.getBoolean(i));
                     break;
                 case Number:
-                    result.add(i, array.getDouble(i)); // XXX what about integers
+                    result.add(i, array.getDouble(i));
                     break;
                 case String:
                     result.add(i, array.getString(i));
