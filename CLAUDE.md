@@ -36,7 +36,7 @@ SalesforceReact
 | **SmartStore** | `libs/SmartStore/` | Encrypted on-device SQLite storage (backed by SQLCipher). Soup-based data model with indexing and Smart SQL query support |
 | **MobileSync** | `libs/MobileSync/` | Bidirectional data sync between device (SmartStore) and Salesforce cloud. Sync targets, sync managers, layout/metadata sync. `MobileSyncSDKManager` |
 | **SalesforceHybrid** | `libs/SalesforceHybrid/` | Support for Cordova-based hybrid applications |
-| **SalesforceReact** | `libs/SalesforceReact/` | Support for React Native applications |
+| **SalesforceReact** | `libs/SalesforceReact/` | App/UI layer for React Native (SalesforceReactActivity, SalesforceReactSDKManager). **Note:** The bridge modules (SFOauthReactBridge, SFNetReactBridge, etc.) have moved to `SalesforceMobileSDK-ReactNative/android/` as of SDK 14.0. |
 
 ### Android Reference Docs
 - [Android Javadoc](https://forcedotcom.github.io/SalesforceMobileSDK-Android/index.html)

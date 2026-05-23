@@ -1,5 +1,7 @@
 # SalesforceReact Architecture
 
+> **MOVED**: As of SDK 14.0, the Android bridge modules (SFOauthReactBridge, SFNetReactBridge, SFSmartStoreReactBridge, SFMobileSyncReactBridge) have moved to `SalesforceMobileSDK-ReactNative/android/`. Module names are now unified with the `SF*` prefix on both platforms. See `SalesforceMobileSDK-ReactNative/docs/ARCHITECTURE.md` for the current cross-platform architecture.
+
 This document provides a deep technical dive into the architecture of the SalesforceReact library, including design patterns, component relationships, and data flow.
 
 ## Table of Contents
