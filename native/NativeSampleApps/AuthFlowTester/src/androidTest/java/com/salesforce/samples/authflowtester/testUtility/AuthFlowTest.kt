@@ -27,7 +27,9 @@
 package com.salesforce.samples.authflowtester.testUtility
 
 import android.Manifest
+import android.content.Intent
 import android.os.Build
+import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -71,7 +73,12 @@ abstract class AuthFlowTest {
     val composeTestRule = createEmptyComposeRule()
 
     @get:Rule(order = 2)
-    val activityRule = ActivityScenarioRule(AuthFlowTesterActivity::class.java)
+    val activityRule = ActivityScenarioRule<AuthFlowTesterActivity>(
+        Intent(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            AuthFlowTesterActivity::class.java,
+        ).putExtra(AuthFlowTesterActivity.EXTRA_IS_UI_TESTING, true)
+    )
 
     val loginOptions = LoginOptionsPageObject(composeTestRule)
     val app = AuthFlowTesterPageObject(composeTestRule)
@@ -130,6 +137,7 @@ abstract class AuthFlowTest {
         useHybridAuthToken: Boolean = true,
         knownLoginHostConfig: KnownLoginHostConfig = REGULAR_AUTH,
         knownUserConfig: KnownUserConfig = user,
+        useWelcomeDiscovery: Boolean = false,
     ) {
         val loginPage = when(knownLoginHostConfig) {
             REGULAR_AUTH -> LoginPageObject(composeTestRule)
@@ -138,8 +146,11 @@ abstract class AuthFlowTest {
 
         ensureRegularAuthServer()
 
-        if (!useWebServerFlow || !useHybridAuthToken ||
-            knownAppConfig != CA_OPAQUE || scopeSelection != EMPTY) {
+        val needsLoginOptions = !useWebServerFlow || !useHybridAuthToken ||
+                knownAppConfig != CA_OPAQUE || scopeSelection != EMPTY ||
+                useWelcomeDiscovery
+
+        if (needsLoginOptions) {
 
             loginPage.openLoginOptions()
 
@@ -151,23 +162,66 @@ abstract class AuthFlowTest {
                 loginOptions.disableHybridAuthToken()
             }
 
+            // Set simulated discovery result first - its Save does NOT dismiss the activity,
+            // unlike the boot-config Save below which calls activity.finish().
+            if (useWelcomeDiscovery) {
+                val (username, _) = testConfig.getUser(knownLoginHostConfig, knownUserConfig)
+                val targetHost = testConfig.getLoginHost(knownLoginHostConfig).url
+                    .removePrefix("https://").removePrefix("http://")
+                loginOptions.setSimulatedDiscoveryResult(
+                    loginHost = targetHost,
+                    username = username,
+                )
+            }
+
             if (knownAppConfig == CA_OPAQUE && scopeSelection == EMPTY) {
+                // No boot config override needed; nothing to save in that section.
                 Espresso.pressBack()
             } else {
+                // setOverrideBootConfig taps Save which calls activity.finish().
                 loginOptions.setOverrideBootConfig(knownAppConfig, scopeSelection)
             }
         }
 
-        if (knownLoginHostConfig != REGULAR_AUTH) {
-            loginPage.changeServer(knownLoginHostConfig)
-        }
+        if (useWelcomeDiscovery) {
+            // Drive the flow through the SDK's server picker via Welcome Discovery URL.
+            // The SDK's switchDefaultOrSalesforceWelcomeDiscoveryLogin path consumes the
+            // armed simulatedDiscoveryResult and routes the OAuth authorize URL to the
+            // simulated host with the simulated login_hint.  We then complete login with
+            // the standard flow (which retypes the username; the pre-fill is exercised
+            // server-side via the OAuth login_hint parameter).
+            val webViewLoginPage = LoginPageObject(composeTestRule)
+            webViewLoginPage.changeServerByUrl(WELCOME_DISCOVERY_URL)
 
-        loginPage.login(knownLoginHostConfig, knownUserConfig)
+            // The simulated host determines the surface: regular_auth -> in-app WebView,
+            // advanced_auth -> Chrome Custom Tab.  In both cases the OAuth login_hint
+            // already pre-filled the username; only the password step remains.
+            val welcomeLoginPage: LoginPageObject = when (knownLoginHostConfig) {
+                REGULAR_AUTH -> webViewLoginPage
+                ADVANCED_AUTH -> {
+                    val chrome = ChromeCustomTabPageObject(composeTestRule)
+                    chrome.skipGoogleSignIn()
+                    chrome
+                }
+            }
+            welcomeLoginPage.welcomeLogin(knownLoginHostConfig, knownUserConfig)
+        } else {
+            if (knownLoginHostConfig != REGULAR_AUTH) {
+                loginPage.changeServer(knownLoginHostConfig)
+            }
+
+            loginPage.login(knownLoginHostConfig, knownUserConfig)
+        }
         app.waitForAppLoad()
 
         app.validateUser(knownLoginHostConfig, knownUserConfig)
         app.validateOAuthValues(knownAppConfig, scopeSelection)
         app.validateApiRequest()
+    }
+
+    companion object {
+        @VisibleForTesting
+        const val WELCOME_DISCOVERY_URL = "https://welcome.salesforce.com/discovery"
     }
 
     /**

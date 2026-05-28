@@ -111,7 +111,7 @@ class LoginOptionsActivityTest {
             composeTestRule.activity.getString(R.string.sf__login_options_hybrid_toggle_content_description),
         )
         saveButton = composeTestRule.onNodeWithText(
-            composeTestRule.activity.getString(R.string.sf__server_url_save),
+            composeTestRule.activity.getString(R.string.sf__login_options_save_and_login),
         )
     }
 
@@ -410,4 +410,89 @@ class LoginOptionsActivityTest {
         composeTestRule.activity.finish()
         assertTrue(SalesforceSDKManager.getInstance().loginDevMenuReload)
     }
+
+    // region Welcome Discovery — DiscoveryResultEditor
+
+    @Test
+    fun applySimulatedDiscoveryResult_emptyHost_returnsNull() {
+        assertNull(applySimulatedDiscoveryResult(loginHost = "", username = "user@example.com"))
+        assertNull(applySimulatedDiscoveryResult(loginHost = "   ", username = "user@example.com"))
+    }
+
+    @Test
+    fun applySimulatedDiscoveryResult_validHost_returnsTrimmedResult() {
+        val result = applySimulatedDiscoveryResult(
+            loginHost = "  test.my.salesforce.com  ",
+            username = "  user@example.com  ",
+        )
+        assertNotNull(result)
+        assertEquals("test.my.salesforce.com", result?.loginHost)
+        assertEquals("user@example.com", result?.loginHint)
+    }
+
+    @Test
+    fun applySimulatedDiscoveryResult_validHostEmptyUser_keepsEmptyUser() {
+        // iOS allows empty user (host-only), so do we.
+        val result = applySimulatedDiscoveryResult(
+            loginHost = "test.my.salesforce.com",
+            username = "",
+        )
+        assertNotNull(result)
+        assertEquals("test.my.salesforce.com", result?.loginHost)
+        assertEquals("", result?.loginHint)
+    }
+
+    @Test
+    fun discoveryResultEditor_saveButton_armsSdkManagerSimulatedResult() {
+        // The editor is gated on isUiTesting; flip it on for this test (debug build)
+        // and recompose so the gated UI is rendered.
+        SalesforceSDKManager.getInstance().isUiTesting = true
+        composeTestRule.activity.runOnUiThread { composeTestRule.activity.recreate() }
+        composeTestRule.waitForIdle()
+
+        val toggle = composeTestRule.onNodeWithContentDescription(
+            composeTestRule.activity.getString(
+                R.string.sf__login_options_discovery_toggle_content_description
+            ),
+        )
+        val saveButton = composeTestRule.onNodeWithContentDescription(
+            composeTestRule.activity.getString(
+                R.string.sf__login_options_discovery_save_button_content_description
+            ),
+        )
+        val hostField = composeTestRule.onNodeWithContentDescription(
+            composeTestRule.activity.getString(
+                R.string.sf__login_options_discovery_login_host_field_content_description
+            ),
+        )
+        val userField = composeTestRule.onNodeWithContentDescription(
+            composeTestRule.activity.getString(
+                R.string.sf__login_options_discovery_username_field_content_description
+            ),
+        )
+
+        assertNull(SalesforceSDKManager.getInstance().simulatedDiscoveryResult)
+
+        toggle.performScrollTo()
+        toggle.performClick()
+        composeTestRule.waitForIdle()
+
+        hostField.performScrollTo()
+        hostField.performTextInput("test.my.salesforce.com")
+        userField.performTextInput("user@example.com")
+        saveButton.performScrollTo()
+        saveButton.performClick()
+        composeTestRule.waitForIdle()
+
+        val armed = SalesforceSDKManager.getInstance().simulatedDiscoveryResult
+        assertNotNull(armed)
+        assertEquals("test.my.salesforce.com", armed?.loginHost)
+        assertEquals("user@example.com", armed?.loginHint)
+
+        // Cleanup: clear simulation + UI testing flag so they don't leak.
+        SalesforceSDKManager.getInstance().simulatedDiscoveryResult = null
+        SalesforceSDKManager.getInstance().isUiTesting = false
+    }
+
+    // endregion
 }
