@@ -412,7 +412,7 @@ open class LoginViewModel(val bootConfig: BootConfig) : ViewModel() {
      * its default inactive state.
      */
     internal fun resetFrontDoorBridgeUrl() {
-        frontDoorBridgeUrl.value = null
+        frontDoorBridgeUrl.postValue(null)
         frontdoorBridgeServer = null
         frontdoorBridgeCodeVerifier = null
     }
