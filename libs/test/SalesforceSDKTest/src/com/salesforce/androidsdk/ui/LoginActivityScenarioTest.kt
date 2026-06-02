@@ -27,7 +27,6 @@
 package com.salesforce.androidsdk.ui
 
 import android.content.Intent
-import android.net.Uri.parse
 import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle.State.RESUMED
@@ -44,6 +43,7 @@ import com.salesforce.androidsdk.ui.LoginActivity.Companion.EXTRA_KEY_LOGIN_HOST
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,26 +52,36 @@ import org.junit.runner.RunWith
 class LoginActivityScenarioTest {
 
     @Test
-    fun viewModelLoginHint_UpdatesOn_onCreateWithSalesforceWelcomeLoginHintIntentExtras() {
+    fun viewModelLoginHint_UpdatesOn_applyWelcomeLoginHintAndHostIntentExtras() {
         val expectedLoginHint = "ietf_example_domain_reserved_for_test@example.com"
         val expectedLoginServerHostname = "welcome.salesforce.com"
+        val expectedPendingServer = "https://$expectedLoginServerHostname"
 
+        val loginServerManager = SalesforceSDKManager.getInstance().loginServerManager
+        val originalSelectedServer = loginServerManager.selectedLoginServer
+
+        // Production never receives the welcome login hint+host extras as the initial
+        // launch intent: they are dispatched via [LoginActivity.startDefaultLoginWithHintAndHost]
+        // (internal, FLAG_ACTIVITY_SINGLE_TOP) onto the running LoginActivity and arrive
+        // through onNewIntent, which calls applySalesforceWelcomeLoginHintAndHost.  Drive
+        // that function directly here since onNewIntent itself is protected.
         launch<LoginActivity>(
-            Intent(
-                getApplicationContext(),
-                LoginActivity::class.java
-            ).apply {
+            Intent(getApplicationContext(), LoginActivity::class.java)
+        ).use { activityScenario ->
+
+            val intentWithExtras = Intent(getApplicationContext(), LoginActivity::class.java).apply {
                 putExtra(EXTRA_KEY_LOGIN_HINT, expectedLoginHint)
                 putExtra(EXTRA_KEY_LOGIN_HOST, expectedLoginServerHostname)
-            }).use { activityScenario ->
+            }
+            activityScenario.onActivity { activity ->
+                activity.applySalesforceWelcomeLoginHintAndHost(intentWithExtras)
+            }
 
             activityScenario.onActivity { activity ->
-
-                val actualLoginHint = activity.viewModel.loginHint
-                val actualLoginServerHostname = SalesforceSDKManager.getInstance().loginServerManager.selectedLoginServer
-
-                assertEquals(expectedLoginHint, actualLoginHint)
-                assertEquals(expectedLoginServerHostname, parse(actualLoginServerHostname.url).host)
+                assertEquals(expectedLoginHint, activity.viewModel.loginHint)
+                assertEquals(expectedPendingServer, activity.viewModel.pendingServer.value)
+                assertEquals(originalSelectedServer, loginServerManager.selectedLoginServer)
+                assertNull(loginServerManager.getLoginServerFromURL(expectedPendingServer))
             }
         }
     }
