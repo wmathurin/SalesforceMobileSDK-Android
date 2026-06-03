@@ -1228,7 +1228,7 @@ open class LoginActivity : FragmentActivity() {
                         viewModel.authFinished.value = true
 
                         when {
-                            viewModel.useWebServerFlow ->
+                            viewModel.useWebServerFlow() ->
                                 viewModel.onWebServerFlowComplete(
                                     params["code"],
                                     ::onAuthFlowError,
