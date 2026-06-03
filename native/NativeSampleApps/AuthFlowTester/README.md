@@ -81,12 +81,22 @@ Tests for Beacon app login flows using advanced authentication with Chrome Custo
 | `testBeaconJwt_SubsetScopes` | Beacon JWT | Subset | Advanced Auth |
 | `testBeaconJwt_AllScopes` | Beacon JWT | All | Advanced Auth |
 
-#### AdvancedAuthLoginTests (WIP)
-Tests login via advanced authentication hosts that use Chrome Custom Tabs instead of the in-app WebView. Skipped on API ≤ 31 in Firebase Test Lab due to outdated Chrome.
+#### LoginForAdminTests
+Tests for the "Login for Admins" menu flow, which launches OAuth in a Chrome Custom Tab while the in-app WebView remains loaded. Intended for orgs requiring browser-based admin sign-in (client certificates, SSO) even when the app uses the in-app WebView. Always uses Web Server Flow + PKCE.
 
-| Test | App Config | Scopes | Login Host |
-|------|-----------|--------|------------|
-| `testECAOpaque_DefaultScopes` | ECA Opaque | Default | Advanced Auth |
+| Test | WebView Flow | Description |
+|------|-------------|-------------|
+| `testLoginForAdmin_WebServerFlowEnabled` | Web Server | Custom tab URL matches WebView URL |
+| `testLoginForAdmin_WebServerFlowDisabled` | User Agent | Custom tab forces Web Server Flow despite WebView config |
+
+#### NegativeLoginTests
+Negative-path tests for runtime consumer-key/dynamic-config selection. Covers invalid consumer keys, invalid scopes, and dynamic-config changes that the user does not commit by logging in.
+
+| Test | Description |
+|------|-------------|
+| `testInvalidConsumerKey_loginFails` | Dynamic config with invalid consumer key; login must fail and no account created |
+| `testInvalidScope_loginFails` | Dynamic config with invalid scope; login must fail and no account created |
+| `testChangeDynamicConfigWithoutLogin_existingUserUnaffected` | Change dynamic config without login; existing user's tokens and config remain intact |
 
 #### RefreshTokenMigrationTests
 Tests the SDK's refresh token migration flow, which exchanges tokens when an app's OAuth configuration changes (e.g., scope upgrades or connected app changes). Validates that tokens are replaced and the new tokens are functional.
@@ -116,8 +126,13 @@ End-to-end tests for multi-user scenarios: logging in two users, switching betwe
 | `testMultiUser_tokenMigration` | Migrate one user's tokens while the other remains unaffected |
 | `testMultiUser_tokenMigration_backgroundUser` | Migrate a background user's tokens; validate foreground user is unaffected and refresh works correctly post-switch |
 
-#### WelcomeLoginTests (WIP)
-Planned tests for welcome discovery login flows with both regular and advanced auth hosts, using static and dynamic configurations.
+#### WelcomeLoginTests
+Tests for the Welcome Discovery login flow. Uses the SDK's Login Options "Discovery Result Editor" to inject a simulated discovery result (login hint + My Domain), then drives the same code path the real callback URL would have produced.
+
+| Test | Login Host | App Config |
+|------|-----------|-----------|
+| `testWelcomeDiscovery_RegularAuthLoginHost` | Regular Auth | ECA Opaque |
+| `testWelcomeDiscovery_AdvancedAuthLoginHost` | Advanced Auth | Beacon Opaque |
 
 ### Validation Per Test
 
@@ -182,6 +197,7 @@ The Login Options screen allows you to override the default boot config for the 
 - **Web Server Flow toggle** — enable or disable the web server OAuth flow (default: on). When off, the user agent flow is used.
 - **Hybrid Auth Token toggle** — enable or disable hybrid authentication tokens (default: on).
 - **Override Boot Config toggle** — when enabled, exposes fields to enter a custom **Consumer Key**, **Redirect URI**, and **Scopes** (space-separated). Tap **Save** to apply. This lets you test different app configurations (CA, ECA, Beacon) without rebuilding the app.
+- **Discovery Result Editor toggle** — when enabled, exposes fields to simulate a Welcome Discovery result by entering a **Login Host** and **Username**. Tap **Save** to arm the simulated discovery result for the next login attempt. This simulates receiving a discovery callback without requiring email verification.
 
 ### Change Server
 
