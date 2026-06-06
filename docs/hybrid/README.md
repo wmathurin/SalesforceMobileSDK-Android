@@ -127,7 +127,32 @@ From command line:
 ./gradlew :libs:SalesforceHybrid:connectedAndroidTest
 ```
 
-Tests require a connected device/emulator and `test_credentials.json` in `shared/test/`.
+Tests require a connected device or emulator (min SDK 31).
+
+Most tests also require a `test_credentials.json` file at `shared/test/test_credentials.json`. Without it, only tests that do not make authenticated Salesforce API calls will pass. Copy the sample and fill in your org details:
+
+```bash
+cp shared/test/test_credentials.json.sample shared/test/test_credentials.json
+# then edit with your Connected App credentials and org details
+```
+
+The file must contain:
+
+```json
+{
+  "test_client_id":    "<Connected App consumer key>",
+  "test_login_domain": "<login URL, e.g. test.salesforce.com>",
+  "test_redirect_uri": "<Connected App callback URL>",
+  "refresh_token":     "<valid refresh token>",
+  "instance_url":      "<org instance URL>",
+  "identity_url":      "<identity URL>",
+  "organization_id":   "<org ID>",
+  "username":          "<test user username>",
+  "user_id":           "<test user ID>"
+}
+```
+
+`test_credentials.json` is gitignored — never commit real credentials.
 
 ## Version Management
 
