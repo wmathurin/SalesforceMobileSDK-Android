@@ -129,6 +129,22 @@ From command line:
 
 Tests require a connected device/emulator and `test_credentials.json` in `shared/test/`.
 
+## Version Management
+
+`setversion.sh` updates the SDK version across all Android library gradle and manifest files:
+
+```bash
+# On dev branch:
+./setversion.sh -v 14.0.0 -c <versionCode> -d yes
+# On master branch (after merging dev → master at release):
+./setversion.sh -v 14.0.0 -c <versionCode> -d no
+```
+
+For hybrid specifically, this updates:
+- `PUBLISH_VERSION` in `libs/SalesforceHybrid/build.gradle.kts` (controls Maven Central artifact version)
+- `android:versionName` in `libs/SalesforceHybrid/AndroidManifest.xml` (appends `.dev` when `-d yes`)
+- All other SDK library gradle and manifest files in the same pass
+
 ## Build Versions
 
 | Component | Version |
