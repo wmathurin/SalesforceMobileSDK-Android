@@ -41,15 +41,15 @@ SalesforceHybrid
 
 ### Android Build Details
 - **Minimum SDK**: 31 (Android 12)
-- **Compile SDK**: 35 (Android 15.0)
+- **Compile SDK**: 36 (Android 15.0)
 - **Target SDK**: Follows compileSdk
-- **Build system**: Gradle 8.14.3 with Kotlin DSL (`.gradle.kts` files)
-- **AGP (Android Gradle Plugin)**: 8.12.0
+- **Build system**: Gradle 9.4.1 with Kotlin DSL (`.gradle.kts` files)
+- **AGP (Android Gradle Plugin)**: 9.1.1
 - **Setup**: Run `./install.sh` after cloning to pull submodule dependencies
 - **Dependency management**: Maven Central for dependencies, libraries published to Maven Central
 - **Encryption**: SmartStore depends on SQLCipher for Android (`net.zetetic:sqlcipher-android:4.10.0`)
-- **Language**: Kotlin for all new code. Legacy Java exists in older classes. No new Java files.
-- **Kotlin version**: 1.9.24 with API/language version 1.6 for backward compatibility
+- **Language**: Kotlin for all new code. Legacy Java exists in older classes (e.g., SalesforceHybrid plugin classes). No new Java files.
+- **Kotlin version**: 2.3.20
 
 ### Android Build & Test Commands
 
