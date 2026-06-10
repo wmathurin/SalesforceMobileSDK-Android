@@ -237,14 +237,26 @@ public class SalesforceLoggerTest {
     }
 
     /**
-     * Test that beacon_child_consumer_secret is redacted in JSON.
+     * Test that auto_installed_app_org_consumer_secret is redacted in JSON.
      */
     @Test
-    public void testRedactBeaconChildConsumerSecret() {
+    public void testRedactAutoInstalledAppOrgConsumerSecret() {
         final String value = randomString(11);
         final String input = "{\"auto_installed_app_org_consumer_secret\":\"" + value + "\"}";
         final String expected = "{\"auto_installed_app_org_consumer_secret\":\"" + expectedMask(value) + "\"}";
         Assert.assertEquals("auto_installed_app_org_consumer_secret should be redacted", expected, SalesforceLogger.redact(input));
+    }
+
+    /**
+     * Test that beacon_child_consumer_secret is redacted in JSON.
+     * TODO: Remove once server version 264 has rolled out everywhere.
+     */
+    @Test
+    public void testRedactBeaconChildConsumerSecret() {
+        final String value = randomString(11);
+        final String input = "{\"beacon_child_consumer_secret\":\"" + value + "\"}";
+        final String expected = "{\"beacon_child_consumer_secret\":\"" + expectedMask(value) + "\"}";
+        Assert.assertEquals("beacon_child_consumer_secret should be redacted", expected, SalesforceLogger.redact(input));
     }
 
     /**
