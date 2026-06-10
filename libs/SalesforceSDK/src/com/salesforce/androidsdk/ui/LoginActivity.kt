@@ -109,6 +109,7 @@ import com.salesforce.androidsdk.R.string.cannot_use_another_apps_login_qr_code
 import com.salesforce.androidsdk.R.string.sf__biometric_opt_in_title
 import com.salesforce.androidsdk.R.string.sf__generic_authentication_error_title
 import com.salesforce.androidsdk.R.string.sf__jwt_authentication_error
+import com.salesforce.androidsdk.R.string.sf__lightning_url_code_exchange_error
 import com.salesforce.androidsdk.R.string.sf__login_with_biometric
 import com.salesforce.androidsdk.R.string.sf__screen_lock_error
 import com.salesforce.androidsdk.R.string.sf__setup_biometric_unlock
@@ -583,9 +584,19 @@ open class LoginActivity : FragmentActivity() {
         )
 
         viewModel.clearCookies()
+        val isLightningTokenEndpointFailure = e is OAuthFailedException
+            && e.tokenErrorResponse.error == "unsupported_grant_type"
+            && viewModel.selectedServer.value?.contains(".lightning.") == true
+        if (isLightningTokenEndpointFailure) {
+            w(TAG, "Code exchange failed with unsupported_grant_type against Lightning URL: ${viewModel.selectedServer.value}. Lightning URLs do not support authorization_code grant type. Use a My Domain login server URL instead.")
+        }
         // Displays the error in a toast, clears cookies and reloads the login page
         runOnUiThread {
-            makeText(this, "$error : $errorDesc", LENGTH_LONG).show()
+            if (isLightningTokenEndpointFailure) {
+                makeText(this, getString(sf__lightning_url_code_exchange_error), LENGTH_LONG).show()
+            } else {
+                makeText(this, "$error : $errorDesc", LENGTH_LONG).show()
+            }
             viewModel.reloadWebView()
         }
     }
