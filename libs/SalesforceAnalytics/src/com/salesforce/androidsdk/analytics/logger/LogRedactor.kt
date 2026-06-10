@@ -32,7 +32,7 @@ private val SENSITIVE_JSON_PATTERN = Regex(
     pattern = """("(?:access_token|refresh_token|id_token|csrf_token|sid""" +
         """|lightning_sid|visualforce_sid|content_sid|parent_sid""" +
         """|cookie-sid_Client|cookie-clientSrc""" +
-        """|beacon_child_consumer_secret)"\s*:\s*")([^"]+)(")""",
+        """|auto_installed_app_org_consumer_secret)"\s*:\s*")([^"]+)(")""",
     option = RegexOption.IGNORE_CASE,
 )
 

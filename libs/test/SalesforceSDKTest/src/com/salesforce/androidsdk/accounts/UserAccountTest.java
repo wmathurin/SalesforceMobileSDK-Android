@@ -655,8 +655,8 @@ public class UserAccountTest {
 
     private OAuth2.TokenEndpointResponse createTokenEndpointResponseLikeWebServerFlow() {
         Map<String, String> params = createTokenEndpointParams();
-        params.put("beacon_child_consumer_key", TEST_BEACON_CHILD_CONSUMER_KEY);
-        params.put("beacon_child_consumer_secret", TEST_BEACON_CHILD_CONSUMER_SECRET);
+        params.put("auto_installed_app_org_consumer_key", TEST_BEACON_CHILD_CONSUMER_KEY);
+        params.put("auto_installed_app_org_consumer_secret", TEST_BEACON_CHILD_CONSUMER_SECRET);
         JSONObject responseJson = new JSONObject(params);
         MediaType mediaType = MediaType.parse("application/json");
         ResponseBody responseBody = ResponseBody.create(responseJson.toString(), mediaType);
