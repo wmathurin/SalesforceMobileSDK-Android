@@ -97,8 +97,8 @@ public class UserAccount {
 	public static final String CLIENT_ID = "clientId";
 	public static final String PARENT_SID = "parentSid";
 	public static final String TOKEN_FORMAT = "tokenFormat";
-	public static final String BEACON_CHILD_CONSUMER_KEY = "beacon_child_consumer_key";
-	public static final String BEACON_CHILD_CONSUMER_SECRET = "beacon_child_consumer_secret";
+	public static final String BEACON_CHILD_CONSUMER_KEY = "auto_installed_app_org_consumer_key";
+	public static final String BEACON_CHILD_CONSUMER_SECRET = "auto_installed_app_org_consumer_secret";
 	public static final String SCOPE = "scope";
 
 	private static final String TAG = "UserAccount";

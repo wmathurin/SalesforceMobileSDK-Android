@@ -213,8 +213,11 @@ public class OAuth2 {
     private static final String SID_COOKIE_NAME = "sidCookieName";
     private static final String PARENT_SID = "parent_sid";
     private static final String TOKEN_FORMAT = "token_format";
-    private static final String BEACON_CHILD_CONSUMER_SECRET = "beacon_child_consumer_secret";
-    private static final String BEACON_CHILD_CONSUMER_KEY = "beacon_child_consumer_key";
+    private static final String BEACON_CHILD_CONSUMER_SECRET = "auto_installed_app_org_consumer_secret";
+    private static final String BEACON_CHILD_CONSUMER_KEY = "auto_installed_app_org_consumer_key";
+    // TODO: Remove legacy fallback constants once server version 264 has rolled out everywhere.
+    private static final String LEGACY_BEACON_CHILD_CONSUMER_SECRET = "beacon_child_consumer_secret";
+    private static final String LEGACY_BEACON_CHILD_CONSUMER_KEY = "beacon_child_consumer_key";
 
     public static final DateFormat TIMESTAMP_FORMAT;
     static {
@@ -1000,11 +1003,16 @@ public class OAuth2 {
                 tokenFormat = parsedResponse.optString(TOKEN_FORMAT);
 
                 // Beacon child fields expected when using a beacon app and web server flow
+                // TODO: Remove LEGACY_BEACON_CHILD_CONSUMER_* fallback once server version 264 has rolled out everywhere.
                 if (parsedResponse.has(BEACON_CHILD_CONSUMER_KEY)) {
                     beaconChildConsumerKey = parsedResponse.getString(BEACON_CHILD_CONSUMER_KEY);
+                } else if (parsedResponse.has(LEGACY_BEACON_CHILD_CONSUMER_KEY)) {
+                    beaconChildConsumerKey = parsedResponse.getString(LEGACY_BEACON_CHILD_CONSUMER_KEY);
                 }
                 if (parsedResponse.has(BEACON_CHILD_CONSUMER_SECRET)) {
                     beaconChildConsumerSecret = parsedResponse.getString(BEACON_CHILD_CONSUMER_SECRET);
+                } else if (parsedResponse.has(LEGACY_BEACON_CHILD_CONSUMER_SECRET)) {
+                    beaconChildConsumerSecret = parsedResponse.getString(LEGACY_BEACON_CHILD_CONSUMER_SECRET);
                 }
                 scope = parsedResponse.optString(SCOPE);
 
