@@ -27,27 +27,27 @@
     },
     {
       "doc": "docs/salesforcereact/README.md",
-      "scope": "docs/salesforcereact",
+      "scope": "libs/SalesforceReact",
       "description": "SalesforceReact Library - React Native integration overview"
     },
     {
       "doc": "docs/salesforcereact/ARCHITECTURE.md",
-      "scope": "docs/salesforcereact",
+      "scope": "libs/SalesforceReact",
       "description": "SalesforceReact Architecture - Technical deep dive"
     },
     {
       "doc": "docs/salesforcereact/API_REFERENCE.md",
-      "scope": "docs/salesforcereact",
+      "scope": "libs/SalesforceReact",
       "description": "SalesforceReact API Reference - Complete API documentation"
     },
     {
       "doc": "docs/salesforcereact/TESTING.md",
-      "scope": "docs/salesforcereact",
+      "scope": "libs/SalesforceReact",
       "description": "SalesforceReact Testing Guide - Test infrastructure and execution"
     },
     {
       "doc": "docs/hybrid/README.md",
-      "scope": "docs/hybrid",
+      "scope": ["libs/SalesforceHybrid", "hybrid"],
       "description": "SalesforceHybrid Library - Cordova-based hybrid app bridge"
     },
     {
