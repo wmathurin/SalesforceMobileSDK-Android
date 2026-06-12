@@ -6,6 +6,11 @@ on:
   # Reference: team Github Actions Tribal Knowledge doc.
   pull_request_target:  # zizmor: ignore[dangerous-triggers]
     branches: [dev, master]
+    paths-ignore:
+      - '**/*.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'CODEOWNERS'
 
 permissions:
   contents: read
