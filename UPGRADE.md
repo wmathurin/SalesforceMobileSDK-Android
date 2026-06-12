@@ -6,4 +6,4 @@
 
 See the [Mobile SDK Development Guide](https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/) for more information about developing apps with the Mobile SDK.
 
-If you have questions, or encounter any issues, we'd love to hear from you. Post any feedback you have on [Trailblazer Community](https://trailblazers.salesforce.com/_ui/core/chatter/groups/GroupProfilePage?g=0F9300000009M9Z).
+If you have questions, or encounter any issues, we'd love to hear from you. Post any feedback you have on [Trailblazer Community](https://trailhead.salesforce.com/en/trailblazer-community/groups/0F94S000000kH0HSAU?tab=discussion&sort=LAST_MODIFIED_DATE_DESC).
