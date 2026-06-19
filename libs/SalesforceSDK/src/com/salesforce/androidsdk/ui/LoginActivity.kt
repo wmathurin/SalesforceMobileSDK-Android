@@ -106,6 +106,7 @@ import com.salesforce.androidsdk.R.color.sf__background
 import com.salesforce.androidsdk.R.color.sf__background_dark
 import com.salesforce.androidsdk.R.drawable.sf__action_back
 import com.salesforce.androidsdk.R.string.cannot_use_another_apps_login_qr_code
+import com.salesforce.androidsdk.R.string.sf__app_blocked_error
 import com.salesforce.androidsdk.R.string.sf__biometric_opt_in_title
 import com.salesforce.androidsdk.R.string.sf__generic_authentication_error_title
 import com.salesforce.androidsdk.R.string.sf__jwt_authentication_error
@@ -125,6 +126,8 @@ import com.salesforce.androidsdk.app.Features.FEATURE_WELCOME_DISCOVERY_LOGIN
 import com.salesforce.androidsdk.app.SalesforceSDKManager
 import com.salesforce.androidsdk.app.SalesforceSDKManager.Theme.DARK
 import com.salesforce.androidsdk.auth.HttpAccess
+import com.salesforce.androidsdk.auth.OAuth2.CLIENT_BLOCKED_ERROR
+import com.salesforce.androidsdk.auth.OAuth2.CLIENT_BLOCKED_RETRY_ERROR
 import com.salesforce.androidsdk.auth.OAuth2.OAuthFailedException
 import com.salesforce.androidsdk.auth.OAuth2.TokenEndpointResponse
 import com.salesforce.androidsdk.auth.OAuth2.swapJWTForTokens
@@ -228,7 +231,7 @@ open class LoginActivity : FragmentActivity() {
     }
 
     // Private variables
-    private var baseUserAgentString = "";
+    private var baseUserAgentString = ""
     private var wasBackgrounded = false
     private var accountAuthenticatorResponse: AccountAuthenticatorResponse? = null
     private var accountAuthenticatorResult: Bundle? = null
@@ -584,6 +587,9 @@ open class LoginActivity : FragmentActivity() {
         )
 
         viewModel.clearCookies()
+        val isClientBlocked = e is OAuthFailedException
+            && (e.tokenErrorResponse.error == CLIENT_BLOCKED_ERROR
+                || e.tokenErrorResponse.error == CLIENT_BLOCKED_RETRY_ERROR)
         val isLightningTokenEndpointFailure = e is OAuthFailedException
             && e.tokenErrorResponse.error == "unsupported_grant_type"
             && viewModel.selectedServer.value?.contains(".lightning.") == true
@@ -592,11 +598,12 @@ open class LoginActivity : FragmentActivity() {
         }
         // Displays the error in a toast, clears cookies and reloads the login page
         runOnUiThread {
-            if (isLightningTokenEndpointFailure) {
-                makeText(this, getString(sf__lightning_url_code_exchange_error), LENGTH_LONG).show()
-            } else {
-                makeText(this, "$error : $errorDesc", LENGTH_LONG).show()
+            val message = when {
+                isClientBlocked -> getString(sf__app_blocked_error)
+                isLightningTokenEndpointFailure -> getString(sf__lightning_url_code_exchange_error)
+                else -> "$error : $errorDesc"
             }
+            makeText(this, message, LENGTH_LONG).show()
             viewModel.reloadWebView()
         }
     }
@@ -936,12 +943,12 @@ open class LoginActivity : FragmentActivity() {
         // Set welcome discovery feature flag if applicable
         if (isLoginWithWelcomeDiscovery(intent)) {
             SalesforceSDKManager.getInstance()
-                .registerUsedAppFeature(FEATURE_WELCOME_DISCOVERY_LOGIN);
+                .registerUsedAppFeature(FEATURE_WELCOME_DISCOVERY_LOGIN)
         }
         else {
             SalesforceSDKManager.getInstance().unregisterUsedAppFeature(
                 FEATURE_WELCOME_DISCOVERY_LOGIN
-            );
+            )
         }
 
         // Re-apply user agent to WebView
@@ -1125,7 +1132,7 @@ open class LoginActivity : FragmentActivity() {
                 loginHint = uri.getQueryParameter(SALESFORCE_WELCOME_DISCOVERY_MOBILE_CALLBACK_URL_QUERY_PARAMETER_KEY_LOGIN_HINT) ?: return false,
                 loginHost = uri.getQueryParameter(SALESFORCE_WELCOME_DISCOVERY_MOBILE_CALLBACK_URL_QUERY_PARAMETER_KEY_MY_DOMAIN)?.toUri()?.host ?: return false
             )
-            return true
+            true
         } else false
     }
 
@@ -1534,7 +1541,7 @@ open class LoginActivity : FragmentActivity() {
         /**
          * Determines if the provided URL has the Salesforce Welcome Discovery
          * path.
-         * @param url The URL to examine for the Salesforce Welcome Discovery
+         * @param uri The URL to examine for the Salesforce Welcome Discovery
          * path
          * @return Boolean true if the URL has the Salesforce Welcome Discovery
          * path or false otherwise
@@ -1549,7 +1556,7 @@ open class LoginActivity : FragmentActivity() {
          * Determines if the provided URL has the Salesforce Welcome Discovery
          * path and parameters for mobile callback.  The client id (consumer
          * key) of the URL must match the boot config's consumer key.
-         * @param url The URL to examine for the Salesforce Welcome Discovery
+         * @param uri The URL to examine for the Salesforce Welcome Discovery
          * path and parameters for mobile callback
          * @return Boolean true if the URL has the Salesforce Welcome Discovery
          * path and parameters for mobile callback and matches the boot config's
@@ -1575,7 +1582,7 @@ open class LoginActivity : FragmentActivity() {
          * Determines if the provided URL has the Salesforce Welcome Discovery
          * path and parameters for mobile callback.  The client id (consumer
          * key) of the URL must match the boot config's consumer key.
-         * @param url The URL to examine for the Salesforce Welcome Discovery
+         * @param uri The URL to examine for the Salesforce Welcome Discovery
          * path and parameters for mobile callback
          * @return Boolean true if the URL has the Salesforce Welcome Discovery
          * path and parameters for mobile callback and matches the boot config's
@@ -1654,7 +1661,7 @@ open class LoginActivity : FragmentActivity() {
      * Activity result callback for the "Login for Admin" custom tab.
      */
     @VisibleForTesting
-    internal inner class AdminCustomTabActivityResult : ActivityResultCallback<ActivityResult> {
+    internal class AdminCustomTabActivityResult : ActivityResultCallback<ActivityResult> {
         override fun onActivityResult(result: ActivityResult) {
             // Intentional no-op: keep the existing WebView visible on cancel.
         }
