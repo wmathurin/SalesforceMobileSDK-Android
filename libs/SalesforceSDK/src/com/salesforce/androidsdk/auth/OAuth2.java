@@ -621,14 +621,14 @@ public class OAuth2 {
      */
     public static URI overrideLoginServerIfNeeded(String loginServer, @Nullable String instanceServer,
                                                   @Nullable String communityId, @Nullable String communityUrl) {
-        if (communityId != null && communityUrl != null) {
+        if (communityId != null && !communityId.isEmpty() && communityUrl != null && !communityUrl.isEmpty()) {
             try {
                 return new URI(communityUrl);
             } catch (URISyntaxException e) {
                 SalesforceSDKLogger.w(TAG, "Invalid community URL, falling through to instanceServer", e);
             }
         }
-        if (instanceServer != null) {
+        if (instanceServer != null && !instanceServer.isEmpty()) {
             try {
                 return new URI(instanceServer);
             } catch (URISyntaxException e) {

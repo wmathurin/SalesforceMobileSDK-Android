@@ -73,4 +73,10 @@ class OAuth2OverrideLoginServerTests {
         val result = overrideLoginServerIfNeeded(loginServer, instanceServer, communityId, "not a valid uri ://")
         assertEquals(instanceServer, result.toString())
     }
+
+    @Test
+    fun test_givenEmptyInstanceServer_whenOverrideLoginServerIfNeeded_thenReturnsLoginServer() {
+        val result = overrideLoginServerIfNeeded(loginServer, "", null, null)
+        assertEquals(loginServer, result.toString())
+    }
 }
