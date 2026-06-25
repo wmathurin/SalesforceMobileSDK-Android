@@ -763,11 +763,7 @@ public class ClientManager {
             // value avoids POSTing a stale token that would fail with invalid_grant.
             final String currentRefreshToken = originalUserAccount.getRefreshToken();
             try {
-                final URI tokenServer = OAuth2.overrideLoginServerIfNeeded(
-                        originalUserAccount.getLoginServer(),
-                        originalUserAccount.getInstanceServer(),
-                        originalUserAccount.getCommunityId(),
-                        originalUserAccount.getCommunityUrl());
+                final URI tokenServer = OAuth2.overrideLoginServerIfNeeded(originalUserAccount);
                 SalesforceSDKLogger.i(TAG, "Initiating token refresh to host: " + tokenServer.getHost());
                 final TokenEndpointResponse tr = refreshAuthToken(HttpAccess.DEFAULT,
                         tokenServer, originalUserAccount.getClientIdForRefresh(), currentRefreshToken, addlParamsMap);

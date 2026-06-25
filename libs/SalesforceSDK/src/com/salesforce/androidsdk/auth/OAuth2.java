@@ -34,6 +34,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.annotation.WorkerThread;
 
+import com.salesforce.androidsdk.accounts.UserAccount;
 import com.salesforce.androidsdk.app.SalesforceSDKManager;
 import com.salesforce.androidsdk.rest.RestResponse;
 import com.salesforce.androidsdk.util.SalesforceSDKLogger;
@@ -640,6 +641,21 @@ public class OAuth2 {
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Invalid login server URL: " + loginServer, e);
         }
+    }
+
+    /**
+     * Selects the server URI to target for token endpoint requests for the given user account.
+     * Precedence: communityUrl &gt; instanceServer &gt; loginServer.
+     *
+     * @param userAccount User account whose server fields are used.
+     * @return The URI to use as the token endpoint base.
+     */
+    public static URI overrideLoginServerIfNeeded(@NonNull UserAccount userAccount) {
+        return overrideLoginServerIfNeeded(
+                userAccount.getLoginServer(),
+                userAccount.getInstanceServer(),
+                userAccount.getCommunityId(),
+                userAccount.getCommunityUrl());
     }
 
     /**

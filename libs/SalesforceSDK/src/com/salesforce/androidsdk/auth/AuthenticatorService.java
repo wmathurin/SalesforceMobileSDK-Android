@@ -134,11 +134,7 @@ public class AuthenticatorService extends Service {
 
             try {
                 final Map<String,String> addlParamsMap = originalUserAccount.getAdditionalOauthValues();
-                final URI tokenServer = OAuth2.overrideLoginServerIfNeeded(
-                        originalUserAccount.getLoginServer(),
-                        originalUserAccount.getInstanceServer(),
-                        originalUserAccount.getCommunityId(),
-                        originalUserAccount.getCommunityUrl());
+                final URI tokenServer = OAuth2.overrideLoginServerIfNeeded(originalUserAccount);
                 SalesforceSDKLogger.i(TAG, "Initiating token refresh to host: " + tokenServer.getHost());
                 final OAuth2.TokenEndpointResponse tr = OAuth2.refreshAuthToken(HttpAccess.DEFAULT,
                         tokenServer, originalUserAccount.getClientIdForRefresh(), originalUserAccount.getRefreshToken(), addlParamsMap);
