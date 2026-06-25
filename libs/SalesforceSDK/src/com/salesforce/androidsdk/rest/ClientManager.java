@@ -50,6 +50,7 @@ import com.salesforce.androidsdk.analytics.EventBuilderHelper;
 import com.salesforce.androidsdk.app.SalesforceSDKManager;
 import com.salesforce.androidsdk.auth.AuthenticatorService;
 import com.salesforce.androidsdk.auth.HttpAccess;
+import com.salesforce.androidsdk.auth.OAuth2;
 import com.salesforce.androidsdk.auth.OAuth2.LogoutReason;
 import com.salesforce.androidsdk.auth.OAuth2.OAuthFailedException;
 import com.salesforce.androidsdk.auth.OAuth2.TokenEndpointResponse;
@@ -762,8 +763,10 @@ public class ClientManager {
             // value avoids POSTing a stale token that would fail with invalid_grant.
             final String currentRefreshToken = originalUserAccount.getRefreshToken();
             try {
+                final URI tokenServer = OAuth2.overrideLoginServerIfNeeded(originalUserAccount);
+                SalesforceSDKLogger.i(TAG, "Initiating token refresh to host: " + tokenServer.getHost());
                 final TokenEndpointResponse tr = refreshAuthToken(HttpAccess.DEFAULT,
-                        new URI(originalUserAccount.getLoginServer()), originalUserAccount.getClientIdForRefresh(), currentRefreshToken, addlParamsMap);
+                        tokenServer, originalUserAccount.getClientIdForRefresh(), currentRefreshToken, addlParamsMap);
 
                 if (tr.authToken == null) {
                     throw new MalformedTokenException("Token endpoint returned null access token");
