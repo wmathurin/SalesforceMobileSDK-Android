@@ -30,9 +30,11 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.annotation.WorkerThread;
 
+import com.salesforce.androidsdk.accounts.UserAccount;
 import com.salesforce.androidsdk.app.SalesforceSDKManager;
 import com.salesforce.androidsdk.rest.RestResponse;
 import com.salesforce.androidsdk.util.SalesforceSDKLogger;
@@ -607,20 +609,76 @@ public class OAuth2 {
     }
 
     /**
+     * Selects the server URI to target for token endpoint requests.
+     * Precedence: communityUrl &gt; instanceServer &gt; loginServer.
+     * instanceServer is populated only after the first token response, so a null instanceServer
+     * naturally identifies the code-exchange path which must target the login pool.
+     *
+     * @param loginServer Login server URL string (fallback, never null).
+     * @param instanceServer Instance server URL string, or null if not yet known.
+     * @param communityId Community ID, or null if not a community user.
+     * @param communityUrl Community URL string, or null if not a community user.
+     * @return The URI to use as the token endpoint base.
+     */
+    public static URI overrideLoginServerIfNeeded(String loginServer, @Nullable String instanceServer,
+                                                  @Nullable String communityId, @Nullable String communityUrl) {
+        if (communityId != null && !communityId.isEmpty() && communityUrl != null && !communityUrl.isEmpty()) {
+            try {
+                return new URI(communityUrl);
+            } catch (URISyntaxException e) {
+                SalesforceSDKLogger.w(TAG, "Invalid community URL, falling through to instanceServer", e);
+            }
+        }
+        if (instanceServer != null && !instanceServer.isEmpty()) {
+            try {
+                return new URI(instanceServer);
+            } catch (URISyntaxException e) {
+                SalesforceSDKLogger.w(TAG, "Invalid instance server URL, falling through to loginServer", e);
+            }
+        }
+        try {
+            return new URI(loginServer);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("Invalid login server URL: " + loginServer, e);
+        }
+    }
+
+    /**
+     * Selects the server URI to target for token endpoint requests for the given user account.
+     * Precedence: communityUrl &gt; instanceServer &gt; loginServer.
+     *
+     * @param userAccount User account whose server fields are used.
+     * @return The URI to use as the token endpoint base.
+     */
+    public static URI overrideLoginServerIfNeeded(@NonNull UserAccount userAccount) {
+        return overrideLoginServerIfNeeded(
+                userAccount.getLoginServer(),
+                userAccount.getInstanceServer(),
+                userAccount.getCommunityId(),
+                userAccount.getCommunityUrl());
+    }
+
+    /**
      * Fetches an OpenID token from the Salesforce backend. This requires an OpenID token to be
      * configured on the Salesforce connected app in the backend. It also requires the "openid"
      * scope to be added on the client side through bootconfig and on the connected app.
      *
      * @param loginServer Login server.
+     * @param instanceServer Instance server, or null if not yet known.
      * @param clientId Client ID.
+     * @param communityId Community ID, or null if not a community user.
+     * @param communityUrl Community URL, or null if not a community user.
      * @param refreshToken Refresh token.
      * @return OpenID token.
      */
-    public static String getOpenIDToken(String loginServer, String clientId, String refreshToken) {
+    public static String getOpenIDToken(String loginServer, @Nullable String instanceServer,
+                                        String clientId, @Nullable String communityId,
+                                        @Nullable String communityUrl, String refreshToken) {
         String idToken = null;
         try {
+            final URI tokenServer = overrideLoginServerIfNeeded(loginServer, instanceServer, communityId, communityUrl);
             final TokenEndpointResponse tr = refreshAuthToken(HttpAccess.DEFAULT,
-                    new URI(loginServer), clientId, refreshToken, null);
+                    tokenServer, clientId, refreshToken, null);
             idToken = tr.idToken;
         } catch (Exception e) {
             SalesforceSDKLogger.e(TAG, "Exception thrown while fetching OpenID token", e);
