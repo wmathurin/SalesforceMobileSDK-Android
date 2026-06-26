@@ -1664,21 +1664,41 @@ open class SalesforceSDKManager protected constructor(
         }
     }
 
+    /**
+     * Determines the target account (or null for all users) for foreground push
+     * re-registration based on [PushService.foregroundRegistrationMode].
+     *
+     * Returns null when re-registration should be skipped entirely (i.e.
+     * [PushService.PushNotificationForegroundRegistrationMode.CURRENT_USER] is set
+     * but there is no current user).
+     */
+    @VisibleForTesting
+    internal fun foregroundPushRegistrationTarget(): ForegroundPushTarget? =
+        when (PushService.foregroundRegistrationMode) {
+            PushService.PushNotificationForegroundRegistrationMode.ALL_USERS ->
+                ForegroundPushTarget(account = null)
+            PushService.PushNotificationForegroundRegistrationMode.CURRENT_USER ->
+                userAccountManager.currentUser?.let { ForegroundPushTarget(account = it) }
+        }
+
+    /** Holds the resolved account argument for foreground push re-registration. */
+    @VisibleForTesting
+    internal data class ForegroundPushTarget(val account: UserAccount?)
+
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
 
         (screenLockManager as ScreenLockManager?)?.onAppForegrounded()
         (biometricAuthenticationManager as? BiometricAuthenticationManager)?.onAppForegrounded()
 
-        // Review push-notifications registration for the current user, if enabled.
-        userAccountManager.currentUser?.let { userAccount ->
-            if (pushNotificationsRegistrationType == ReRegistrationOnAppForeground) {
-                register(
-                    context = appContext,
-                    account = userAccount,
-                    recreateKey = false
-                )
-            }
+        // Review push-notifications registration on foreground, if enabled.
+        if (pushNotificationsRegistrationType == ReRegistrationOnAppForeground) {
+            val target = foregroundPushRegistrationTarget() ?: return@onResume
+            register(
+                context = appContext,
+                account = target.account,
+                recreateKey = false
+            )
         }
 
         // Display the Salesforce Mobile SDK "Show Developer Support" notification
