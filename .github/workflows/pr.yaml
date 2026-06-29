@@ -5,7 +5,9 @@ on:
   # Mitigated by per-job Member Check (see "Check Write Permission" + "Validate Write Permission" steps).
   # Reference: team Github Actions Tribal Knowledge doc.
   pull_request_target:  # zizmor: ignore[dangerous-triggers]
-    branches: [dev, master]
+    # feature/dpopBehavior is a temporary entry: PRs in the multi-PR DPoP
+    # rollout target this branch. Remove once DPoP is merged back to dev.
+    branches: [dev, master, dpop]
     paths-ignore:
       - '**/*.md'
       - 'LICENSE'
