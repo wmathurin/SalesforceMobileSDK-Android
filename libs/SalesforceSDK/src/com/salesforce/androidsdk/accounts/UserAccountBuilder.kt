@@ -72,7 +72,7 @@ class UserAccountBuilder private constructor() {
     private var beaconChildConsumerKey: String? = null
     private var beaconChildConsumerSecret: String? = null
     private var scope: String? = null
-    private var dpopScope: String? = null
+    private var credentialsIdentifier: String? = null
     private var tokenType: String? = null
 
     /**
@@ -179,7 +179,7 @@ class UserAccountBuilder private constructor() {
             .beaconChildConsumerKey(userAccount.beaconChildConsumerKey)
             .beaconChildConsumerSecret(userAccount.beaconChildConsumerSecret)
             .scope(userAccount.scope)
-            .dpopScope(userAccount.dpopScope)
+            .credentialsIdentifier(userAccount.credentialsIdentifier)
             .tokenType(userAccount.tokenType)
     }
 
@@ -591,13 +591,13 @@ class UserAccountBuilder private constructor() {
     }
 
     /**
-     * Sets DPoP credentials identifier (keystore alias for the DPoP keypair).
+     * Sets credentials identifier (keystore alias for the DPoP keypair).
      *
-     * @param dpopScope DPoP credentials identifier.
+     * @param credentialsIdentifier Credentials identifier.
      * @return Instance of this class.
      */
-    fun dpopScope(dpopScope: String?): UserAccountBuilder {
-        return if (!allowUnset && dpopScope == null) this else apply { this.dpopScope = dpopScope }
+    fun credentialsIdentifier(credentialsIdentifier: String?): UserAccountBuilder {
+        return if (!allowUnset && credentialsIdentifier == null) this else apply { this.credentialsIdentifier = credentialsIdentifier }
     }
 
     /**
@@ -656,7 +656,7 @@ class UserAccountBuilder private constructor() {
             apiInstanceServer,
             scope,
         )
-        account.dpopScope = dpopScope
+        account.credentialsIdentifier = credentialsIdentifier
         account.tokenType = tokenType
         return account
     }

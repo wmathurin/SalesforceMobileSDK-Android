@@ -165,7 +165,7 @@ internal suspend fun onAuthFlowComplete(
         .loginServer(loginServer)
         .clientId(consumerKey)
         .nativeLogin(nativeLogin)
-        .dpopScope(credentialsIdentifier)
+        .credentialsIdentifier(credentialsIdentifier)
         .build()
 
     // Set additional administrator prefs if they exist

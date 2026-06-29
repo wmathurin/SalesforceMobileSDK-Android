@@ -105,7 +105,7 @@ public class UserAccount {
 	public static final String BEACON_CHILD_CONSUMER_SECRET = "auto_installed_app_org_consumer_secret";
 	public static final String SCOPE = "scope";
 	public static final String FEATURE_FLAGS = "feature_flags";
-	public static final String DPOP_SCOPE = "dpopScope";
+	public static final String CREDENTIALS_IDENTIFIER = "credentialsIdentifier";
 	public static final String TOKEN_TYPE = "tokenType";
 
 	private static final String TAG = "UserAccount";
@@ -154,7 +154,7 @@ public class UserAccount {
 	private String beaconChildConsumerKey;
 	private String beaconChildConsumerSecret;
 	private String scope;
-	private String dpopScope;
+	private String credentialsIdentifier;
 	private String tokenType;
 	private Set<String> featureFlags = new java.util.HashSet<>();
 
@@ -299,7 +299,7 @@ public class UserAccount {
 			beaconChildConsumerKey = object.optString(BEACON_CHILD_CONSUMER_KEY, null);
 			beaconChildConsumerSecret = object.optString(BEACON_CHILD_CONSUMER_SECRET, null);
 			scope = object.optString(SCOPE, null);
-			dpopScope = object.optString(DPOP_SCOPE, null);
+			credentialsIdentifier = object.optString(CREDENTIALS_IDENTIFIER, null);
 			tokenType = object.optString(TOKEN_TYPE, null);
 			additionalOauthValues = MapUtil.addJSONObjectToMap(object, additionalOauthKeys, additionalOauthValues);
 		}
@@ -358,7 +358,7 @@ public class UserAccount {
 			beaconChildConsumerKey = bundle.getString(BEACON_CHILD_CONSUMER_KEY);
 			beaconChildConsumerSecret = bundle.getString(BEACON_CHILD_CONSUMER_SECRET);
 			scope = bundle.getString(SCOPE);
-			dpopScope = bundle.getString(DPOP_SCOPE);
+			credentialsIdentifier = bundle.getString(CREDENTIALS_IDENTIFIER);
 			tokenType = bundle.getString(TOKEN_TYPE);
 			additionalOauthValues = MapUtil.addBundleToMap(bundle, additionalOauthKeys, additionalOauthValues);
 		}
@@ -749,22 +749,22 @@ public class UserAccount {
 	}
 
 	/**
-	 * Returns the DPoP credentials identifier used as the keystore alias for
+	 * Returns the credentials identifier used as the keystore alias for
 	 * this user's DPoP keypair.
 	 *
-	 * @return DPoP credentials identifier, or null if DPoP is not in use.
+	 * @return Credentials identifier, or null if DPoP is not in use.
 	 */
-	public String getDpopScope() {
-		return dpopScope;
+	public String getCredentialsIdentifier() {
+		return credentialsIdentifier;
 	}
 
 	/**
-	 * Sets the DPoP credentials identifier.
+	 * Sets the credentials identifier.
 	 *
-	 * @param dpopScope DPoP credentials identifier.
+	 * @param credentialsIdentifier Credentials identifier.
 	 */
-	public void setDpopScope(String dpopScope) {
-		this.dpopScope = dpopScope;
+	public void setCredentialsIdentifier(String credentialsIdentifier) {
+		this.credentialsIdentifier = credentialsIdentifier;
 	}
 
 	/**
@@ -1094,7 +1094,7 @@ public class UserAccount {
 			object.put(BEACON_CHILD_CONSUMER_KEY, beaconChildConsumerKey);
 			object.put(BEACON_CHILD_CONSUMER_SECRET, beaconChildConsumerSecret);
 			object.put(SCOPE, scope);
-			if (dpopScope != null) object.put(DPOP_SCOPE, dpopScope);
+			if (credentialsIdentifier != null) object.put(CREDENTIALS_IDENTIFIER, credentialsIdentifier);
 			if (tokenType != null) object.put(TOKEN_TYPE, tokenType);
 			if (!featureFlags.isEmpty()) {
 				org.json.JSONArray flagsArray = new org.json.JSONArray();
@@ -1162,7 +1162,7 @@ public class UserAccount {
 		object.putString(BEACON_CHILD_CONSUMER_KEY, beaconChildConsumerKey);
 		object.putString(BEACON_CHILD_CONSUMER_SECRET, beaconChildConsumerSecret);
 		object.putString(SCOPE, scope);
-		if (dpopScope != null) object.putString(DPOP_SCOPE, dpopScope);
+		if (credentialsIdentifier != null) object.putString(CREDENTIALS_IDENTIFIER, credentialsIdentifier);
 		if (tokenType != null) object.putString(TOKEN_TYPE, tokenType);
 		object = MapUtil.addMapToBundle(additionalOauthValues, additionalOauthKeys, object);
 		return object;

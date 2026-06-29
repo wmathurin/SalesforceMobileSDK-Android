@@ -778,7 +778,7 @@ public class ClientManager {
                 SalesforceSDKLogger.i(TAG, "Initiating token refresh to host: " + tokenServer.getHost());
                 final TokenEndpointResponse tr = refreshAuthToken(HttpAccess.DEFAULT,
                         tokenServer, originalUserAccount.getClientIdForRefresh(), currentRefreshToken, addlParamsMap,
-                        originalUserAccount.getDpopScope());
+                        originalUserAccount.getCredentialsIdentifier());
 
                 if (tr.authToken == null) {
                     throw new MalformedTokenException("Token endpoint returned null access token");

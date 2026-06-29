@@ -1236,9 +1236,9 @@ open class SalesforceSDKManager protected constructor(
             userAccount,
             showLoginPage
         )
-        userAccount?.dpopScope?.takeIf { it.isNotEmpty() }?.let { scope ->
+        userAccount?.credentialsIdentifier?.takeIf { it.isNotEmpty() }?.let { id ->
             runCatching {
-                DPoPKeyManager.deleteKeyPair(DPoPKeyManager.aliasForCredentialsIdentifier(scope))
+                DPoPKeyManager.deleteKeyPair(DPoPKeyManager.aliasForCredentialsIdentifier(id))
             }.onFailure { e ->
                 w(TAG, "Failed to delete DPoP key pair on logout", e)
             }
