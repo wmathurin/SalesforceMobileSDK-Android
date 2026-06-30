@@ -23,6 +23,8 @@ import com.salesforce.androidsdk.push.PushService.Companion.REGISTRATION_STATUS_
 import com.salesforce.androidsdk.push.PushService.Companion.REGISTRATION_STATUS_SUCCEEDED
 import com.salesforce.androidsdk.push.PushService.Companion.UNREGISTRATION_STATUS_SUCCEEDED
 import com.salesforce.androidsdk.push.PushService.Companion.enqueuePushNotificationsRegistrationWork
+import com.salesforce.androidsdk.push.PushService.PushNotificationForegroundRegistrationMode.ALL_USERS
+import com.salesforce.androidsdk.push.PushService.PushNotificationForegroundRegistrationMode.CURRENT_USER
 import com.salesforce.androidsdk.push.PushService.PushNotificationReRegistrationType.ReRegistrationDisabled
 import com.salesforce.androidsdk.rest.ApiVersionStrings.VERSION_NUMBER_TEST
 import com.salesforce.androidsdk.rest.NotificationsActionsResponseBody
@@ -89,6 +91,7 @@ class PushServiceTest {
     fun tearDown() {
 
         VERSION_NUMBER_TEST = null
+        PushService.foregroundRegistrationMode = ALL_USERS
         cleanupAccounts(accountManager)
 
         userAccountManager = null
@@ -945,6 +948,66 @@ class PushServiceTest {
     fun testRemoveNotificationsCategories() {
         PushService().removeNotificationsCategories()
     }
+
+    // region Foreground Registration Mode Tests
+
+    @Test
+    fun test_givenDefault_thenForegroundRegistrationModeIsAllUsers() {
+        assertEquals(ALL_USERS, PushService.foregroundRegistrationMode)
+    }
+
+    @Test
+    fun test_givenModeCurrentUser_whenSet_thenForegroundRegistrationModeIsCurrentUser() {
+        PushService.foregroundRegistrationMode = CURRENT_USER
+        assertEquals(CURRENT_USER, PushService.foregroundRegistrationMode)
+    }
+
+    @Test
+    fun test_givenModeAllUsers_whenAppEntersForeground_thenTargetAccountIsNull() {
+        PushService.foregroundRegistrationMode = ALL_USERS
+        createTestAccountInAccountManager(userAccountManager)
+
+        val target = SalesforceSDKManager.getInstance().foregroundPushRegistrationTarget()
+
+        // null account means the worker iterates all authenticated users
+        assertNotNull(target)
+        assertNull(target?.account)
+    }
+
+    @Test
+    fun test_givenModeCurrentUser_whenAppEntersForeground_thenTargetAccountIsCurrentUser() {
+        PushService.foregroundRegistrationMode = CURRENT_USER
+        createTestAccountInAccountManager(userAccountManager)
+        val currentUser = userAccountManager?.currentUser
+
+        val target = SalesforceSDKManager.getInstance().foregroundPushRegistrationTarget()
+
+        assertNotNull(target)
+        assertEquals(currentUser, target?.account)
+    }
+
+    @Test
+    fun test_givenModeAllUsers_whenNoAuthenticatedUsers_thenTargetAccountIsNull() {
+        PushService.foregroundRegistrationMode = ALL_USERS
+        // No accounts — worker will iterate an empty list and do nothing
+
+        val target = SalesforceSDKManager.getInstance().foregroundPushRegistrationTarget()
+
+        assertNotNull(target)
+        assertNull(target?.account)
+    }
+
+    @Test
+    fun test_givenModeCurrentUser_whenNoCurrentUser_thenTargetIsNull() {
+        PushService.foregroundRegistrationMode = CURRENT_USER
+        // No accounts — currentUser is null, registration must be skipped
+
+        val target = SalesforceSDKManager.getInstance().foregroundPushRegistrationTarget()
+
+        assertNull(target)
+    }
+
+    // endregion
 
     companion object {
 

@@ -121,6 +121,7 @@ import com.salesforce.androidsdk.R.string.sf__ssl_not_yet_valid
 import com.salesforce.androidsdk.R.string.sf__ssl_unknown_error
 import com.salesforce.androidsdk.R.string.sf__ssl_untrusted
 import com.salesforce.androidsdk.accounts.UserAccount
+import com.salesforce.androidsdk.app.Features.FEATURE_BROWSER_LOGIN
 import com.salesforce.androidsdk.app.Features.FEATURE_QR_CODE_LOGIN
 import com.salesforce.androidsdk.app.Features.FEATURE_WELCOME_DISCOVERY_LOGIN
 import com.salesforce.androidsdk.app.SalesforceSDKManager
@@ -153,7 +154,6 @@ import org.json.JSONObject
 import java.lang.String.format
 import java.net.URI
 import java.net.URLDecoder
-import java.net.URLEncoder
 import java.security.PrivateKey
 import java.security.cert.X509Certificate
 
@@ -233,6 +233,7 @@ open class LoginActivity : FragmentActivity() {
     // Private variables
     private var baseUserAgentString = ""
     private var wasBackgrounded = false
+    private var completedViaBrowserTab = false
     private var accountAuthenticatorResponse: AccountAuthenticatorResponse? = null
     private var accountAuthenticatorResult: Bundle? = null
     private var newUserIntent = false
@@ -537,6 +538,32 @@ open class LoginActivity : FragmentActivity() {
      * @param userAccount The newly created user account.
      */
     protected open fun onAuthFlowSuccess(userAccount: UserAccount) {
+        val sdkManager = SalesforceSDKManager.getInstance()
+
+        // WD: write per-user and clear transient global
+        val usedWelcomeDiscovery = sdkManager.isGlobalFeatureRegistered(FEATURE_WELCOME_DISCOVERY_LOGIN)
+        sdkManager.unregisterUsedAppFeature(FEATURE_WELCOME_DISCOVERY_LOGIN)
+        if (usedWelcomeDiscovery) {
+            sdkManager.registerUsedAppFeature(FEATURE_WELCOME_DISCOVERY_LOGIN, userAccount)
+        }
+
+        // BW: promote transient global to per-user, then clear global.
+        // completedViaBrowserTab is true for both regular and Login for Admin Custom Tab paths.
+        // The global was set in loadLoginPageInCustomTab() so it appears in UA during login.
+        sdkManager.unregisterUsedAppFeature(FEATURE_BROWSER_LOGIN)
+        if (completedViaBrowserTab) {
+            sdkManager.registerUsedAppFeature(FEATURE_BROWSER_LOGIN, userAccount)
+        } else {
+            sdkManager.unregisterUsedAppFeature(FEATURE_BROWSER_LOGIN, userAccount)
+        }
+
+        // QR: write per-user and clear transient global
+        val usedQrLogin = sdkManager.isGlobalFeatureRegistered(FEATURE_QR_CODE_LOGIN)
+        sdkManager.unregisterUsedAppFeature(FEATURE_QR_CODE_LOGIN)
+        if (usedQrLogin) {
+            sdkManager.registerUsedAppFeature(FEATURE_QR_CODE_LOGIN, userAccount)
+        }
+
         // Create account and save result before switching to new user
         accountAuthenticatorResult = SalesforceSDKManager.getInstance().userAccountManager.createAccount(userAccount)
 
@@ -775,15 +802,32 @@ open class LoginActivity : FragmentActivity() {
      *  Launches the current login server in a Custom Tab. This allows Admins
      *  to authenticate with a Passkey or by other methods that require
      *  Advanced/Browser Authentication.
+     *
+     *  This function is a no-op for Welcome Discovery.
      */
     @Deprecated(message = "This function will be replaced by a permanent solution in 14.0.")
     fun launchLoginForAdminsAction() {
+        // Guard against launching a Custom Tab on the Welcome Discovery Phase 1 page, whose
+        // callback (sfdc://discocallback) is not app-unique.  This MUST use the same signal as the
+        // menu-item visibility gating in LoginView (viewModel.selectedServer), NOT
+        // LoginServerManager.selectedLoginServer: the latter stays welcome.salesforce.com through
+        // BOTH phases, while selectedServer is the discovered My Domain in Phase 2 — where LFA is
+        // valid and the menu item is shown.  Keying off LoginServerManager here would no-op the
+        // action in Phase 2 even though the menu offers it.
+        val selectedServer = viewModel.selectedServer.value?.toUri()
+        if (selectedServer?.let { isSalesforceWelcomeDiscoveryUrlPath(it) } == true) {
+            w(TAG, "launchLoginForAdminsAction is a no-op for Welcome Discovery; " +
+                    "LFA requires an app-unique OAuth callback")
+            return
+        }
         val loginUrl = viewModel.browserCustomTabUrl.value ?: return
         loadLoginPageInCustomTab(loginUrl, adminLoginCustomTabLauncher)
     }
 
     @VisibleForTesting
     internal fun loadLoginPageInCustomTab(loginUrl: String, customTabLauncher: ActivityResultLauncher<Intent>) {
+        completedViaBrowserTab = true
+        SalesforceSDKManager.getInstance().registerUsedAppFeature(FEATURE_BROWSER_LOGIN)
         val customTabsIntent = CustomTabsIntent.Builder().apply {
             /*
              * Set a custom animation to slide in and out for Chrome custom tab
@@ -1042,31 +1086,6 @@ open class LoginActivity : FragmentActivity() {
     }
 
     /**
-     * Creates a Salesforce Welcome Discovery mobile URL using the provided
-     * Salesforce Welcome Discovery host and path URL.
-     * @param salesforceWelcomeDiscoveryHostAndPathUrl The Salesforce Welcome
-     * Discovery host and path URL
-     * @return A Salesforce Welcome Discovery mobile URL with all required
-     * parameters
-     */
-    private fun generateSalesforceWelcomeDiscoveryMobileUrl(
-        salesforceWelcomeDiscoveryHostAndPathUrl: Uri
-    ) = salesforceWelcomeDiscoveryHostAndPathUrl.buildUpon()
-        .appendQueryParameter(
-            SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CLIENT_ID,
-            viewModel.oAuthConfig.consumerKey,
-        )
-        .appendQueryParameter(
-            SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CLIENT_VERSION,
-            URLEncoder.encode(SalesforceSDKManager.getInstance().appVersion, "utf8")
-        )
-        .appendQueryParameter(
-            SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CALLBACK_URL,
-            SALESFORCE_WELCOME_DISCOVERY_MOBILE_CALLBACK_URL
-        )
-        .build()
-
-    /**
      * Switches between default or Salesforce Welcome Discovery log in as needed
      * using the provided pending login server URL.
      * @param pendingLoginServerUri The pending login server URL
@@ -1091,7 +1110,7 @@ open class LoginActivity : FragmentActivity() {
                         this,
                         SalesforceSDKManager.getInstance().webViewLoginActivityClass
                     ).apply {
-                        data = generateSalesforceWelcomeDiscoveryMobileUrl(pendingLoginServerUri)
+                        data = viewModel.generateSalesforceWelcomeDiscoveryMobileUrl(pendingLoginServerUri)
                         flags = FLAG_ACTIVITY_SINGLE_TOP
                     })
                 true
@@ -1259,8 +1278,15 @@ open class LoginActivity : FragmentActivity() {
                     return@evaluateJavascript
                 }
 
-                viewModel.dynamicBackgroundColor.value = validateAndExtractBackgroundColor(result)
-                    ?: return@evaluateJavascript
+                viewModel.dynamicBackgroundColor.value =
+                    if (url?.toUri()?.let { isSalesforceWelcomeDiscoveryUrlPath(it) } == true) {
+                        // The Welcome Discovery Phase 1 page (welcome.salesforce.com/discovery)
+                        // reports a dark computed background in some states (e.g. after logout),
+                        // which would tint the top and bottom app bars black.
+                        Color.White
+                    } else {
+                        validateAndExtractBackgroundColor(result) ?: return@evaluateJavascript
+                    }
 
                 // Ensure Status Bar Icons are readable no matter which OS theme is used.
                 val titleTextColorLight = viewModel.titleTextColor?.luminance()?.let { it < 0.5 }
@@ -1503,7 +1529,7 @@ open class LoginActivity : FragmentActivity() {
         // region Salesforce Welcome Login Private Implementation
 
         /** The default Salesforce Welcome Discovery mobile callback URL.  This value is fixed until future Salesforce Welcome updates */
-        private const val SALESFORCE_WELCOME_DISCOVERY_MOBILE_CALLBACK_URL = "sfdc://discocallback"
+        internal const val SALESFORCE_WELCOME_DISCOVERY_MOBILE_CALLBACK_URL = "sfdc://discocallback"
 
         /** The Salesforce Welcome Discovery mobile callback URL's "login hint" parameter key */
         private const val SALESFORCE_WELCOME_DISCOVERY_MOBILE_CALLBACK_URL_QUERY_PARAMETER_KEY_LOGIN_HINT = "login_hint"

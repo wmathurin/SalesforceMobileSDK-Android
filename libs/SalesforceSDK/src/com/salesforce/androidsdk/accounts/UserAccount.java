@@ -49,8 +49,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This class represents a single user account that is currently
@@ -100,6 +104,9 @@ public class UserAccount {
 	public static final String BEACON_CHILD_CONSUMER_KEY = "auto_installed_app_org_consumer_key";
 	public static final String BEACON_CHILD_CONSUMER_SECRET = "auto_installed_app_org_consumer_secret";
 	public static final String SCOPE = "scope";
+	public static final String FEATURE_FLAGS = "feature_flags";
+	public static final String CREDENTIALS_IDENTIFIER = "credentialsIdentifier";
+	public static final String TOKEN_TYPE = "tokenType";
 
 	private static final String TAG = "UserAccount";
 	private static final String FORWARD_SLASH = "/";
@@ -147,6 +154,9 @@ public class UserAccount {
 	private String beaconChildConsumerKey;
 	private String beaconChildConsumerSecret;
 	private String scope;
+	private String credentialsIdentifier;
+	private String tokenType;
+	private Set<String> featureFlags = new java.util.HashSet<>();
 
 	/**
 	 * Parameterized constructor.
@@ -289,6 +299,8 @@ public class UserAccount {
 			beaconChildConsumerKey = object.optString(BEACON_CHILD_CONSUMER_KEY, null);
 			beaconChildConsumerSecret = object.optString(BEACON_CHILD_CONSUMER_SECRET, null);
 			scope = object.optString(SCOPE, null);
+			credentialsIdentifier = object.optString(CREDENTIALS_IDENTIFIER, null);
+			tokenType = object.optString(TOKEN_TYPE, null);
 			additionalOauthValues = MapUtil.addJSONObjectToMap(object, additionalOauthKeys, additionalOauthValues);
 		}
 	}
@@ -346,6 +358,8 @@ public class UserAccount {
 			beaconChildConsumerKey = bundle.getString(BEACON_CHILD_CONSUMER_KEY);
 			beaconChildConsumerSecret = bundle.getString(BEACON_CHILD_CONSUMER_SECRET);
 			scope = bundle.getString(SCOPE);
+			credentialsIdentifier = bundle.getString(CREDENTIALS_IDENTIFIER);
+			tokenType = bundle.getString(TOKEN_TYPE);
 			additionalOauthValues = MapUtil.addBundleToMap(bundle, additionalOauthKeys, additionalOauthValues);
 		}
 	}
@@ -733,6 +747,44 @@ public class UserAccount {
 	public boolean hasScope(String scopeToCheck) {
 		return new ScopeParser(scope).hasScope(scopeToCheck);
 	}
+
+	/**
+	 * Returns the credentials identifier used as the keystore alias for
+	 * this user's DPoP keypair.
+	 *
+	 * @return Credentials identifier, or null if DPoP is not in use.
+	 */
+	public String getCredentialsIdentifier() {
+		return credentialsIdentifier;
+	}
+
+	/**
+	 * Sets the credentials identifier.
+	 *
+	 * @param credentialsIdentifier Credentials identifier.
+	 */
+	public void setCredentialsIdentifier(String credentialsIdentifier) {
+		this.credentialsIdentifier = credentialsIdentifier;
+	}
+
+	/**
+	 * Returns the token type returned by the token endpoint
+	 * (e.g. "Bearer" or "DPoP").
+	 *
+	 * @return Token type, or null if not set.
+	 */
+	public String getTokenType() {
+		return tokenType;
+	}
+
+	/**
+	 * Sets the token type.
+	 *
+	 * @param tokenType Token type.
+	 */
+	public void setTokenType(String tokenType) {
+		this.tokenType = tokenType;
+	}
 	/**
 	 * Returns the beacon child consumer key.
 	 *
@@ -758,6 +810,24 @@ public class UserAccount {
 	 */
 	public Map<String, String> getAdditionalOauthValues() {
 		return additionalOauthValues;
+	}
+
+	/**
+	 * Returns the persisted per-user feature flags (e.g. BW, SU, MS).
+	 *
+	 * @return Unmodifiable set of feature flag codes.
+	 */
+	public Set<String> getFeatureFlags() {
+		return Collections.unmodifiableSet(featureFlags);
+	}
+
+	/**
+	 * Replaces the in-memory set of persisted per-user feature flags.
+	 *
+	 * @param flags The new set of feature flags.
+	 */
+	public void setFeatureFlags(Set<String> flags) {
+		featureFlags = flags != null ? new HashSet<>(flags) : new HashSet<>();
 	}
 
 	/**
@@ -1024,6 +1094,13 @@ public class UserAccount {
 			object.put(BEACON_CHILD_CONSUMER_KEY, beaconChildConsumerKey);
 			object.put(BEACON_CHILD_CONSUMER_SECRET, beaconChildConsumerSecret);
 			object.put(SCOPE, scope);
+			if (credentialsIdentifier != null) object.put(CREDENTIALS_IDENTIFIER, credentialsIdentifier);
+			if (tokenType != null) object.put(TOKEN_TYPE, tokenType);
+			if (!featureFlags.isEmpty()) {
+				org.json.JSONArray flagsArray = new org.json.JSONArray();
+				for (String f : featureFlags) flagsArray.put(f);
+				object.put(FEATURE_FLAGS, flagsArray);
+			}
 			object = MapUtil.addMapToJSONObject(additionalOauthValues, additionalOauthKeys, object);
 		} catch (JSONException e) {
 			SalesforceSDKLogger.e(TAG, "Unable to convert to JSON", e);
@@ -1085,6 +1162,8 @@ public class UserAccount {
 		object.putString(BEACON_CHILD_CONSUMER_KEY, beaconChildConsumerKey);
 		object.putString(BEACON_CHILD_CONSUMER_SECRET, beaconChildConsumerSecret);
 		object.putString(SCOPE, scope);
+		if (credentialsIdentifier != null) object.putString(CREDENTIALS_IDENTIFIER, credentialsIdentifier);
+		if (tokenType != null) object.putString(TOKEN_TYPE, tokenType);
 		object = MapUtil.addMapToBundle(additionalOauthValues, additionalOauthKeys, object);
 		return object;
 	}
