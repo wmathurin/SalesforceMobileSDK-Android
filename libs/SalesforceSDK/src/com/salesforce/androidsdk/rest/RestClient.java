@@ -31,6 +31,7 @@ import com.salesforce.androidsdk.app.SalesforceSDKManager;
 import com.salesforce.androidsdk.auth.HttpAccess;
 import com.salesforce.androidsdk.auth.OAuth2;
 import com.salesforce.androidsdk.auth.dpop.DPoPKeyManager;
+import com.salesforce.androidsdk.auth.dpop.DPoPNonceCache;
 import com.salesforce.androidsdk.auth.dpop.DPoPProofBuilder;
 import com.salesforce.androidsdk.auth.dpop.DPoPURLHelper;
 import com.salesforce.androidsdk.security.BiometricAuthenticationManager;
@@ -832,6 +833,18 @@ public class RestClient {
             request = buildAuthenticatedRequest(request);
             Response response = chain.proceed(request);
 
+            // Always harvest DPoP-Nonce from the response for proactive use on the next call.
+            extractAndCacheNonce(response);
+
+            // DPoP nonce challenge: server requires a nonce we didn't include. Retry once.
+            if (isNonceChallenge(response)) {
+                SalesforceSDKLogger.d(TAG, "DPoP nonce challenge received, retrying with nonce");
+                response.close();
+                request = buildAuthenticatedRequest(request);
+                response = chain.proceed(request);
+                extractAndCacheNonce(response);
+            }
+
             /*
              * Standard access token expiry returns 401 as the error code.
              */
@@ -878,6 +891,29 @@ public class RestClient {
             return response;
         }
 
+        private void extractAndCacheNonce(Response response) {
+            if (!DPOP.equals(tokenType)) return;
+            if (credentialsIdentifier == null || credentialsIdentifier.isEmpty()) return;
+            final String nonce = response.header("DPoP-Nonce");
+            if (nonce != null && !nonce.isEmpty()) {
+                DPoPNonceCache.INSTANCE.store(credentialsIdentifier, nonce);
+            }
+        }
+
+        private boolean isNonceChallenge(Response response) {
+            final int code = response.code();
+            if (code != HttpURLConnection.HTTP_BAD_REQUEST && code != HttpURLConnection.HTTP_UNAUTHORIZED) {
+                return false;
+            }
+            if (!DPOP.equals(tokenType)) return false;
+            try {
+                final String body = response.peekBody(512).string();
+                return body.contains("use_dpop_nonce");
+            } catch (IOException e) {
+                return false;
+            }
+        }
+
         /**
          * Build new request which has the new host. This is essential in case of instance migration
          *
@@ -915,7 +951,8 @@ public class RestClient {
                 final String htu = DPoPURLHelper.INSTANCE.canonicalize(url);
                 final String alias = DPoPKeyManager.INSTANCE.aliasForCredentialsIdentifier(credentialsIdentifier);
                 final java.security.KeyPair keyPair = DPoPKeyManager.INSTANCE.generateOrLoadKeyPair(alias);
-                final String proof = DPoPProofBuilder.INSTANCE.buildProof(method, htu, keyPair, null, authToken);
+                final String nonce = DPoPNonceCache.INSTANCE.get(credentialsIdentifier);
+                final String proof = DPoPProofBuilder.INSTANCE.buildProof(method, htu, keyPair, nonce, authToken);
                 builder.header(DPOP, proof);
             } catch (Exception e) {
                 SalesforceSDKLogger.e(TAG, "Failed to attach DPoP header in interceptor, proceeding without it", e);
