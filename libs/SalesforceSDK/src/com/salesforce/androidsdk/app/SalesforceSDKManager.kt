@@ -95,6 +95,7 @@ import com.salesforce.androidsdk.auth.OAuth2.LogoutReason
 import com.salesforce.androidsdk.auth.OAuth2.LogoutReason.UNKNOWN
 import com.salesforce.androidsdk.auth.OAuth2.revokeRefreshToken
 import com.salesforce.androidsdk.auth.RemoteAccessConsumerKeyProvider
+import com.salesforce.androidsdk.auth.dpop.DPoPKeyManager
 import com.salesforce.androidsdk.auth.idp.SPConfig
 import com.salesforce.androidsdk.auth.idp.interfaces.IDPManager
 import com.salesforce.androidsdk.auth.idp.interfaces.SPManager
@@ -426,6 +427,20 @@ open class SalesforceSDKManager protected constructor(
      * false.
      */
     var clearCookiesAfterLogin = true
+
+    /**
+     * Opt-in flag for DPoP (Demonstration of Proof-of-Possession, RFC 9449).
+     * When true, the SDK will attach a DPoP proof JWT to token endpoint
+     * requests and use the `DPoP` Authorization scheme for resource requests
+     * when the token endpoint advertises `token_type: DPoP`.
+     */
+    private var useDPoP = false
+
+    fun isUseDPoP(): Boolean = useDPoP
+
+    fun setUseDPoP(useDPoP: Boolean) {
+        this.useDPoP = useDPoP
+    }
 
     /**
      * The login brand. In the following example, "<brand>" should be set here.
@@ -1221,6 +1236,13 @@ open class SalesforceSDKManager protected constructor(
             userAccount,
             showLoginPage
         )
+        userAccount?.credentialsIdentifier?.takeIf { it.isNotEmpty() }?.let { id ->
+            runCatching {
+                DPoPKeyManager.deleteKeyPair(DPoPKeyManager.aliasForCredentialsIdentifier(id))
+            }.onFailure { e ->
+                w(TAG, "Failed to delete DPoP key pair on logout", e)
+            }
+        }
         clientMgr.removeAccount(account)
         isLoggingOut = false
 
