@@ -408,29 +408,7 @@ public class RestClient {
             }
         }
 
-        // Attach DPoP proof header for DPoP-bound access tokens
-        final String authToken = oAuthRefreshInterceptor.getAuthToken();
-        final String tokenType = oAuthRefreshInterceptor.tokenType;
-        final String credentialsIdentifier = oAuthRefreshInterceptor.credentialsIdentifier;
-        attachDPoPProofHeader(builder, restRequest.getMethod().toString(), url.toString(), authToken, tokenType, credentialsIdentifier);
-
         return builder.build();
-    }
-
-    private void attachDPoPProofHeader(Request.Builder builder, String method, String url,
-                                       String accessToken, String tokenType, String credentialsIdentifier) {
-        if (!DPOP.equals(tokenType)) return;
-        if (!SalesforceSDKManager.getInstance().isUseDPoP()) return;
-        if (credentialsIdentifier == null || credentialsIdentifier.isEmpty()) return;
-        try {
-            final String htu = DPoPURLHelper.INSTANCE.canonicalize(url);
-            final String alias = DPoPKeyManager.INSTANCE.aliasForCredentialsIdentifier(credentialsIdentifier);
-            final java.security.KeyPair keyPair = DPoPKeyManager.INSTANCE.generateOrLoadKeyPair(alias);
-            final String proof = DPoPProofBuilder.INSTANCE.buildProof(method, htu, keyPair, null, accessToken);
-            builder.header(DPOP, proof);
-        } catch (Exception e) {
-            SalesforceSDKLogger.e(TAG, "Failed to attach DPoP header, proceeding without it", e);
-        }
     }
 
     /**

@@ -624,15 +624,14 @@ public class OAuth2 {
         final Request.Builder builder = new Request.Builder().url(identityServiceIdUrl).get();
         addAuthorizationHeader(builder, authToken, tokenType);
         if (DPOP.equals(tokenType) && credentialsIdentifier != null && SalesforceSDKManager.getInstance().isUseDPoP()) {
-            try {
-                final String htu = DPoPURLHelper.INSTANCE.canonicalize(identityServiceIdUrl);
-                final String alias = DPoPKeyManager.INSTANCE.aliasForCredentialsIdentifier(credentialsIdentifier);
-                final KeyPair keyPair = DPoPKeyManager.INSTANCE.generateOrLoadKeyPair(alias);
-                final String proof = DPoPProofBuilder.INSTANCE.buildProof("GET", htu, keyPair, null, authToken);
-                builder.header(DPOP, proof);
-            } catch (Exception e) {
-                SalesforceSDKLogger.e(TAG, "Failed to attach DPoP header for identity service, proceeding without it", e);
-            }
+            // Fail-closed: a DPoP-bound identity request without a proof header will be rejected
+            // by the server regardless, so surface the error rather than sending an unusable request.
+            // This matches iOS SFIdentityCoordinator behaviour (commit 97a62410a).
+            final String htu = DPoPURLHelper.INSTANCE.canonicalize(identityServiceIdUrl);
+            final String alias = DPoPKeyManager.INSTANCE.aliasForCredentialsIdentifier(credentialsIdentifier);
+            final KeyPair keyPair = DPoPKeyManager.INSTANCE.generateOrLoadKeyPair(alias);
+            final String proof = DPoPProofBuilder.INSTANCE.buildProof("GET", htu, keyPair, null, authToken);
+            builder.header(DPOP, proof);
         }
         final Request request = builder.build();
         final Response response = httpAccessor.getOkHttpClient().newCall(request).execute();
