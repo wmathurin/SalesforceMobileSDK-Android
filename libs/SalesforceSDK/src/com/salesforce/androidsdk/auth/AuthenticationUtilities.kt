@@ -333,6 +333,8 @@ private suspend fun fetchUserIdentity(
                 HttpAccess.DEFAULT,
                 tokenResponse.idUrlWithInstance,
                 tokenResponse.authToken,
+                tokenResponse.tokenType,
+                tokenResponse.credentialsIdentifier,
             )
         }
     }.onFailure { throwable ->

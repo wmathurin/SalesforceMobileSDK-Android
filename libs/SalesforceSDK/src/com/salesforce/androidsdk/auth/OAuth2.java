@@ -598,8 +598,42 @@ public class OAuth2 {
                                                         String identityServiceIdUrl,
                                                         String authToken)
             throws IOException {
+        return callIdentityService(httpAccessor, identityServiceIdUrl, authToken, null, null);
+    }
+
+    /**
+     * Calls the identity service to determine the username of the user and the mobile policy, given
+     * their identity service ID and an access token. When the token is DPoP-bound, attaches a DPoP
+     * proof header.
+     *
+     * @param httpAccessor HttpAccessor instance.
+     * @param identityServiceIdUrl Identity service URL.
+     * @param authToken Access token.
+     * @param tokenType Token type (e.g. "Bearer" or "DPoP"), or null for default Bearer.
+     * @param credentialsIdentifier Identifier used to look up the DPoP keypair, or null.
+     * @return IdServiceResponse instance.
+     *
+     * @throws IOException See {@link IOException}.
+     */
+    public static IdServiceResponse callIdentityService(HttpAccess httpAccessor,
+                                                        String identityServiceIdUrl,
+                                                        String authToken,
+                                                        @Nullable String tokenType,
+                                                        @Nullable String credentialsIdentifier)
+            throws IOException {
         final Request.Builder builder = new Request.Builder().url(identityServiceIdUrl).get();
-        addAuthorizationHeader(builder, authToken);
+        addAuthorizationHeader(builder, authToken, tokenType);
+        if (DPOP.equals(tokenType) && credentialsIdentifier != null && SalesforceSDKManager.getInstance().isUseDPoP()) {
+            try {
+                final String htu = DPoPURLHelper.INSTANCE.canonicalize(identityServiceIdUrl);
+                final String alias = DPoPKeyManager.INSTANCE.aliasForCredentialsIdentifier(credentialsIdentifier);
+                final KeyPair keyPair = DPoPKeyManager.INSTANCE.generateOrLoadKeyPair(alias);
+                final String proof = DPoPProofBuilder.INSTANCE.buildProof("GET", htu, keyPair, null, authToken);
+                builder.header(DPOP, proof);
+            } catch (Exception e) {
+                SalesforceSDKLogger.e(TAG, "Failed to attach DPoP header for identity service, proceeding without it", e);
+            }
+        }
         final Request request = builder.build();
         final Response response = httpAccessor.getOkHttpClient().newCall(request).execute();
         return new IdServiceResponse(response);
@@ -683,7 +717,9 @@ public class OAuth2 {
         final Request request = requestBuilder.build();
         final Response response = httpAccessor.getOkHttpClient().newCall(request).execute();
         if (response.isSuccessful()) {
-            return new TokenEndpointResponse(response);
+            final TokenEndpointResponse tokenResponse = new TokenEndpointResponse(response);
+            tokenResponse.credentialsIdentifier = credentialsIdentifier;
+            return tokenResponse;
         } else {
             throw new OAuthFailedException(new TokenErrorResponse(response), response.code());
         }
@@ -1031,6 +1067,7 @@ public class OAuth2 {
         public String beaconChildConsumerSecret;
         public String scope;
         public String tokenType;
+        public String credentialsIdentifier;
 
         /**
          * Parameterized constructor built from params during user agent login flow.
