@@ -93,6 +93,8 @@ public class AuthenticatorService extends Service {
     public static final String KEY_BEACON_CHILD_CONSUMER_SECRET = "auto_installed_app_org_consumer_secret";
     public static final String KEY_SCOPE = "scope";
     public static final String KEY_FEATURE_FLAGS = "feature_flags";
+    public static final String KEY_CREDENTIALS_IDENTIFIER = "credentialsIdentifier";
+    public static final String KEY_TOKEN_TYPE = "tokenType";
 
     private static final String TAG = "AuthenticatorService";
 
