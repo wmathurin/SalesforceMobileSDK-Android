@@ -430,6 +430,8 @@ public class UserAccountTest {
         object.put(UserAccount.SCOPE, TEST_SCOPE);
         object.put(UserAccount.BEACON_CHILD_CONSUMER_KEY, TEST_BEACON_CHILD_CONSUMER_KEY);
         object.put(UserAccount.BEACON_CHILD_CONSUMER_SECRET, TEST_BEACON_CHILD_CONSUMER_SECRET);
+        object.put(UserAccount.CREDENTIALS_IDENTIFIER, TEST_CREDENTIALS_IDENTIFIER);
+        object.put(UserAccount.TOKEN_TYPE, TEST_TOKEN_TYPE);
         object = MapUtil.addMapToJSONObject(createAdditionalOauthValues(), createAdditionalOauthKeys(), object);
         return object;
     }
@@ -478,6 +480,8 @@ public class UserAccountTest {
         object.putString(UserAccount.BEACON_CHILD_CONSUMER_KEY, TEST_BEACON_CHILD_CONSUMER_KEY);
         object.putString(UserAccount.BEACON_CHILD_CONSUMER_SECRET, TEST_BEACON_CHILD_CONSUMER_SECRET);
         object.putString(UserAccount.SCOPE, TEST_SCOPE);
+        object.putString(UserAccount.CREDENTIALS_IDENTIFIER, TEST_CREDENTIALS_IDENTIFIER);
+        object.putString(UserAccount.TOKEN_TYPE, TEST_TOKEN_TYPE);
         object = MapUtil.addMapToBundle(createAdditionalOauthValues(), createAdditionalOauthKeys(), object);
         return object;
     }
