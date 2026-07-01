@@ -107,6 +107,8 @@ public class UserAccountTest {
     public static final String TEST_BEACON_CHILD_CONSUMER_KEY = "test-beacon-child-consumer-key";
     public static final String TEST_BEACON_CHILD_CONSUMER_SECRET = "test-beacon-child-consumer-secret";
     public static final String TEST_SCOPE = "api web openid refresh_token";
+    public static final String TEST_CREDENTIALS_IDENTIFIER = "test-credentials-identifier-uuid";
+    public static final String TEST_TOKEN_TYPE = "DPoP";
 
     // other user
     public static final String TEST_ORG_ID_2 = "test_org_id_2";
@@ -522,6 +524,8 @@ public class UserAccountTest {
                 .beaconChildConsumerKey(TEST_BEACON_CHILD_CONSUMER_KEY)
                 .beaconChildConsumerSecret(TEST_BEACON_CHILD_CONSUMER_SECRET)
                 .scope(TEST_SCOPE)
+                .credentialsIdentifier(TEST_CREDENTIALS_IDENTIFIER)
+                .tokenType(TEST_TOKEN_TYPE)
                 .additionalOauthValues(createAdditionalOauthValues())
                 .build();
     }
