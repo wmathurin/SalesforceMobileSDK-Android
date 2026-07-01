@@ -496,9 +496,10 @@ class AuthFlowTesterPageObject(composeTestRule: ComposeTestRule): BasePageObject
         usesWelcomeDiscovery: Boolean = false,
         isMultiUser: Boolean = false,
         expectAdvancedAuth: Boolean = false,
+        isRtr: Boolean = false,
     ) {
         expandUserCredentialsSection(targetNode = USER_AGENT_CONTENT_DESC)
-        validateUserAgent(getText(USER_AGENT_CONTENT_DESC), knownLoginHostConfig, usesWelcomeDiscovery, isMultiUser, expectAdvancedAuth)
+        validateUserAgent(getText(USER_AGENT_CONTENT_DESC), knownLoginHostConfig, usesWelcomeDiscovery, isMultiUser, expectAdvancedAuth, isRtr)
     }
 
     private fun validateUserAgent(
@@ -507,6 +508,7 @@ class AuthFlowTesterPageObject(composeTestRule: ComposeTestRule): BasePageObject
         usesWelcomeDiscovery: Boolean = false,
         isMultiUser: Boolean = false,
         expectAdvancedAuth: Boolean = false,
+        isRtr: Boolean = false,
     ) {
         assert(ua.contains("SalesforceMobileSDK/")) {
             "User agent missing 'SalesforceMobileSDK/' prefix: $ua"
@@ -539,6 +541,12 @@ class AuthFlowTesterPageObject(composeTestRule: ComposeTestRule): BasePageObject
         if (isMultiUser) {
             assert("MU" in flags) {
                 "Expected 'MU' flag for multi-user in: $ua"
+            }
+        }
+
+        if (isRtr) {
+            assert("RT" in flags) {
+                "Expected 'RT' flag after Refresh Token Rotation in: $ua"
             }
         }
     }
