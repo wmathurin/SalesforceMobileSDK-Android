@@ -33,25 +33,27 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * RFC 9449 §8 allows the AS/RS to supply a `DPoP-Nonce` response header. The
  * client must echo that value in the `nonce` claim of its next DPoP proof for the
- * same credentials. This cache stores the most-recently-seen nonce per credentials
- * identifier, enabling proactive nonce inclusion (Option B) with a
- * challenge-response fallback on first use or after nonce expiry.
- *
- * Keyed by `credentialsIdentifier` (not by host) to match the per-user key
- * isolation used by [DPoPKeyManager].
+ * same endpoint. This cache is keyed by `(credentialsIdentifier, host)` so that
+ * the AS nonce (login host) and RS nonce (instance host) never overwrite each other.
+ * This matches the per-host isolation used by the iOS implementation, while also
+ * ensuring per-user isolation consistent with [DPoPKeyManager].
  */
 object DPoPNonceCache {
 
     private val cache = ConcurrentHashMap<String, String>()
 
-    fun get(credentialsIdentifier: String): String? = cache[credentialsIdentifier]
+    private fun cacheKey(credentialsIdentifier: String, host: String) =
+        "$credentialsIdentifier|$host"
 
-    fun store(credentialsIdentifier: String, nonce: String) {
-        cache[credentialsIdentifier] = nonce
+    fun get(credentialsIdentifier: String, host: String): String? =
+        cache[cacheKey(credentialsIdentifier, host)]
+
+    fun store(credentialsIdentifier: String, host: String, nonce: String) {
+        cache[cacheKey(credentialsIdentifier, host)] = nonce
     }
 
     fun clear(credentialsIdentifier: String) {
-        cache.remove(credentialsIdentifier)
+        cache.keys.removeAll { it.startsWith("$credentialsIdentifier|") }
     }
 
     fun clearAll() {

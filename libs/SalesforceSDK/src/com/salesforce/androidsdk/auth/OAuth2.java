@@ -61,6 +61,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import okhttp3.FormBody;
+import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -624,6 +625,7 @@ public class OAuth2 {
             throws IOException {
         final Request.Builder builder = new Request.Builder().url(identityServiceIdUrl).get();
         addAuthorizationHeader(builder, authToken, tokenType);
+        final String identityHost = HttpUrl.get(identityServiceIdUrl).host();
         if (DPOP.equals(tokenType) && credentialsIdentifier != null && SalesforceSDKManager.getInstance().isUseDPoP()) {
             // Fail-closed: a DPoP-bound identity request without a proof header will be rejected
             // by the server regardless, so surface the error rather than sending an unusable request.
@@ -631,7 +633,7 @@ public class OAuth2 {
             final String htu = DPoPURLHelper.INSTANCE.canonicalize(identityServiceIdUrl);
             final String alias = DPoPKeyManager.INSTANCE.aliasForCredentialsIdentifier(credentialsIdentifier);
             final KeyPair keyPair = DPoPKeyManager.INSTANCE.generateOrLoadKeyPair(alias);
-            final String nonce = DPoPNonceCache.INSTANCE.get(credentialsIdentifier);
+            final String nonce = DPoPNonceCache.INSTANCE.get(credentialsIdentifier, identityHost);
             final String proof = DPoPProofBuilder.INSTANCE.buildProof("GET", htu, keyPair, nonce, authToken);
             builder.header(DPOP, proof);
         }
@@ -642,7 +644,7 @@ public class OAuth2 {
         if (credentialsIdentifier != null) {
             final String responseNonce = response.header("DPoP-Nonce");
             if (responseNonce != null && !responseNonce.isEmpty()) {
-                DPoPNonceCache.INSTANCE.store(credentialsIdentifier, responseNonce);
+                DPoPNonceCache.INSTANCE.store(credentialsIdentifier, identityHost, responseNonce);
             }
         }
 
@@ -654,7 +656,7 @@ public class OAuth2 {
             final String htu = DPoPURLHelper.INSTANCE.canonicalize(identityServiceIdUrl);
             final String alias = DPoPKeyManager.INSTANCE.aliasForCredentialsIdentifier(credentialsIdentifier);
             final KeyPair keyPair = DPoPKeyManager.INSTANCE.generateOrLoadKeyPair(alias);
-            final String nonce = DPoPNonceCache.INSTANCE.get(credentialsIdentifier);
+            final String nonce = DPoPNonceCache.INSTANCE.get(credentialsIdentifier, identityHost);
             final String proof = DPoPProofBuilder.INSTANCE.buildProof("GET", htu, keyPair, nonce, authToken);
             final Request.Builder retryBuilder = new Request.Builder().url(identityServiceIdUrl).get();
             addAuthorizationHeader(retryBuilder, authToken, tokenType);
@@ -725,6 +727,7 @@ public class OAuth2 {
         }
 
         final String refreshPath = sb.toString();
+        final String tokenHost = HttpUrl.get(refreshPath).host();
         final RequestBody body = formBodyBuilder.build();
         final Request.Builder requestBuilder = new Request.Builder().url(refreshPath).post(body);
 
@@ -733,7 +736,7 @@ public class OAuth2 {
                 final String htu = DPoPURLHelper.INSTANCE.canonicalize(refreshPath);
                 final String alias = DPoPKeyManager.INSTANCE.aliasForCredentialsIdentifier(credentialsIdentifier);
                 final KeyPair keyPair = DPoPKeyManager.INSTANCE.generateOrLoadKeyPair(alias);
-                final String nonce = DPoPNonceCache.INSTANCE.get(credentialsIdentifier);
+                final String nonce = DPoPNonceCache.INSTANCE.get(credentialsIdentifier, tokenHost);
                 final String proof = DPoPProofBuilder.INSTANCE.buildProof("POST", htu, keyPair, nonce, null);
                 requestBuilder.header(DPOP, proof);
             } catch (Exception e) {
@@ -748,7 +751,7 @@ public class OAuth2 {
         if (credentialsIdentifier != null) {
             final String responseNonce = response.header("DPoP-Nonce");
             if (responseNonce != null && !responseNonce.isEmpty()) {
-                DPoPNonceCache.INSTANCE.store(credentialsIdentifier, responseNonce);
+                DPoPNonceCache.INSTANCE.store(credentialsIdentifier, tokenHost, responseNonce);
             }
         }
 
@@ -760,7 +763,7 @@ public class OAuth2 {
                 final String htu = DPoPURLHelper.INSTANCE.canonicalize(refreshPath);
                 final String alias = DPoPKeyManager.INSTANCE.aliasForCredentialsIdentifier(credentialsIdentifier);
                 final KeyPair keyPair = DPoPKeyManager.INSTANCE.generateOrLoadKeyPair(alias);
-                final String nonce = DPoPNonceCache.INSTANCE.get(credentialsIdentifier);
+                final String nonce = DPoPNonceCache.INSTANCE.get(credentialsIdentifier, tokenHost);
                 final String proof = DPoPProofBuilder.INSTANCE.buildProof("POST", htu, keyPair, nonce, null);
                 final Request retryRequest = request.newBuilder().header(DPOP, proof).build();
                 response = httpAccessor.getOkHttpClient().newCall(retryRequest).execute();

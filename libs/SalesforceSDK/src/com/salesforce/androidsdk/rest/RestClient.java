@@ -896,7 +896,8 @@ public class RestClient {
             if (credentialsIdentifier == null || credentialsIdentifier.isEmpty()) return;
             final String nonce = response.header("DPoP-Nonce");
             if (nonce != null && !nonce.isEmpty()) {
-                DPoPNonceCache.INSTANCE.store(credentialsIdentifier, nonce);
+                final String host = response.request().url().host();
+                DPoPNonceCache.INSTANCE.store(credentialsIdentifier, host, nonce);
             }
         }
 
@@ -949,13 +950,14 @@ public class RestClient {
             if (credentialsIdentifier == null || credentialsIdentifier.isEmpty()) return;
             try {
                 final String htu = DPoPURLHelper.INSTANCE.canonicalize(url);
+                final String host = HttpUrl.get(url).host();
                 final String alias = DPoPKeyManager.INSTANCE.aliasForCredentialsIdentifier(credentialsIdentifier);
                 final java.security.KeyPair keyPair = DPoPKeyManager.INSTANCE.generateOrLoadKeyPair(alias);
-                final String nonce = DPoPNonceCache.INSTANCE.get(credentialsIdentifier);
+                final String nonce = DPoPNonceCache.INSTANCE.get(credentialsIdentifier, host);
                 final String proof = DPoPProofBuilder.INSTANCE.buildProof(method, htu, keyPair, nonce, authToken);
                 builder.header(DPOP, proof);
             } catch (Exception e) {
-                SalesforceSDKLogger.e(TAG, "Failed to attach DPoP header in interceptor, proceeding without it", e);
+                SalesforceSDKLogger.e(TAG, "Failed to attach DPoP proof", e);
             }
         }
 

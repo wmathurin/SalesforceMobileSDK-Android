@@ -38,50 +38,67 @@ import java.util.concurrent.Executors
 @RunWith(AndroidJUnit4::class)
 class DPoPNonceCacheTest {
 
+    private val id = "user1"
+    private val loginHost = "login.salesforce.com"
+    private val instanceHost = "org.my.salesforce.com"
+
     @After
     fun tearDown() {
         DPoPNonceCache.clearAll()
     }
 
     @Test
-    fun test_givenCredentialsIdentifier_whenStoreAndGet_thenNonceReturned() {
-        val id = "user1"
-        val nonce = "abc123"
-        DPoPNonceCache.store(id, nonce)
-        assertEquals(nonce, DPoPNonceCache.get(id))
+    fun test_givenCredentialsIdentifierAndHost_whenStoreAndGet_thenNonceReturned() {
+        DPoPNonceCache.store(id, loginHost, "abc123")
+        assertEquals("abc123", DPoPNonceCache.get(id, loginHost))
     }
 
     @Test
-    fun test_givenStoredNonce_whenClear_thenNonceIsNull() {
-        val id = "user1"
-        DPoPNonceCache.store(id, "abc123")
+    fun test_givenStoredNonce_whenClear_thenAllHostsForThatIdAreRemoved() {
+        DPoPNonceCache.store(id, loginHost, "as-nonce")
+        DPoPNonceCache.store(id, instanceHost, "rs-nonce")
         DPoPNonceCache.clear(id)
-        assertNull(DPoPNonceCache.get(id))
+        assertNull(DPoPNonceCache.get(id, loginHost))
+        assertNull(DPoPNonceCache.get(id, instanceHost))
     }
 
     @Test
     fun test_givenTwoDifferentIdentifiers_whenStoreForBoth_thenValuesAreIsolated() {
-        val id1 = "user1"
         val id2 = "user2"
-        DPoPNonceCache.store(id1, "nonce-one")
-        DPoPNonceCache.store(id2, "nonce-two")
-        assertEquals("nonce-one", DPoPNonceCache.get(id1))
-        assertEquals("nonce-two", DPoPNonceCache.get(id2))
-        DPoPNonceCache.clear(id1)
-        assertNull(DPoPNonceCache.get(id1))
-        assertEquals("nonce-two", DPoPNonceCache.get(id2))
+        DPoPNonceCache.store(id, loginHost, "nonce-one")
+        DPoPNonceCache.store(id2, loginHost, "nonce-two")
+        assertEquals("nonce-one", DPoPNonceCache.get(id, loginHost))
+        assertEquals("nonce-two", DPoPNonceCache.get(id2, loginHost))
+        DPoPNonceCache.clear(id)
+        assertNull(DPoPNonceCache.get(id, loginHost))
+        assertEquals("nonce-two", DPoPNonceCache.get(id2, loginHost))
+    }
+
+    /*
+     * Regression: AS nonce (login host) and RS nonce (instance host) must not overwrite each
+     * other. Previously the cache was keyed only by credentialsIdentifier, so a token-refresh
+     * response nonce would clobber the API-server nonce, causing the replayed API request to
+     * be rejected with 401 by the RS.
+     */
+    @Test
+    fun test_givenASAndRSNonces_whenStoredSeparately_thenEachHostRetainsItsOwnNonce() {
+        val asNonce = "as-nonce-xyz"
+        val rsNonce = "rs-nonce-abc"
+        DPoPNonceCache.store(id, loginHost, asNonce)
+        DPoPNonceCache.store(id, instanceHost, rsNonce)
+        assertEquals("AS nonce must be retrievable by login host", asNonce, DPoPNonceCache.get(id, loginHost))
+        assertEquals("RS nonce must be retrievable by instance host", rsNonce, DPoPNonceCache.get(id, instanceHost))
     }
 
     @Test
-    fun test_givenConcurrentWrites_whenMultipleThreads_thenLastWriteWins() {
-        val id = "user-concurrent"
+    fun test_givenConcurrentWrites_whenMultipleThreads_thenNoRace() {
         val threadCount = 20
         val latch = CountDownLatch(threadCount)
         val executor = Executors.newFixedThreadPool(threadCount)
 
         for (i in 0 until threadCount) {
             executor.submit {
-                DPoPNonceCache.store(id, "nonce-$i")
+                DPoPNonceCache.store(id, instanceHost, "nonce-$i")
                 latch.countDown()
             }
         }
@@ -89,8 +106,7 @@ class DPoPNonceCacheTest {
         latch.await()
         executor.shutdown()
 
-        // The cache must contain *some* nonce — no NPE, no corruption, no missing entry.
-        val result = DPoPNonceCache.get(id)
+        val result = DPoPNonceCache.get(id, instanceHost)
         assert(result != null && result.startsWith("nonce-")) {
             "Expected a nonce-N value, got: $result"
         }

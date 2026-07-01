@@ -62,6 +62,7 @@ import java.net.URI
 class OAuthRefreshInterceptorNonceTest {
 
     private val credentialsId = "test-credentials-id"
+    private val instanceHost = "test.salesforce.com"
     private val authToken = "test-access-token"
     private val dpopKeyAlias = DPoPKeyManager.aliasForCredentialsIdentifier(credentialsId)
 
@@ -145,7 +146,7 @@ class OAuthRefreshInterceptorNonceTest {
         interceptor.intercept(chain)
 
         // No nonce was in the response, so the cache stays empty.
-        assertNull(DPoPNonceCache.get(credentialsId))
+        assertNull(DPoPNonceCache.get(credentialsId, instanceHost))
     }
 
     @Test
@@ -159,13 +160,13 @@ class OAuthRefreshInterceptorNonceTest {
 
         interceptor.intercept(chain)
 
-        assertEquals("server-nonce-xyz", DPoPNonceCache.get(credentialsId))
+        assertEquals("server-nonce-xyz", DPoPNonceCache.get(credentialsId, instanceHost))
     }
 
     @Test
     fun test_givenCachedNonce_whenRequestSent_thenProofContainsNonceClaim() {
         // Pre-load a nonce so the interceptor picks it up during proof construction.
-        DPoPNonceCache.store(credentialsId, "pre-cached-nonce")
+        DPoPNonceCache.store(credentialsId, instanceHost, "pre-cached-nonce")
         val request = buildRequest()
         val interceptor = buildInterceptor()
 
@@ -219,7 +220,7 @@ class OAuthRefreshInterceptorNonceTest {
         // chain.proceed must be called exactly twice: initial + one retry.
         assertEquals(2, callCount)
         // The nonce was stored during the challenge response.
-        assertEquals(serverNonce, DPoPNonceCache.get(credentialsId))
+        assertEquals(serverNonce, DPoPNonceCache.get(credentialsId, instanceHost))
     }
 
     @Test
@@ -265,6 +266,6 @@ class OAuthRefreshInterceptorNonceTest {
         // Bearer type must not trigger the DPoP nonce retry path.
         assertEquals(1, callCount)
         // Nonce must not be cached for Bearer type.
-        assertNull(DPoPNonceCache.get(credentialsId))
+        assertNull(DPoPNonceCache.get(credentialsId, instanceHost))
     }
 }
