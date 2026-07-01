@@ -98,7 +98,7 @@ class ClientManagerMockTest {
 
         val responseBody = """
                 {
-                    "access_token": $REFRESHED_ACCESS_TOKEN,
+                    "access_token": "$REFRESHED_ACCESS_TOKEN",
                     "instance_url": "https://login.salesforce.com",
                     "id": "https://login.salesforce.com/id/orgId/userId",
                     "token_type": "Bearer",
