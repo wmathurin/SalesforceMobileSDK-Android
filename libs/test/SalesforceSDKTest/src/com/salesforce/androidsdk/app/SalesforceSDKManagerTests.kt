@@ -574,6 +574,33 @@ class SalesforceSDKManagerTests {
     }
 
     @Test
+    fun test_givenRTRDetected_whenRegisterRTFeature_thenRTFlagAppearsInUserAgentForUser() {
+        val sdkManager = createSdkManagerWithMockedAccountManager()
+
+        val userA = buildMinimalUserAccount(orgId = "org1", userId = "user1")
+        val userB = buildMinimalUserAccount(orgId = "org2", userId = "user2")
+
+        // Act: simulate what ClientManager does on RTR detection
+        sdkManager.registerUsedAppFeature(Features.FEATURE_RTR, userA)
+
+        try {
+            // Assert: RT appears in per-user user agent for userA
+            val agentA = sdkManager.getUserAgent("", userA)
+            assertTrue("User agent for userA should contain ftr_ segment", agentA.contains("ftr_"))
+            assertTrue("User agent for userA should contain RT flag", agentA.contains(Features.FEATURE_RTR))
+
+            // Assert: RT does NOT appear in user agent for a different user
+            val agentB = sdkManager.getUserAgent("", userB)
+            assertFalse(
+                "User agent for userB should NOT contain RT flag (per-user isolation)",
+                agentB.contains(Features.FEATURE_RTR)
+            )
+        } finally {
+            sdkManager.unregisterUsedAppFeature(Features.FEATURE_RTR, userA)
+        }
+    }
+
+    @Test
     fun test_givenNullUser_whenRegisterUsedAppFeature_thenGlobalFlagRegistered() {
         val sdkManager = SalesforceSDKManager.getInstance()
 
