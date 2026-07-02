@@ -496,9 +496,10 @@ class AuthFlowTesterPageObject(composeTestRule: ComposeTestRule): BasePageObject
         usesWelcomeDiscovery: Boolean = false,
         isMultiUser: Boolean = false,
         expectAdvancedAuth: Boolean = false,
+        isRtr: Boolean = false,
     ) {
         expandUserCredentialsSection(targetNode = USER_AGENT_CONTENT_DESC)
-        validateUserAgent(getText(USER_AGENT_CONTENT_DESC), knownLoginHostConfig, usesWelcomeDiscovery, isMultiUser, expectAdvancedAuth)
+        validateUserAgent(getText(USER_AGENT_CONTENT_DESC), knownLoginHostConfig, usesWelcomeDiscovery, isMultiUser, expectAdvancedAuth, isRtr)
     }
 
     private fun validateUserAgent(
@@ -507,6 +508,7 @@ class AuthFlowTesterPageObject(composeTestRule: ComposeTestRule): BasePageObject
         usesWelcomeDiscovery: Boolean = false,
         isMultiUser: Boolean = false,
         expectAdvancedAuth: Boolean = false,
+        isRtr: Boolean = false,
     ) {
         assert(ua.contains("SalesforceMobileSDK/")) {
             "User agent missing 'SalesforceMobileSDK/' prefix: $ua"
@@ -534,11 +536,29 @@ class AuthFlowTesterPageObject(composeTestRule: ComposeTestRule): BasePageObject
             assert("WD" in flags) {
                 "Expected 'WD' flag for Welcome Discovery in: $ua"
             }
+        } else {
+            assert("WD" !in flags) {
+                "Expected no 'WD' flag when Welcome Discovery was not used in: $ua"
+            }
         }
 
         if (isMultiUser) {
             assert("MU" in flags) {
                 "Expected 'MU' flag for multi-user in: $ua"
+            }
+        } else {
+            assert("MU" !in flags) {
+                "Expected no 'MU' flag when only one user is logged in, in: $ua"
+            }
+        }
+
+        if (isRtr) {
+            assert("RT" in flags) {
+                "Expected 'RT' flag after Refresh Token Rotation in: $ua"
+            }
+        } else {
+            assert("RT" !in flags) {
+                "Expected no 'RT' flag when Refresh Token Rotation has not occurred in: $ua"
             }
         }
     }

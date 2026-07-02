@@ -441,7 +441,10 @@ abstract class AuthFlowTest {
         app.validateApiRequest()
     }
 
-    fun assertRevokeAndRefreshWorks(isRtr: Boolean) {
+    fun assertRevokeAndRefreshWorks(
+        isRtr: Boolean,
+        knownLoginHostConfig: KnownLoginHostConfig = REGULAR_AUTH,
+    ) {
         val (preAccessToken, preRefreshToken) = app.getTokens()
         app.revokeAccessToken()
         app.validateApiRequest()
@@ -454,5 +457,7 @@ abstract class AuthFlowTest {
         } else {
             assert(preRefreshToken == postRefreshToken) { "Refresh token should not have changed (non-RTR app)" }
         }
+
+        app.validateUserAgent(knownLoginHostConfig = knownLoginHostConfig, isRtr = isRtr)
     }
 }
