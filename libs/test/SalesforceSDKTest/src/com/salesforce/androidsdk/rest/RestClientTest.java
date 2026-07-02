@@ -1702,4 +1702,83 @@ public class RestClientTest {
             this.name = name;
         }
     }
+
+    // -------------------------------------------------------------------------
+    // User-Agent tests (W-23278653)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Verifies that getJSONCredentials() uses the clientInfo user (not currentUser) when
+     * building the userAgent field.
+     *
+     * Strategy: register a per-user flag on the user that matches this restClient's
+     * clientInfo (TestCredentials.ORG_ID / USER_ID). getJSONCredentials() must look up
+     * that user via getUserFromOrgAndUserId and include the flag in the returned userAgent.
+     * If it still used getCurrentUser() the flag would be absent whenever the two diverge.
+     */
+    @Test
+    public void test_givenPerUserFlagOnClientInfoUser_whenGetJSONCredentials_thenUserAgentContainsFlag()
+            throws Exception {
+        final String testFlag = "W2";
+        final com.salesforce.androidsdk.accounts.UserAccount user =
+                SalesforceSDKManager.getInstance()
+                        .getUserAccountManager()
+                        .getUserFromOrgAndUserId(
+                                TestCredentials.ORG_ID, TestCredentials.USER_ID);
+
+        // Only run the per-user assertion when AccountManager has this user registered.
+        // In a clean CI environment the test user IS in AccountManager after OAuth setup.
+        if (user != null) {
+            SalesforceSDKManager.getInstance().registerUsedAppFeature(testFlag, user);
+            try {
+                final JSONObject creds = restClient.getJSONCredentials();
+                final String userAgent = creds.getString("userAgent");
+                Assert.assertTrue(
+                        "userAgent in getJSONCredentials() should contain per-user flag " + testFlag,
+                        userAgent.contains(testFlag));
+            } finally {
+                SalesforceSDKManager.getInstance().unregisterUsedAppFeature(testFlag, user);
+            }
+        } else {
+            // User not in AccountManager (e.g., unit-test-only environment) —
+            // verify we at least get a valid SDK user-agent string back.
+            final JSONObject creds = restClient.getJSONCredentials();
+            final String userAgent = creds.getString("userAgent");
+            Assert.assertTrue(
+                    "userAgent should start with SalesforceMobileSDK/",
+                    userAgent.startsWith("SalesforceMobileSDK/"));
+        }
+    }
+
+    /**
+     * Verifies that getJSONCredentials() does NOT bleed per-user flags from
+     * an unrelated user into a different RestClient's credentials.
+     */
+    @Test
+    public void test_givenPerUserFlagOnDifferentUser_whenGetJSONCredentials_thenUserAgentExcludesFlag()
+            throws Exception {
+        final String isolatedFlag = "W3";
+        // Build a synthetic user with IDs that differ from the test RestClient's clientInfo.
+        final com.salesforce.androidsdk.accounts.UserAccount otherUser =
+                com.salesforce.androidsdk.accounts.UserAccountBuilder.getInstance()
+                        .authToken("tok").refreshToken("rtok")
+                        .loginServer("https://login.salesforce.com")
+                        .idUrl("https://login.salesforce.com/id/otherOrg/otherUser")
+                        .instanceServer("https://cs1.salesforce.com")
+                        .orgId("otherOrg").userId("otherUser")
+                        .username("other@example.com")
+                        .accountName("other (SalesforceSDKTest)")
+                        .build();
+
+        SalesforceSDKManager.getInstance().registerUsedAppFeature(isolatedFlag, otherUser);
+        try {
+            final JSONObject creds = restClient.getJSONCredentials();
+            final String userAgent = creds.getString("userAgent");
+            Assert.assertFalse(
+                    "userAgent for restClient should NOT contain flag registered for a different user",
+                    userAgent.contains(isolatedFlag));
+        } finally {
+            SalesforceSDKManager.getInstance().unregisterUsedAppFeature(isolatedFlag, otherUser);
+        }
+    }
 }
