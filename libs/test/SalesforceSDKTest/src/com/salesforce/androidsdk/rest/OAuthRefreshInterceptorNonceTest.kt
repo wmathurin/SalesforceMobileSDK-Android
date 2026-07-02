@@ -51,11 +51,12 @@ import org.junit.runner.RunWith
 import java.net.URI
 
 /**
- * Tests for DPoP nonce handling in OAuthRefreshInterceptor:
- *   - Proactive caching of DPoP-Nonce header from every response
- *   - Nonce is included in proof when one is cached
- *   - use_dpop_nonce challenge triggers exactly one retry
- *   - No retry occurs for Bearer token type
+ * Tests for DPoP nonce handling in OAuthRefreshInterceptor.
+ *
+ * Nonces are issued exclusively by the /token endpoint (during token exchange and refresh)
+ * and cached by OAuth2.java. The interceptor's role is limited to proactively reading
+ * the cached nonce when building each DPoP proof — it does not harvest nonces from
+ * resource-server responses and does not retry on use_dpop_nonce challenges.
  */
 @SmallTest
 @RunWith(AndroidJUnit4::class)
@@ -121,21 +122,15 @@ class OAuthRefreshInterceptorNonceTest {
         return builder.build()
     }
 
-    private fun nonceChallengeResponse(request: Request, nonce: String? = null): Response {
-        val builder = Response.Builder()
-            .request(request)
-            .protocol(Protocol.HTTP_1_1)
-            .code(401)
-            .message("Unauthorized")
-            .body("""{"error":"use_dpop_nonce"}""".toResponseBody("application/json".toMediaType()))
-        if (nonce != null) builder.header("DPoP-Nonce", nonce)
-        return builder.build()
-    }
-
     // ---- tests ----
 
+    /**
+     * When no nonce is in the cache, the DPoP proof is still attached but contains no nonce claim.
+     * No retry happens — the resource server will fall through to the normal 401 refresh path
+     * if it requires a nonce (which it won't, since nonce enforcement is only on /token).
+     */
     @Test
-    fun test_givenNoCachedNonce_whenRequestSent_thenProofHasNoNonceInCache() {
+    fun test_givenNoCachedNonce_whenRequestSent_thenProofHasNoNonceClaim() {
         val request = buildRequest()
         val interceptor = buildInterceptor()
         val chain = mockk<Interceptor.Chain> {
@@ -145,28 +140,17 @@ class OAuthRefreshInterceptorNonceTest {
 
         interceptor.intercept(chain)
 
-        // No nonce was in the response, so the cache stays empty.
         assertNull(DPoPNonceCache.get(credentialsId, instanceHost))
     }
 
+    /**
+     * When a nonce was previously cached by the token exchange (OAuth2.java), the interceptor
+     * includes it in the DPoP proof on every subsequent API call — no extra round-trip needed.
+     */
     @Test
-    fun test_givenSuccessResponseWithDPoPNonceHeader_whenRequestCompletes_thenNonceIsCached() {
-        val request = buildRequest()
-        val interceptor = buildInterceptor()
-        val chain = mockk<Interceptor.Chain> {
-            every { request() } returns request
-            every { proceed(any()) } returns successResponse(request, dpopNonce = "server-nonce-xyz")
-        }
-
-        interceptor.intercept(chain)
-
-        assertEquals("server-nonce-xyz", DPoPNonceCache.get(credentialsId, instanceHost))
-    }
-
-    @Test
-    fun test_givenCachedNonce_whenRequestSent_thenProofContainsNonceClaim() {
-        // Pre-load a nonce so the interceptor picks it up during proof construction.
-        DPoPNonceCache.store(credentialsId, instanceHost, "pre-cached-nonce")
+    fun test_givenNonceCachedByTokenExchange_whenRequestSent_thenProofContainsNonceClaim() {
+        // Simulate a nonce already populated by the token exchange in OAuth2.java.
+        DPoPNonceCache.store(credentialsId, instanceHost, "token-exchange-nonce")
         val request = buildRequest()
         val interceptor = buildInterceptor()
 
@@ -183,72 +167,42 @@ class OAuthRefreshInterceptorNonceTest {
 
         val dpopHeader = capturedRequest?.header("DPoP")
         assertNotNull("DPoP header must be present", dpopHeader)
-        // Decode payload and verify the nonce claim.
         val parts = dpopHeader!!.split(".")
         assertEquals(3, parts.size)
         val payloadJson = String(
             android.util.Base64.decode(parts[1], android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING),
             Charsets.UTF_8
         )
-        assert(payloadJson.contains("pre-cached-nonce")) {
-            "DPoP proof payload should contain the nonce. Payload: $payloadJson"
+        assert(payloadJson.contains("token-exchange-nonce")) {
+            "DPoP proof payload should contain the cached nonce. Payload: $payloadJson"
         }
     }
 
+    /**
+     * A DPoP-Nonce header in a resource-server response is not harvested by the interceptor.
+     * Only the token endpoint (OAuth2.java) populates the cache.
+     */
     @Test
-    fun test_givenUseDPoPNonceError_whenFirstAttempt_thenRetryOnceWithNonce() {
-        val serverNonce = "fresh-nonce-from-server"
+    fun test_givenResourceServerResponseWithDPoPNonceHeader_whenRequestCompletes_thenNonceIsNotCached() {
         val request = buildRequest()
         val interceptor = buildInterceptor()
-
-        var callCount = 0
         val chain = mockk<Interceptor.Chain> {
             every { request() } returns request
-            every { proceed(any()) } answers {
-                callCount++
-                val req: Request = firstArg()
-                if (callCount == 1) {
-                    nonceChallengeResponse(req, nonce = serverNonce)
-                } else {
-                    successResponse(req)
-                }
-            }
+            every { proceed(any()) } returns successResponse(request, dpopNonce = "resource-server-nonce")
         }
 
         interceptor.intercept(chain)
 
-        // chain.proceed must be called exactly twice: initial + one retry.
-        assertEquals(2, callCount)
-        // The nonce was stored during the challenge response.
-        assertEquals(serverNonce, DPoPNonceCache.get(credentialsId, instanceHost))
+        // The interceptor must not harvest nonces from resource-server responses.
+        assertNull(DPoPNonceCache.get(credentialsId, instanceHost))
     }
 
+    /**
+     * Bearer token flows are completely unaffected — no DPoP proof is attached,
+     * and no nonce logic runs.
+     */
     @Test
-    fun test_givenUseDPoPNonceError_whenSecondAttemptAlsoFails_thenNoFurtherRetry() {
-        val request = buildRequest()
-        val interceptor = buildInterceptor()
-
-        var callCount = 0
-        val chain = mockk<Interceptor.Chain> {
-            every { request() } returns request
-            every { proceed(any()) } answers {
-                callCount++
-                nonceChallengeResponse(firstArg(), nonce = "nonce-$callCount")
-            }
-        }
-
-        interceptor.intercept(chain)
-
-        // Only two calls: the nonce challenge path retries at most once;
-        // the second call is a 401 but falls through to the standard refresh path
-        // (which won't retry further since authTokenProvider is null here).
-        assert(callCount <= 2) {
-            "Expected at most 2 chain.proceed calls, got $callCount"
-        }
-    }
-
-    @Test
-    fun test_givenBearerTokenType_whenUseDPoPNonceResponseReceived_thenNoRetry() {
+    fun test_givenBearerTokenType_whenRequestSent_thenNoDPoPHeaderAndNoCacheWrite() {
         val request = buildRequest()
         val interceptor = buildInterceptor(tokenType = "Bearer")
 
@@ -257,15 +211,13 @@ class OAuthRefreshInterceptorNonceTest {
             every { request() } returns request
             every { proceed(any()) } answers {
                 callCount++
-                nonceChallengeResponse(firstArg())
+                successResponse(firstArg())
             }
         }
 
         interceptor.intercept(chain)
 
-        // Bearer type must not trigger the DPoP nonce retry path.
         assertEquals(1, callCount)
-        // Nonce must not be cached for Bearer type.
         assertNull(DPoPNonceCache.get(credentialsId, instanceHost))
     }
 }

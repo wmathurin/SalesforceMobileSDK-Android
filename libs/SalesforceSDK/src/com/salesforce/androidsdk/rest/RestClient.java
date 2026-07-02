@@ -833,18 +833,6 @@ public class RestClient {
             request = buildAuthenticatedRequest(request);
             Response response = chain.proceed(request);
 
-            // Always harvest DPoP-Nonce from the response for proactive use on the next call.
-            extractAndCacheNonce(response);
-
-            // DPoP nonce challenge: server requires a nonce we didn't include. Retry once.
-            if (isNonceChallenge(response)) {
-                SalesforceSDKLogger.d(TAG, "DPoP nonce challenge received, retrying with nonce");
-                response.close();
-                request = buildAuthenticatedRequest(request);
-                response = chain.proceed(request);
-                extractAndCacheNonce(response);
-            }
-
             /*
              * Standard access token expiry returns 401 as the error code.
              */
@@ -889,30 +877,6 @@ public class RestClient {
                 }
             }
             return response;
-        }
-
-        private void extractAndCacheNonce(Response response) {
-            if (!DPOP.equals(tokenType)) return;
-            if (credentialsIdentifier == null || credentialsIdentifier.isEmpty()) return;
-            final String nonce = response.header("DPoP-Nonce");
-            if (nonce != null && !nonce.isEmpty()) {
-                final String host = response.request().url().host();
-                DPoPNonceCache.INSTANCE.store(credentialsIdentifier, host, nonce);
-            }
-        }
-
-        private boolean isNonceChallenge(Response response) {
-            final int code = response.code();
-            if (code != HttpURLConnection.HTTP_BAD_REQUEST && code != HttpURLConnection.HTTP_UNAUTHORIZED) {
-                return false;
-            }
-            if (!DPOP.equals(tokenType)) return false;
-            try {
-                final String body = response.peekBody(512).string();
-                return body.contains("use_dpop_nonce");
-            } catch (IOException e) {
-                return false;
-            }
         }
 
         /**
