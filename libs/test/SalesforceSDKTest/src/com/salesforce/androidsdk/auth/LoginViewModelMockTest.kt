@@ -125,6 +125,7 @@ class LoginViewModelMockTest {
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = any(),
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -164,6 +165,7 @@ class LoginViewModelMockTest {
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = false,
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -194,6 +196,7 @@ class LoginViewModelMockTest {
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = any(),
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -232,6 +235,7 @@ class LoginViewModelMockTest {
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = false,
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -262,6 +266,7 @@ class LoginViewModelMockTest {
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = any(),
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -310,6 +315,7 @@ class LoginViewModelMockTest {
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = any(),
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -347,6 +353,7 @@ class LoginViewModelMockTest {
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = false,
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -534,6 +541,7 @@ class LoginViewModelMockTest {
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = any(),
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -571,6 +579,7 @@ class LoginViewModelMockTest {
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = true,
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -644,12 +653,12 @@ class LoginViewModelMockTest {
         TIMESTAMP_FORMAT
         mockkStatic(OAuth2::class)
         every {
-            exchangeCode(any(), any(), any(), any(), any(), any())
+            exchangeCode(any(), any(), any(), any(), any(), any(), any(), any())
         } returns mockTokenResponse
 
         // Mock doCodeExchange to prevent actual execution
         coEvery {
-            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any())
+            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any(), any())
         } just runs
 
         // Set up required state
@@ -673,6 +682,7 @@ class LoginViewModelMockTest {
                 mockOnSuccess,
                 tokenMigration = false,
                 loginServer = "https://test.salesforce.com",
+                credentialsIdentifier = any(),
             )
         }
     }
@@ -692,12 +702,12 @@ class LoginViewModelMockTest {
         TIMESTAMP_FORMAT
         mockkStatic(OAuth2::class)
         every {
-            exchangeCode(any(), any(), any(), any(), any(), any())
+            exchangeCode(any(), any(), any(), any(), any(), any(), any(), any())
         } returns mockTokenResponse
 
         // Mock doCodeExchange to prevent actual execution
         coEvery {
-            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any())
+            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any(), any())
         } just runs
 
         // Set up required state
@@ -723,6 +733,7 @@ class LoginViewModelMockTest {
                 mockOnSuccess,
                 tokenMigration = true,
                 loginServer = migrationServer,
+                credentialsIdentifier = any(),
             )
         }
     }
@@ -746,13 +757,13 @@ class LoginViewModelMockTest {
         TIMESTAMP_FORMAT
         mockkStatic(OAuth2::class)
         every {
-            exchangeCode(any(), any(), any(), any(), any(), any())
+            exchangeCode(any(), any(), any(), any(), any(), any(), any(), any())
         } returns mockTokenResponse
 
         // Spy so we can short-circuit account creation, leaving exchangeCode as the observable.
         val spyViewModel = spyk(viewModel)
         coEvery {
-            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any())
+            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any(), any())
         } just runs
 
         // Sanity: distinct from boot config so a missing side effect would surface.
@@ -788,6 +799,8 @@ class LoginViewModelMockTest {
                 /* code = */ testCode,
                 /* codeVerifier = */ any(),
                 /* callbackUrl = */ migrationRedirectUri,
+                /* salesforceSdkManager = */ any(),
+                /* credentialsIdentifier = */ any(),
             )
         }
     }
@@ -800,7 +813,7 @@ class LoginViewModelMockTest {
         TIMESTAMP_FORMAT
         mockkStatic(OAuth2::class)
         every {
-            exchangeCode(any(), any(), any(), any(), any(), any())
+            exchangeCode(any(), any(), any(), any(), any(), any(), any(), any())
         } throws throws
     }
 
@@ -871,7 +884,7 @@ class LoginViewModelMockTest {
         setupExchangeCodeMock(oauthException)
 
         coEvery {
-            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any())
+            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any(), any())
         } just runs
 
         spyViewModel.selectedServer.value = "https://test.salesforce.com"
@@ -880,7 +893,7 @@ class LoginViewModelMockTest {
         verify { mockOnError("Token Request Error", any(), oauthException) }
         verify(exactly = 0) { mockOnSuccess(any()) }
         coVerify(exactly = 0) {
-            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any())
+            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any(), any())
         }
     }
 

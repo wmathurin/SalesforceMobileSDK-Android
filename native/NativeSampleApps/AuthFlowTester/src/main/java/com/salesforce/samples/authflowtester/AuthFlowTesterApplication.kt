@@ -44,6 +44,7 @@ class AuthFlowTesterApplication : Application() {
 
         with(SalesforceSDKManager.getInstance()) {
             registerUsedAppFeature(FEATURE_APP_USES_KOTLIN)
+            setUseDPoP(true)
         }
     }
 }

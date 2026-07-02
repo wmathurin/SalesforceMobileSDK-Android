@@ -29,6 +29,7 @@ package com.salesforce.androidsdk.auth.dpop
 import android.util.Base64
 import org.json.JSONObject
 import java.security.KeyPair
+import java.security.MessageDigest
 import java.security.SecureRandom
 import java.security.Signature
 import java.security.interfaces.ECPublicKey
@@ -45,7 +46,7 @@ object DPoPProofBuilder {
         val publicKey = keyPair.public as ECPublicKey
         val jwk = buildJwk(publicKey)
         val header = buildHeader(jwk)
-        val payload = buildPayload(httpMethod, htu)
+        val payload = buildPayload(httpMethod, htu, nonce, accessToken)
         val headerEncoded = base64url(header.toString().toByteArray(Charsets.UTF_8))
         val payloadEncoded = base64url(payload.toString().toByteArray(Charsets.UTF_8))
         val signingInput = "$headerEncoded.$payloadEncoded"
@@ -73,13 +74,18 @@ object DPoPProofBuilder {
             put("jwk", jwk)
         }
 
-    private fun buildPayload(httpMethod: String, htu: String): JSONObject {
+    private fun buildPayload(httpMethod: String, htu: String, nonce: String?, accessToken: String?): JSONObject {
         val jti = ByteArray(12).also { SecureRandom().nextBytes(it) }
         return JSONObject().apply {
             put("htm", httpMethod.uppercase())
             put("htu", htu)
             put("iat", System.currentTimeMillis() / 1000L)
             put("jti", base64url(jti))
+            if (!nonce.isNullOrEmpty()) put("nonce", nonce)
+            if (!accessToken.isNullOrEmpty()) {
+                val digest = MessageDigest.getInstance("SHA-256").digest(accessToken.toByteArray(Charsets.UTF_8))
+                put("ath", base64url(digest))
+            }
         }
     }
 

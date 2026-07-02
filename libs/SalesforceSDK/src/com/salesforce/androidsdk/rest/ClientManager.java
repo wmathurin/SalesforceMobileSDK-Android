@@ -213,7 +213,7 @@ public class ClientManager {
             		userAccount.getUserId(), userAccount.getOrgId(), userAccount.getCommunityId(), userAccount.getCommunityUrl(),
                     userAccount.getFirstName(), userAccount.getLastName(), userAccount.getDisplayName(), userAccount.getEmail(), userAccount.getPhotoUrl(), userAccount.getThumbnailUrl(), userAccount.getAdditionalOauthValues(),
                     userAccount.getLightningDomain(), userAccount.getLightningSid(), userAccount.getVFDomain(), userAccount.getVFSid(), userAccount.getContentDomain(), userAccount.getContentSid(), userAccount.getCSRFToken());
-            return new RestClient(clientInfo, userAccount.getAuthToken(), HttpAccess.DEFAULT, authTokenProvider);
+            return new RestClient(clientInfo, userAccount.getAuthToken(), userAccount.getTokenType(), userAccount.getCredentialsIdentifier(), HttpAccess.DEFAULT, authTokenProvider);
         } catch (URISyntaxException e) {
             SalesforceSDKLogger.w(TAG, "Invalid server URL", e);
             throw new AccountInfoNotFoundException("invalid server url", e);

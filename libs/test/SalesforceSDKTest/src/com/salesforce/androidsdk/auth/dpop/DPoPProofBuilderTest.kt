@@ -38,6 +38,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.security.KeyPair
+import java.security.MessageDigest
 import java.security.Signature
 
 @RunWith(AndroidJUnit4::class)
@@ -151,5 +152,42 @@ class DPoPProofBuilderTest {
         val yBytes = base64UrlDecode(jwk.getString("y"))
         assertEquals(32, xBytes.size)
         assertEquals(32, yBytes.size)
+    }
+
+    @Test
+    fun test_givenAccessToken_whenBuildProof_thenPayloadIncludesAth() {
+        val accessToken = "test-access-token-abc123"
+        val proof = DPoPProofBuilder.buildProof("GET", "https://example.com/api", keyPair, accessToken = accessToken)
+        val payload = decodeJson(proof.split(".")[1])
+        assertTrue(payload.has("ath"))
+        val expectedAth = Base64.encodeToString(
+            MessageDigest.getInstance("SHA-256").digest(accessToken.toByteArray(Charsets.UTF_8)),
+            Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP
+        )
+        assertEquals(expectedAth, payload.getString("ath"))
+    }
+
+    @Test
+    fun test_givenNullAccessToken_whenBuildProof_thenPayloadOmitsAth() {
+        val proof = DPoPProofBuilder.buildProof("GET", "https://example.com/api", keyPair, accessToken = null)
+        val payload = decodeJson(proof.split(".")[1])
+        assertFalse(payload.has("ath"))
+    }
+
+    @Test
+    fun test_givenEmptyAccessToken_whenBuildProof_thenPayloadOmitsAth() {
+        val proof = DPoPProofBuilder.buildProof("GET", "https://example.com/api", keyPair, accessToken = "")
+        val payload = decodeJson(proof.split(".")[1])
+        assertFalse(payload.has("ath"))
+    }
+
+    @Test
+    fun test_givenAccessToken_whenBuildProofTwice_thenAthIsIdentical() {
+        val accessToken = "deterministic-token"
+        val proof1 = DPoPProofBuilder.buildProof("GET", "https://example.com/api", keyPair, accessToken = accessToken)
+        val proof2 = DPoPProofBuilder.buildProof("GET", "https://example.com/api", keyPair, accessToken = accessToken)
+        val ath1 = decodeJson(proof1.split(".")[1]).getString("ath")
+        val ath2 = decodeJson(proof2.split(".")[1]).getString("ath")
+        assertEquals(ath1, ath2)
     }
 }
