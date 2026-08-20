@@ -59,6 +59,7 @@ class AuthenticatorServiceTest {
             every { additionalOauthKeys } returns emptyList()
             every { useHybridAuthentication } returns true
             every { appAttestationClient } returns null
+            every { useDPoP } returns false
             @Suppress("UNCHECKED_CAST")
             every { loginActivityClass } returns Class.forName("com.salesforce.androidsdk.ui.LoginActivity") as Class<out android.app.Activity>
         }
@@ -105,19 +106,19 @@ class AuthenticatorServiceTest {
     }
 
     @Test
-    fun testGetAuthToken_clientBlockedRetry_returnsErrorBundle() {
-        setupTokenErrorResponse("client_blocked_retry", "Attestation verification pending")
+    fun testGetAuthToken_appAttestFailedRetry_returnsErrorBundle() {
+        setupTokenErrorResponse("app_attest_failed_retry", "Attestation verification pending")
 
         val result = authenticator.getAuthToken(null, mockAccount, "authTokenType", null)
 
-        assertEquals("client_blocked_retry", result.getString(KEY_ERROR_CODE))
+        assertEquals("app_attest_failed_retry", result.getString(KEY_ERROR_CODE))
         assertEquals("Attestation verification pending", result.getString(KEY_ERROR_MESSAGE))
         assertNull(result.getParcelable<android.content.Intent>(KEY_INTENT))
     }
 
     @Test
-    fun testGetAuthToken_clientBlocked_returnsLoginIntent() {
-        setupTokenErrorResponse("client_blocked", "Device failed integrity check")
+    fun testGetAuthToken_appAttestFailed_returnsLoginIntent() {
+        setupTokenErrorResponse("app_attest_failed", "Device failed integrity check")
 
         val result = authenticator.getAuthToken(null, mockAccount, "authTokenType", null)
 

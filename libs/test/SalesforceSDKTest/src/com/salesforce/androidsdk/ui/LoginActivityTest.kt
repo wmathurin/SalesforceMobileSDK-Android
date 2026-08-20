@@ -31,11 +31,21 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
+import android.net.Uri
 import androidx.activity.result.ActivityResult
+import androidx.compose.ui.graphics.Color
 import androidx.core.net.toUri
 import androidx.lifecycle.MediatorLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import com.salesforce.androidsdk.app.SalesforceSDKManager
+import com.salesforce.androidsdk.rest.ClientManager
+import com.salesforce.androidsdk.rest.RestClient
+import com.salesforce.androidsdk.rest.RestClient.OAuthRefreshInterceptor
 import com.salesforce.androidsdk.ui.LoginActivity.Companion.ABOUT_BLANK
+import com.salesforce.androidsdk.ui.LoginActivity.Companion.AUTH_TRIGGER_FORCE_ADVANCED_AUTH
+import com.salesforce.androidsdk.ui.LoginActivity.Companion.AUTH_TRIGGER_LOGIN_FOR_ADMIN
+import com.salesforce.androidsdk.ui.LoginActivity.Companion.AUTH_TRIGGER_ORG_CONFIG
 import com.salesforce.androidsdk.ui.LoginActivity.Companion.EXTRA_KEY_LOGIN_HINT
 import com.salesforce.androidsdk.ui.LoginActivity.Companion.EXTRA_KEY_LOGIN_HOST
 import com.salesforce.androidsdk.ui.LoginActivity.Companion.SALESFORCE_WELCOME_DISCOVERY_MOBILE_URL_QUERY_PARAMETER_KEY_CALLBACK_URL
@@ -45,12 +55,18 @@ import com.salesforce.androidsdk.ui.LoginActivity.Companion.SALESFORCE_WELCOME_D
 import com.salesforce.androidsdk.ui.LoginActivity.Companion.isSalesforceWelcomeDiscoveryMobileUrl
 import com.salesforce.androidsdk.ui.LoginActivity.Companion.SimulatedDiscoveryResult
 import com.salesforce.androidsdk.ui.LoginActivity.Companion.startDefaultLoginWithHintAndHost
-import com.salesforce.androidsdk.app.SalesforceSDKManager
+import com.salesforce.androidsdk.accounts.UserAccountManager
+import com.salesforce.androidsdk.security.BiometricAuthenticationManager
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
+import io.mockk.unmockkObject
 import io.mockk.verify
+import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -58,6 +74,71 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class LoginActivityTest {
+
+    @After
+    fun tearDown() {
+        unmockkAll()
+    }
+
+    @Test
+    fun doTokenRefresh_whenClientCannotBeBuilt_finishesActivity() {
+        mockkObject(SalesforceSDKManager)
+        val clientManager = mockk<ClientManager>()
+        every { clientManager.peekRestClient() } returns null
+        val sdkManager = mockk<SalesforceSDKManager>()
+        every { sdkManager.clientManager } returns clientManager
+        every { sdkManager.appContext } returns
+                InstrumentationRegistry.getInstrumentation().targetContext
+        every { SalesforceSDKManager.getInstance() } returns sdkManager
+        var finishCalls = 0
+
+        try {
+            InstrumentationRegistry.getInstrumentation().runOnMainSync {
+                val activity = object : LoginActivity() {
+                    override fun finish() {
+                        finishCalls += 1
+                    }
+                }
+                invokeDoTokenRefresh(activity)
+            }
+
+            assertTrue(finishCalls == 1)
+        } finally {
+            unmockkObject(SalesforceSDKManager)
+        }
+    }
+
+    @Test
+    fun doTokenRefresh_whenRefreshFails_stillFinishesActivity() {
+        mockkObject(SalesforceSDKManager)
+        val interceptor = mockk<OAuthRefreshInterceptor>()
+        every { interceptor.refreshAccessToken() } throws RuntimeException("Refresh failed")
+        val client = mockk<RestClient>()
+        every { client.oAuthRefreshInterceptor } returns interceptor
+        val clientManager = mockk<ClientManager>()
+        every { clientManager.peekRestClient() } returns client
+        val sdkManager = mockk<SalesforceSDKManager>()
+        every { sdkManager.clientManager } returns clientManager
+        every { sdkManager.appContext } returns
+                InstrumentationRegistry.getInstrumentation().targetContext
+        every { SalesforceSDKManager.getInstance() } returns sdkManager
+        var finishCalls = 0
+
+        try {
+            InstrumentationRegistry.getInstrumentation().runOnMainSync {
+                val activity = object : LoginActivity() {
+                    override fun finish() {
+                        finishCalls += 1
+                    }
+                }
+                invokeDoTokenRefresh(activity)
+            }
+
+            assertTrue(finishCalls == 1)
+        } finally {
+            unmockkObject(SalesforceSDKManager)
+        }
+    }
 
     @Test
     fun loginActivityCustomTabLauncher_withSingleServerCustomTabActivity_setsAboutBlank() {
@@ -75,6 +156,12 @@ class LoginActivityTest {
 
         verify(exactly = 1) { loginUrl.value = ABOUT_BLANK }
     }
+
+    private fun invokeDoTokenRefresh(activity: LoginActivity) =
+        LoginActivity::class.java
+            .getDeclaredMethod("doTokenRefresh", LoginActivity::class.java)
+            .apply { isAccessible = true }
+            .invoke(activity, activity)
 
     @Test
     fun loginActivityCustomTabLauncher_withoutSingleServerCustomTabActivity_clearsWebView() {
@@ -231,6 +318,112 @@ class LoginActivityTest {
         activity.launchLoginForAdminsAction()
 
         verify(exactly = 0) { activity.loadLoginPageInCustomTab(any(), any()) }
+    }
+
+    // endregion
+
+    // region Custom Tab toolbar color
+
+    @Test
+    fun customTabToolbarColor_withoutTopBarColor_usesLoginBackgroundColor() {
+        // The toolbar color is the fixed login.salesforce.com background, NOT the WebView-sampled
+        // dynamicBackgroundColor (which is stale at Custom Tab launch time and caused the
+        // black/white inconsistency).
+        assertEquals(
+            LoginActivity.LOGIN_BACKGROUND_COLOR,
+            LoginActivity.customTabToolbarColor(topBarColor = null),
+        )
+    }
+
+    @Test
+    fun customTabToolbarColor_withTopBarColor_usesAppProvidedColor() {
+        val appColor = Color(red = 10, green = 20, blue = 30)
+        assertEquals(appColor, LoginActivity.customTabToolbarColor(topBarColor = appColor))
+    }
+
+    // endregion
+
+    // region buildCustomTabAuthorizeUrl
+
+    @Test
+    @Suppress("DEPRECATION")
+    fun buildCustomTabAuthorizeUrl_forRegularLogin_appendsSdkInfoAndOrgConfigTrigger() {
+        val loginUrl = "https://example.com/services/oauth2/authorize?client_id=abc"
+        val sdkManager = mockk<SalesforceSDKManager>(relaxed = true)
+        every { sdkManager.forceAdvancedAuthentication } returns false
+        every { sdkManager.getUserAgent("") } returns "SalesforceMobileSDK/test"
+        val activity = mockk<LoginActivity>(relaxed = true)
+        every { activity.sharedBrowserSession } returns false
+        every {
+            activity.buildCustomTabAuthorizeUrl(any(), any(), any())
+        } answers { callOriginal() }
+
+        val result = activity.buildCustomTabAuthorizeUrl(loginUrl, false, sdkManager)
+
+        assertTrue("Should append sdkInfo",
+            result.contains("&sdkInfo=${Uri.encode("SalesforceMobileSDK/test")}"))
+        assertTrue("Should append org_config trigger (no admin/force flag)",
+            result.contains("&auth_trigger=$AUTH_TRIGGER_ORG_CONFIG"))
+        assertTrue("Should append prompt=login when not sharing browser session",
+            result.endsWith("&prompt=login"))
+    }
+
+    @Test
+    @Suppress("DEPRECATION")
+    fun buildCustomTabAuthorizeUrl_withForceAdvancedAuth_appendsForceAdvancedAuthTrigger() {
+        val loginUrl = "https://example.com/services/oauth2/authorize?client_id=abc"
+        val sdkManager = mockk<SalesforceSDKManager>(relaxed = true)
+        every { sdkManager.forceAdvancedAuthentication } returns true
+        every { sdkManager.getUserAgent("") } returns "SalesforceMobileSDK/test"
+        val activity = mockk<LoginActivity>(relaxed = true)
+        every { activity.sharedBrowserSession } returns false
+        every {
+            activity.buildCustomTabAuthorizeUrl(any(), any(), any())
+        } answers { callOriginal() }
+
+        val result = activity.buildCustomTabAuthorizeUrl(loginUrl, false, sdkManager)
+
+        assertTrue("Should append force_advanced_auth trigger",
+            result.contains("&auth_trigger=$AUTH_TRIGGER_FORCE_ADVANCED_AUTH"))
+    }
+
+    @Test
+    @Suppress("DEPRECATION")
+    fun buildCustomTabAuthorizeUrl_forAdminLogin_appendsLoginForAdminTriggerEvenWithForceFlag() {
+        val loginUrl = "https://example.com/services/oauth2/authorize?client_id=abc"
+        val sdkManager = mockk<SalesforceSDKManager>(relaxed = true)
+        // Force flag is also set, but admin login should still take priority.
+        every { sdkManager.forceAdvancedAuthentication } returns true
+        every { sdkManager.getUserAgent("") } returns "SalesforceMobileSDK/test"
+        val activity = mockk<LoginActivity>(relaxed = true)
+        every { activity.sharedBrowserSession } returns false
+        every {
+            activity.buildCustomTabAuthorizeUrl(any(), any(), any())
+        } answers { callOriginal() }
+
+        val result = activity.buildCustomTabAuthorizeUrl(loginUrl, true, sdkManager)
+
+        assertTrue("Admin login should take priority and append login_for_admin trigger",
+            result.contains("&auth_trigger=$AUTH_TRIGGER_LOGIN_FOR_ADMIN"))
+    }
+
+    @Test
+    @Suppress("DEPRECATION")
+    fun buildCustomTabAuthorizeUrl_withSharedBrowserSession_omitsPromptLogin() {
+        val loginUrl = "https://example.com/services/oauth2/authorize?client_id=abc"
+        val sdkManager = mockk<SalesforceSDKManager>(relaxed = true)
+        every { sdkManager.forceAdvancedAuthentication } returns false
+        every { sdkManager.getUserAgent("") } returns "SalesforceMobileSDK/test"
+        val activity = mockk<LoginActivity>(relaxed = true)
+        every { activity.sharedBrowserSession } returns true
+        every {
+            activity.buildCustomTabAuthorizeUrl(any(), any(), any())
+        } answers { callOriginal() }
+
+        val result = activity.buildCustomTabAuthorizeUrl(loginUrl, false, sdkManager)
+
+        assertFalse("prompt=login should be omitted for a shared browser session",
+            result.contains("prompt=login"))
     }
 
     // endregion
@@ -509,6 +702,351 @@ class LoginActivityTest {
 
         verify(exactly = 1) { viewModel.loginHint = loginHint }
         verify(exactly = 0) { pendingServer.value = any() }
+    }
+
+    // endregion
+
+    // region handleBackBehavior (W-23731759 — non-dismissable login picker)
+
+    @Test
+    fun test_handleBackBehavior_fromPicker_noAccounts_movesTaskToBack() {
+        val sdkManager = mockk<SalesforceSDKManager>(relaxed = true)
+        mockkObject(SalesforceSDKManager)
+        mockkObject(SalesforceSDKManager.Companion)
+        every { SalesforceSDKManager.getInstance() } returns sdkManager
+        every { sdkManager.nativeLoginActivity } returns null
+        val bioAuthManager = mockk<BiometricAuthenticationManager>(relaxed = true)
+        every { bioAuthManager.locked } returns false
+        every { sdkManager.biometricAuthenticationManager } returns bioAuthManager
+        val userAccountManager = mockk<UserAccountManager>(relaxed = true)
+        every { sdkManager.userAccountManager } returns userAccountManager
+        every { userAccountManager.authenticatedUsers } returns null
+
+        val activity = mockk<LoginActivity>(relaxed = true)
+        every { activity.handleBackBehavior() } answers { callOriginal() }
+
+        activity.handleBackBehavior()
+
+        verify(exactly = 1) { activity.moveTaskToBack(true) }
+        verify(exactly = 0) { activity.finish() }
+    }
+
+    @Test
+    fun test_handleBackBehavior_fromPicker_hasAccount_finishes() {
+        val sdkManager = mockk<SalesforceSDKManager>(relaxed = true)
+        mockkObject(SalesforceSDKManager)
+        mockkObject(SalesforceSDKManager.Companion)
+        every { SalesforceSDKManager.getInstance() } returns sdkManager
+        every { sdkManager.nativeLoginActivity } returns null
+        val bioAuthManager = mockk<BiometricAuthenticationManager>(relaxed = true)
+        every { bioAuthManager.locked } returns false
+        every { sdkManager.biometricAuthenticationManager } returns bioAuthManager
+        val userAccountManager = mockk<UserAccountManager>(relaxed = true)
+        every { sdkManager.userAccountManager } returns userAccountManager
+        every { userAccountManager.authenticatedUsers } returns listOf(mockk(relaxed = true))
+
+        val activity = mockk<LoginActivity>(relaxed = true)
+        every { activity.handleBackBehavior() } answers { callOriginal() }
+
+        activity.handleBackBehavior()
+
+        verify(exactly = 1) { activity.setResult(RESULT_CANCELED) }
+        verify(exactly = 1) { activity.finish() }
+        verify(exactly = 0) { activity.moveTaskToBack(any()) }
+    }
+
+    @Test
+    fun test_handleBackBehavior_fromPicker_biometricLocked_doesNothing() {
+        val sdkManager = mockk<SalesforceSDKManager>(relaxed = true)
+        mockkObject(SalesforceSDKManager)
+        mockkObject(SalesforceSDKManager.Companion)
+        every { SalesforceSDKManager.getInstance() } returns sdkManager
+        every { sdkManager.nativeLoginActivity } returns null
+        val bioAuthManager = mockk<BiometricAuthenticationManager>(relaxed = true)
+        every { bioAuthManager.locked } returns true
+        every { sdkManager.biometricAuthenticationManager } returns bioAuthManager
+
+        val viewModel = mockk<LoginViewModel>(relaxed = true)
+        val activity = mockk<LoginActivity>(relaxed = true)
+        every { activity.viewModel } returns viewModel
+        every { activity.handleBackBehavior() } answers { callOriginal() }
+
+        activity.handleBackBehavior()
+
+        verify(exactly = 0) { activity.finish() }
+        verify(exactly = 0) { activity.moveTaskToBack(any()) }
+    }
+
+    @Test
+    fun test_handleBackBehavior_fromPicker_nativeLogin_earlyReturns() {
+        val sdkManager = mockk<SalesforceSDKManager>(relaxed = true)
+        mockkObject(SalesforceSDKManager)
+        mockkObject(SalesforceSDKManager.Companion)
+        every { SalesforceSDKManager.getInstance() } returns sdkManager
+        every { sdkManager.nativeLoginActivity } returns LoginActivity::class.java
+
+        val viewModel = mockk<LoginViewModel>(relaxed = true)
+        val activity = mockk<LoginActivity>(relaxed = true)
+        every { activity.viewModel } returns viewModel
+        every { activity.handleBackBehavior() } answers { callOriginal() }
+
+        activity.handleBackBehavior()
+
+        verify(exactly = 1) { activity.setResult(RESULT_CANCELED) }
+        verify(exactly = 1) { activity.finish() }
+        // The early return must prevent moveTaskToBack from also running.
+        verify(exactly = 0) { activity.moveTaskToBack(any()) }
+    }
+
+    // endregion
+
+    // region clearWebView (W-23731759 — non-dismissable login picker)
+
+    @Test
+    fun test_clearWebView_showServerPickerTrue_showsPicker() {
+        val loginUrl = mockk<MediatorLiveData<String>>(relaxed = true)
+        val showServerPicker = mockk<androidx.compose.runtime.MutableState<Boolean>>(relaxed = true)
+        val viewModel = mockk<LoginViewModel>(relaxed = true)
+        every { viewModel.loginUrl } returns loginUrl
+        every { viewModel.showServerPicker } returns showServerPicker
+        val activity = mockk<LoginActivity>(relaxed = true)
+        every { activity.viewModel } returns viewModel
+        every { activity.runOnUiThread(any()) } answers { firstArg<Runnable>().run() }
+        every { activity.clearWebView(any()) } answers { callOriginal() }
+
+        activity.clearWebView(showServerPicker = true)
+
+        verify(exactly = 1) { loginUrl.value = ABOUT_BLANK }
+        verify(exactly = 1) { showServerPicker.value = true }
+    }
+
+    @Test
+    fun test_clearWebView_showServerPickerFalse_doesNotShowPicker() {
+        val loginUrl = mockk<MediatorLiveData<String>>(relaxed = true)
+        val showServerPicker = mockk<androidx.compose.runtime.MutableState<Boolean>>(relaxed = true)
+        val viewModel = mockk<LoginViewModel>(relaxed = true)
+        every { viewModel.loginUrl } returns loginUrl
+        every { viewModel.showServerPicker } returns showServerPicker
+        val activity = mockk<LoginActivity>(relaxed = true)
+        every { activity.viewModel } returns viewModel
+        every { activity.runOnUiThread(any()) } answers { firstArg<Runnable>().run() }
+        every { activity.clearWebView(any()) } answers { callOriginal() }
+
+        activity.clearWebView(showServerPicker = false)
+
+        verify(exactly = 1) { loginUrl.value = ABOUT_BLANK }
+        verify(exactly = 0) { showServerPicker.value = any() }
+    }
+
+    // endregion
+
+    // region shouldAutoPresentBiometricOnCreate / onAuthFlowFinished (W-22831383 — automaticPresentation)
+
+    @Test
+    fun shouldAutoPresentBiometricOnCreate_lockedOptedInAutomatic_showBiometricExtraAbsent_returnsTrue() {
+        val bioAuthManager = mockk<BiometricAuthenticationManager>(relaxed = true)
+        every { bioAuthManager.locked } returns true
+        every { bioAuthManager.hasBiometricOptedIn() } returns true
+        every { bioAuthManager.automaticPresentation } returns true
+
+        val activity = mockk<LoginActivity>(relaxed = true)
+        every { activity.intent } returns Intent()
+        every { activity.shouldAutoPresentBiometricOnCreate(any()) } answers { callOriginal() }
+
+        assertTrue(activity.shouldAutoPresentBiometricOnCreate(bioAuthManager))
+    }
+
+    @Test
+    fun shouldAutoPresentBiometricOnCreate_automaticPresentationFalse_returnsFalse() {
+        val bioAuthManager = mockk<BiometricAuthenticationManager>(relaxed = true)
+        every { bioAuthManager.locked } returns true
+        every { bioAuthManager.hasBiometricOptedIn() } returns true
+        every { bioAuthManager.automaticPresentation } returns false
+
+        val activity = mockk<LoginActivity>(relaxed = true)
+        every { activity.intent } returns Intent()
+        every { activity.shouldAutoPresentBiometricOnCreate(any()) } answers { callOriginal() }
+
+        assertFalse(activity.shouldAutoPresentBiometricOnCreate(bioAuthManager))
+    }
+
+    @Test
+    fun shouldAutoPresentBiometricOnCreate_notLocked_returnsFalse() {
+        val bioAuthManager = mockk<BiometricAuthenticationManager>(relaxed = true)
+        every { bioAuthManager.locked } returns false
+        every { bioAuthManager.hasBiometricOptedIn() } returns true
+        every { bioAuthManager.automaticPresentation } returns true
+
+        val activity = mockk<LoginActivity>(relaxed = true)
+        every { activity.intent } returns Intent()
+        every { activity.shouldAutoPresentBiometricOnCreate(any()) } answers { callOriginal() }
+
+        assertFalse(activity.shouldAutoPresentBiometricOnCreate(bioAuthManager))
+    }
+
+    @Test
+    fun shouldAutoPresentBiometricOnCreate_notOptedIn_returnsFalse() {
+        val bioAuthManager = mockk<BiometricAuthenticationManager>(relaxed = true)
+        every { bioAuthManager.locked } returns true
+        every { bioAuthManager.hasBiometricOptedIn() } returns false
+        every { bioAuthManager.automaticPresentation } returns true
+
+        val activity = mockk<LoginActivity>(relaxed = true)
+        every { activity.intent } returns Intent()
+        every { activity.shouldAutoPresentBiometricOnCreate(any()) } answers { callOriginal() }
+
+        assertFalse(activity.shouldAutoPresentBiometricOnCreate(bioAuthManager))
+    }
+
+    @Test
+    fun shouldAutoPresentBiometricOnCreate_showBiometricExtraFalse_returnsFalse() {
+        val bioAuthManager = mockk<BiometricAuthenticationManager>(relaxed = true)
+        every { bioAuthManager.locked } returns true
+        every { bioAuthManager.hasBiometricOptedIn() } returns true
+        every { bioAuthManager.automaticPresentation } returns true
+
+        val activity = mockk<LoginActivity>(relaxed = true)
+        every { activity.intent } returns Intent().apply {
+            putExtra(BiometricAuthenticationManager.SHOW_BIOMETRIC, false)
+        }
+        every { activity.shouldAutoPresentBiometricOnCreate(any()) } answers { callOriginal() }
+
+        assertFalse(activity.shouldAutoPresentBiometricOnCreate(bioAuthManager))
+    }
+
+    @Test
+    fun shouldAutoPresentBiometricOnCreate_nullManager_returnsFalse() {
+        val activity = mockk<LoginActivity>(relaxed = true)
+        every { activity.intent } returns Intent()
+        every { activity.shouldAutoPresentBiometricOnCreate(any()) } answers { callOriginal() }
+
+        assertFalse(activity.shouldAutoPresentBiometricOnCreate(null))
+    }
+
+    @Test
+    fun onAuthFlowFinished_automaticPresentationFalse_finishesImmediately() {
+        val sdkManager = SalesforceSDKManager.getInstance()
+        val originalBioAuthManager = sdkManager.biometricAuthenticationManager
+        val bioAuthManager = mockk<BiometricAuthenticationManager>(relaxed = true)
+        every { bioAuthManager.enabled } returns true
+        every { bioAuthManager.automaticPresentation } returns false
+        every { bioAuthManager.hasBiometricOptedIn() } returns false
+        sdkManager.biometricAuthenticationManager = bioAuthManager
+
+        try {
+            var finishCalls = 0
+            var proceedCalls = 0
+
+            InstrumentationRegistry.getInstrumentation().runOnMainSync {
+                val activity = object : LoginActivity() {
+                    override fun finish() {
+                        finishCalls += 1
+                    }
+                }
+                activity.onAuthFlowFinished { proceedCalls += 1 }
+            }
+
+            assertTrue("Should proceed immediately when automaticPresentation is false.", proceedCalls == 1)
+            assertTrue("Should finish immediately when automaticPresentation is false.", finishCalls == 1)
+        } finally {
+            sdkManager.biometricAuthenticationManager = originalBioAuthManager
+        }
+    }
+
+    @Test
+    fun onAuthFlowFinished_alreadyOptedIn_finishesImmediately() {
+        val sdkManager = SalesforceSDKManager.getInstance()
+        val originalBioAuthManager = sdkManager.biometricAuthenticationManager
+        val bioAuthManager = mockk<BiometricAuthenticationManager>(relaxed = true)
+        every { bioAuthManager.enabled } returns true
+        every { bioAuthManager.automaticPresentation } returns true
+        every { bioAuthManager.hasBiometricOptedIn() } returns true
+        every { bioAuthManager.hasBiometricOptInDecision() } returns true
+        sdkManager.biometricAuthenticationManager = bioAuthManager
+
+        try {
+            var finishCalls = 0
+            var proceedCalls = 0
+
+            InstrumentationRegistry.getInstrumentation().runOnMainSync {
+                val activity = object : LoginActivity() {
+                    override fun finish() {
+                        finishCalls += 1
+                    }
+                }
+                activity.onAuthFlowFinished { proceedCalls += 1 }
+            }
+
+            assertTrue("Should proceed immediately when already opted in.", proceedCalls == 1)
+            assertTrue("Should finish immediately when already opted in.", finishCalls == 1)
+        } finally {
+            sdkManager.biometricAuthenticationManager = originalBioAuthManager
+        }
+    }
+
+    @Test
+    fun onAuthFlowFinished_previouslyDeclined_finishesImmediatelyWithoutReprompting() {
+        // Regression test: a user who chose "Use Password" (declined) must not be re-prompted
+        // on every subsequent login. hasBiometricOptedIn() is false in this case (the user did
+        // not opt in), but hasBiometricOptInDecision() is true (the user already responded).
+        val sdkManager = SalesforceSDKManager.getInstance()
+        val originalBioAuthManager = sdkManager.biometricAuthenticationManager
+        val bioAuthManager = mockk<BiometricAuthenticationManager>(relaxed = true)
+        every { bioAuthManager.enabled } returns true
+        every { bioAuthManager.automaticPresentation } returns true
+        every { bioAuthManager.hasBiometricOptedIn() } returns false
+        every { bioAuthManager.hasBiometricOptInDecision() } returns true
+        sdkManager.biometricAuthenticationManager = bioAuthManager
+
+        try {
+            var finishCalls = 0
+            var proceedCalls = 0
+
+            InstrumentationRegistry.getInstrumentation().runOnMainSync {
+                val activity = object : LoginActivity() {
+                    override fun finish() {
+                        finishCalls += 1
+                    }
+                }
+                activity.onAuthFlowFinished { proceedCalls += 1 }
+            }
+
+            assertTrue("Should proceed immediately when the user already declined.", proceedCalls == 1)
+            assertTrue("Should finish immediately when the user already declined.", finishCalls == 1)
+        } finally {
+            sdkManager.biometricAuthenticationManager = originalBioAuthManager
+        }
+    }
+
+    @Test
+    fun onAuthFlowFinished_notEnabled_finishesImmediately() {
+        val sdkManager = SalesforceSDKManager.getInstance()
+        val originalBioAuthManager = sdkManager.biometricAuthenticationManager
+        val bioAuthManager = mockk<BiometricAuthenticationManager>(relaxed = true)
+        every { bioAuthManager.enabled } returns false
+        every { bioAuthManager.automaticPresentation } returns true
+        every { bioAuthManager.hasBiometricOptedIn() } returns false
+        every { bioAuthManager.hasBiometricOptInDecision() } returns false
+        sdkManager.biometricAuthenticationManager = bioAuthManager
+
+        try {
+            var finishCalls = 0
+            var proceedCalls = 0
+
+            InstrumentationRegistry.getInstrumentation().runOnMainSync {
+                val activity = object : LoginActivity() {
+                    override fun finish() {
+                        finishCalls += 1
+                    }
+                }
+                activity.onAuthFlowFinished { proceedCalls += 1 }
+            }
+
+            assertTrue("Should proceed immediately when biometric auth is not enabled.", proceedCalls == 1)
+            assertTrue("Should finish immediately when biometric auth is not enabled.", finishCalls == 1)
+        } finally {
+            sdkManager.biometricAuthenticationManager = originalBioAuthManager
+        }
     }
 
     // endregion

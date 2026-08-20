@@ -35,8 +35,6 @@ import com.salesforce.androidsdk.accounts.UserAccountBuilder
 import com.salesforce.androidsdk.accounts.UserAccountManager
 import com.salesforce.androidsdk.accounts.UserAccountTest
 import com.salesforce.androidsdk.app.SalesforceSDKManager
-import com.salesforce.androidsdk.auth.OAuth2.CLIENT_BLOCKED_ERROR
-import com.salesforce.androidsdk.auth.OAuth2.CLIENT_BLOCKED_RETRY_ERROR
 import com.salesforce.androidsdk.auth.OAuth2.OAuthFailedException
 import com.salesforce.androidsdk.auth.OAuth2.TIMESTAMP_FORMAT
 import com.salesforce.androidsdk.auth.OAuth2.TokenEndpointResponse
@@ -59,8 +57,6 @@ import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -120,11 +116,13 @@ class LoginViewModelMockTest {
                 tokenResponse = any(),
                 loginServer = any(),
                 consumerKey = any(),
+                redirectUri = any(),
                 onAuthFlowError = any(),
                 onAuthFlowSuccess = any(),
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = any(),
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -137,6 +135,7 @@ class LoginViewModelMockTest {
                 handleScreenLockPolicy = any(),
                 handleBiometricAuthPolicy = any(),
                 handleDuplicateUserAccount = any(),
+                onAuthFlowFinished = any(),
             )
         } returns Unit
 
@@ -159,11 +158,13 @@ class LoginViewModelMockTest {
                 tokenResponse = mockTokenResponse,
                 loginServer = testServer,
                 consumerKey = bootConfig.remoteAccessConsumerKey,
+                redirectUri = any(),
                 onAuthFlowError = any(),
                 onAuthFlowSuccess = any(),
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = false,
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -176,6 +177,7 @@ class LoginViewModelMockTest {
                 handleScreenLockPolicy = any(),
                 handleBiometricAuthPolicy = any(),
                 handleDuplicateUserAccount = any(),
+                onAuthFlowFinished = any(),
             )
         }
     }
@@ -189,11 +191,13 @@ class LoginViewModelMockTest {
                 tokenResponse = any(),
                 loginServer = any(),
                 consumerKey = any(),
+                redirectUri = any(),
                 onAuthFlowError = any(),
                 onAuthFlowSuccess = any(),
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = any(),
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -206,6 +210,7 @@ class LoginViewModelMockTest {
                 handleScreenLockPolicy = any(),
                 handleBiometricAuthPolicy = any(),
                 handleDuplicateUserAccount = any(),
+                onAuthFlowFinished = any(),
             )
         } returns Unit
 
@@ -227,11 +232,13 @@ class LoginViewModelMockTest {
                 tokenResponse = mockTokenResponse,
                 loginServer = any(),
                 consumerKey = any(),
+                redirectUri = any(),
                 onAuthFlowError = any(),
                 onAuthFlowSuccess = any(),
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = false,
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -244,56 +251,9 @@ class LoginViewModelMockTest {
                 handleScreenLockPolicy = any(),
                 handleBiometricAuthPolicy = any(),
                 handleDuplicateUserAccount = any(),
+                onAuthFlowFinished = any(),
             )
         }
-    }
-
-    @Test
-    fun onAuthFlowComplete_ResetsAuthCodeForJwtFlow() = runBlocking {
-        // Mock the AuthenticationUtilities.onAuthFlowComplete function
-
-        coEvery {
-            onAuthFlowComplete(
-                tokenResponse = any(),
-                loginServer = any(),
-                consumerKey = any(),
-                onAuthFlowError = any(),
-                onAuthFlowSuccess = any(),
-                buildAccountName = any(),
-                nativeLogin = any(),
-                tokenMigration = any(),
-                context = any(),
-                userAccountManager = any(),
-                blockIntegrationUser = any(),
-                runtimeConfig = any(),
-                updateLoggingPrefs = any(),
-                fetchUserIdentity = any(),
-                startMainActivity = any(),
-                setAdministratorPreferences = any(),
-                addAccount = any(),
-                handleScreenLockPolicy = any(),
-                handleBiometricAuthPolicy = any(),
-                handleDuplicateUserAccount = any(),
-            )
-        } returns Unit
-
-        val mockTokenResponse = mockk<TokenEndpointResponse>(relaxed = true)
-        val mockOnError: (String, String?, Throwable?) -> Unit = mockk(relaxed = true)
-        val mockOnSuccess: (UserAccount) -> Unit = mockk(relaxed = true)
-
-        // Set up the view model state with JWT flow
-        viewModel.selectedServer.value = "https://test.salesforce.com"
-        viewModel.authCodeForJwtFlow = "test_jwt_auth_code"
-        Thread.sleep(100)
-
-        // Verify authCodeForJwtFlow is set
-        assertNotNull("authCodeForJwtFlow should be set before call", viewModel.authCodeForJwtFlow)
-
-        // Call the method under test
-        viewModel.onAuthFlowComplete(mockTokenResponse, mockOnError, mockOnSuccess)
-
-        // Verify authCodeForJwtFlow is reset to null
-        assertNull("authCodeForJwtFlow should be null after call", viewModel.authCodeForJwtFlow)
     }
 
     @Test
@@ -305,11 +265,13 @@ class LoginViewModelMockTest {
                 tokenResponse = any(),
                 loginServer = any(),
                 consumerKey = any(),
+                redirectUri = any(),
                 onAuthFlowError = any(),
                 onAuthFlowSuccess = any(),
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = any(),
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -322,6 +284,7 @@ class LoginViewModelMockTest {
                 handleScreenLockPolicy = any(),
                 handleBiometricAuthPolicy = any(),
                 handleDuplicateUserAccount = any(),
+                onAuthFlowFinished = any(),
             )
         } returns Unit
 
@@ -342,11 +305,13 @@ class LoginViewModelMockTest {
                 tokenResponse = mockTokenResponse,
                 loginServer = "",
                 consumerKey = any(),
+                redirectUri = any(),
                 onAuthFlowError = any(),
                 onAuthFlowSuccess = any(),
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = false,
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -359,6 +324,7 @@ class LoginViewModelMockTest {
                 handleScreenLockPolicy = any(),
                 handleBiometricAuthPolicy = any(),
                 handleDuplicateUserAccount = any(),
+                onAuthFlowFinished = any(),
             )
         }
     }
@@ -375,7 +341,7 @@ class LoginViewModelMockTest {
 
         // Mock doCodeExchange to prevent actual execution
         coEvery {
-            spyViewModel.doCodeExchange(any(), any(), any(), any(), any())
+            spyViewModel.doCodeExchange(any(), any(), any(), any(), any(), any())
         } returns Result.success(Unit)
 
         // Set up the view model state
@@ -396,6 +362,7 @@ class LoginViewModelMockTest {
                 mockOnSuccess,
                 loginServer = null,
                 tokenMigration = false,
+                onAuthFlowFinished = any(),
             )
         }
     }
@@ -413,7 +380,7 @@ class LoginViewModelMockTest {
 
         // Mock doCodeExchange to prevent actual execution
         coEvery {
-            spyViewModel.doCodeExchange(any(), any(), any(), any(), any())
+            spyViewModel.doCodeExchange(any(), any(), any(), any(), any(), any())
         } returns Result.success(Unit)
 
         // Set up the view model state
@@ -440,6 +407,7 @@ class LoginViewModelMockTest {
                 mockOnSuccess,
                 loginServer = migrationLoginServer,
                 tokenMigration = true,
+                onAuthFlowFinished = any(),
             )
         }
     }
@@ -458,7 +426,7 @@ class LoginViewModelMockTest {
 
         // Mock doCodeExchange to prevent actual execution
         coEvery {
-            spyViewModel.doCodeExchange(any(), any(), any(), any(), any())
+            spyViewModel.doCodeExchange(any(), any(), any(), any(), any(), any())
         } returns Result.success(Unit)
 
         // Set up front door bridge
@@ -479,6 +447,7 @@ class LoginViewModelMockTest {
                 mockOnSuccess,
                 loginServer = null,
                 tokenMigration = false,
+                onAuthFlowFinished = any(),
             )
         }
     }
@@ -494,7 +463,7 @@ class LoginViewModelMockTest {
 
         // Mock doCodeExchange to prevent actual execution
         coEvery {
-            spyViewModel.doCodeExchange(any(), any(), any(), any(), any())
+            spyViewModel.doCodeExchange(any(), any(), any(), any(), any(), any())
         } returns Result.success(Unit)
 
         // Set up the view model state
@@ -515,6 +484,7 @@ class LoginViewModelMockTest {
                 mockOnSuccess,
                 loginServer = null,
                 tokenMigration = false,
+                onAuthFlowFinished = any(),
             )
         }
     }
@@ -529,11 +499,13 @@ class LoginViewModelMockTest {
                 tokenResponse = any(),
                 loginServer = any(),
                 consumerKey = any(),
+                redirectUri = any(),
                 onAuthFlowError = any(),
                 onAuthFlowSuccess = any(),
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = any(),
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -546,6 +518,7 @@ class LoginViewModelMockTest {
                 handleScreenLockPolicy = any(),
                 handleBiometricAuthPolicy = any(),
                 handleDuplicateUserAccount = any(),
+                onAuthFlowFinished = any(),
             )
         } returns Unit
 
@@ -566,11 +539,13 @@ class LoginViewModelMockTest {
                 tokenResponse = mockTokenResponse,
                 loginServer = any(),
                 consumerKey = any(),
+                redirectUri = any(),
                 onAuthFlowError = any(),
                 onAuthFlowSuccess = any(),
                 buildAccountName = any(),
                 nativeLogin = any(),
                 tokenMigration = true,
+                credentialsIdentifier = any(),
                 context = any(),
                 userAccountManager = any(),
                 blockIntegrationUser = any(),
@@ -583,6 +558,7 @@ class LoginViewModelMockTest {
                 handleScreenLockPolicy = any(),
                 handleBiometricAuthPolicy = any(),
                 handleDuplicateUserAccount = any(),
+                onAuthFlowFinished = any(),
             )
         }
     }
@@ -599,7 +575,7 @@ class LoginViewModelMockTest {
 
         // Mock doCodeExchange to prevent actual execution
         coEvery {
-            spyViewModel.doCodeExchange(any(), any(), any(), any(), any())
+            spyViewModel.doCodeExchange(any(), any(), any(), any(), any(), any())
         } returns Result.success(Unit)
 
         // Set up the view model state with different server
@@ -626,6 +602,7 @@ class LoginViewModelMockTest {
                 mockOnSuccess,
                 loginServer = customLoginServer,
                 tokenMigration = true,
+                onAuthFlowFinished = any(),
             )
         }
     }
@@ -644,12 +621,12 @@ class LoginViewModelMockTest {
         TIMESTAMP_FORMAT
         mockkStatic(OAuth2::class)
         every {
-            exchangeCode(any(), any(), any(), any(), any(), any())
+            exchangeCode(any(), any(), any(), any(), any(), any(), any(), any())
         } returns mockTokenResponse
 
         // Mock doCodeExchange to prevent actual execution
         coEvery {
-            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any())
+            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any(), any(), any())
         } just runs
 
         // Set up required state
@@ -672,7 +649,9 @@ class LoginViewModelMockTest {
                 mockOnError,
                 mockOnSuccess,
                 tokenMigration = false,
+                onAuthFlowFinished = any(),
                 loginServer = "https://test.salesforce.com",
+                credentialsIdentifier = any(),
             )
         }
     }
@@ -692,12 +671,12 @@ class LoginViewModelMockTest {
         TIMESTAMP_FORMAT
         mockkStatic(OAuth2::class)
         every {
-            exchangeCode(any(), any(), any(), any(), any(), any())
+            exchangeCode(any(), any(), any(), any(), any(), any(), any(), any())
         } returns mockTokenResponse
 
         // Mock doCodeExchange to prevent actual execution
         coEvery {
-            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any())
+            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any(), any(), any())
         } just runs
 
         // Set up required state
@@ -722,7 +701,9 @@ class LoginViewModelMockTest {
                 mockOnError,
                 mockOnSuccess,
                 tokenMigration = true,
+                onAuthFlowFinished = any(),
                 loginServer = migrationServer,
+                credentialsIdentifier = any(),
             )
         }
     }
@@ -746,13 +727,13 @@ class LoginViewModelMockTest {
         TIMESTAMP_FORMAT
         mockkStatic(OAuth2::class)
         every {
-            exchangeCode(any(), any(), any(), any(), any(), any())
+            exchangeCode(any(), any(), any(), any(), any(), any(), any(), any())
         } returns mockTokenResponse
 
         // Spy so we can short-circuit account creation, leaving exchangeCode as the observable.
         val spyViewModel = spyk(viewModel)
         coEvery {
-            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any())
+            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any(), any(), any())
         } just runs
 
         // Sanity: distinct from boot config so a missing side effect would surface.
@@ -788,6 +769,8 @@ class LoginViewModelMockTest {
                 /* code = */ testCode,
                 /* codeVerifier = */ any(),
                 /* callbackUrl = */ migrationRedirectUri,
+                /* salesforceSdkManager = */ any(),
+                /* credentialsIdentifier = */ any(),
             )
         }
     }
@@ -800,18 +783,18 @@ class LoginViewModelMockTest {
         TIMESTAMP_FORMAT
         mockkStatic(OAuth2::class)
         every {
-            exchangeCode(any(), any(), any(), any(), any(), any())
+            exchangeCode(any(), any(), any(), any(), any(), any(), any(), any())
         } throws throws
     }
 
     @Test
-    fun doCodeExchange_whenExchangeCodeThrowsClientBlocked_callsOnAuthFlowError() = runBlocking {
+    fun doCodeExchange_whenExchangeCodeThrowsAppAttestFailed_callsOnAuthFlowError() = runBlocking {
         val mockOnError: (String, String?, Throwable?) -> Unit = mockk(relaxed = true)
         val mockOnSuccess: (UserAccount) -> Unit = mockk(relaxed = true)
         val spyViewModel = spyk(viewModel)
 
         val tokenErrorResponse = mockk<TokenErrorResponse>(relaxed = true)
-        tokenErrorResponse.error = CLIENT_BLOCKED_ERROR
+        tokenErrorResponse.error = "app_attest_failed"
         tokenErrorResponse.errorDescription = "App is blocked"
         val oauthException = OAuthFailedException(tokenErrorResponse, 403)
         setupExchangeCodeMock(oauthException)
@@ -824,13 +807,13 @@ class LoginViewModelMockTest {
     }
 
     @Test
-    fun doCodeExchange_whenExchangeCodeThrowsClientBlockedRetry_callsOnAuthFlowError() = runBlocking {
+    fun doCodeExchange_whenExchangeCodeThrowsAppAttestFailedRetry_callsOnAuthFlowError() = runBlocking {
         val mockOnError: (String, String?, Throwable?) -> Unit = mockk(relaxed = true)
         val mockOnSuccess: (UserAccount) -> Unit = mockk(relaxed = true)
         val spyViewModel = spyk(viewModel)
 
         val tokenErrorResponse = mockk<TokenErrorResponse>(relaxed = true)
-        tokenErrorResponse.error = CLIENT_BLOCKED_RETRY_ERROR
+        tokenErrorResponse.error = "app_attest_failed_retry"
         tokenErrorResponse.errorDescription = "App is blocked (retry)"
         val oauthException = OAuthFailedException(tokenErrorResponse, 403)
         setupExchangeCodeMock(oauthException)
@@ -871,7 +854,7 @@ class LoginViewModelMockTest {
         setupExchangeCodeMock(oauthException)
 
         coEvery {
-            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any())
+            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any(), any(), any())
         } just runs
 
         spyViewModel.selectedServer.value = "https://test.salesforce.com"
@@ -880,7 +863,7 @@ class LoginViewModelMockTest {
         verify { mockOnError("Token Request Error", any(), oauthException) }
         verify(exactly = 0) { mockOnSuccess(any()) }
         coVerify(exactly = 0) {
-            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any())
+            spyViewModel.onAuthFlowComplete(any(), any(), any(), any(), any(), any(), any())
         }
     }
 

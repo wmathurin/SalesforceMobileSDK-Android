@@ -58,6 +58,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -77,6 +78,7 @@ import androidx.compose.material3.RichTooltipColors
 import androidx.compose.material3.RippleConfiguration
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.TopAppBarDefaults
@@ -111,11 +113,16 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.DialogProperties
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.salesforce.androidsdk.R.string.sf__back_button_content_description
+import com.salesforce.androidsdk.R.string.sf__biometric_opt_in_approve
+import com.salesforce.androidsdk.R.string.sf__biometric_opt_in_deny
+import com.salesforce.androidsdk.R.string.sf__biometric_opt_in_message
+import com.salesforce.androidsdk.R.string.sf__biometric_opt_in_title
 import com.salesforce.androidsdk.R.string.sf__clear_cache
 import com.salesforce.androidsdk.R.string.sf__clear_cookies
 import com.salesforce.androidsdk.R.string.sf__dev_support_title_menu_item
@@ -234,6 +241,8 @@ fun LoginView() {
         loadingIndicator = viewModel.loadingIndicator ?: { DefaultLoadingIndicator() },
         bottomAppBar = bottomAppBar,
         showServerPicker = viewModel.showServerPicker,
+        showBiometricOptInDialog = viewModel.showBiometricOptInDialog,
+        onBiometricOptInResult = { optedIn -> viewModel.onBiometricOptInResult(optedIn) },
     )
 }
 
@@ -249,6 +258,8 @@ internal fun LoginView(
     loadingIndicator: @Composable () -> Unit,
     bottomAppBar: @Composable () -> Unit,
     showServerPicker: MutableState<Boolean>,
+    showBiometricOptInDialog: MutableState<Boolean> = remember { mutableStateOf(false) },
+    onBiometricOptInResult: (optedIn: Boolean) -> Unit = {},
 ) {
     val loginUrl = loginUrlData.observeAsState()
     val frontDoorBridgeUrl = frontDoorBridgeUrlData.observeAsState()
@@ -280,7 +291,7 @@ internal fun LoginView(
                 },
             )
 
-            if (loading) {
+            if (loading && !showServerPicker.value) {
                 loadingIndicator()
             }
         }
@@ -288,9 +299,32 @@ internal fun LoginView(
         if (showServerPicker.value) {
             PickerBottomSheet(PickerStyle.LoginServerPicker)
         }
+
+        if (showBiometricOptInDialog.value) {
+            BiometricOptInDialog(onResult = onBiometricOptInResult)
+        }
     }
 }
 
+@Composable
+internal fun BiometricOptInDialog(onResult: (optedIn: Boolean) -> Unit) {
+    AlertDialog(
+        onDismissRequest = { onResult(false) },
+        properties = DialogProperties(dismissOnClickOutside = false),
+        title = { Text(stringResource(sf__biometric_opt_in_title)) },
+        text = { Text(stringResource(sf__biometric_opt_in_message)) },
+        confirmButton = {
+            TextButton(onClick = { onResult(true) }) {
+                Text(stringResource(sf__biometric_opt_in_approve))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onResult(false) }) {
+                Text(stringResource(sf__biometric_opt_in_deny))
+            }
+        },
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -322,66 +356,74 @@ internal fun DefaultTopAppBar(
             )
         },
         actions = @Composable {
-            ToolTipWrapper(sf__more_options) { moreOptionsDescription ->
-                IconButton(
-                    onClick = { showMenu = !showMenu },
-                    colors = IconButtonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = titleTextColor,
-                        disabledContainerColor = Color.Transparent,
-                        disabledContentColor = Color.Transparent,
-                    ),
-                    modifier = Modifier.testTag(LoginViewTestTags.MORE_OPTIONS_BUTTON),
-                ) {
-                    Icon(Icons.Default.MoreVert, contentDescription = moreOptionsDescription)
+            // The picker renders in its own full-screen ModalBottomSheet window above this bar,
+            // so the overflow menu is already covered — hide it too rather than leaving it an
+            // invisible, screen-reader-reachable control behind the scrim.
+            if (!showServerPicker.value) {
+                ToolTipWrapper(sf__more_options) { moreOptionsDescription ->
+                    IconButton(
+                        onClick = { showMenu = !showMenu },
+                        colors = IconButtonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = titleTextColor,
+                            disabledContainerColor = Color.Transparent,
+                            disabledContentColor = Color.Transparent,
+                        ),
+                        modifier = Modifier.testTag(LoginViewTestTags.MORE_OPTIONS_BUTTON),
+                    ) {
+                        Icon(Icons.Default.MoreVert, contentDescription = moreOptionsDescription)
+                    }
                 }
-            }
 
-            CompositionLocalProvider(
-                LocalRippleConfiguration provides RippleConfiguration(color = colorScheme.onSecondary)
-            ) {
-                DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false },
-                    // The menu renders in its own popup window, so opt in here as well to expose
-                    // the menu items' testTags as Android resource-ids for UI automation.
-                    modifier = Modifier.semantics { testTagsAsResourceId = true },
+                CompositionLocalProvider(
+                    LocalRippleConfiguration provides RippleConfiguration(color = colorScheme.onSecondary)
                 ) {
-                    MenuItem(stringResource(sf__pick_server), testTag = LoginViewTestTags.MENU_ITEM_PICK_SERVER) {
-                        showServerPicker.value = true
-                        showMenu = false
-                    }
-                    MenuItem(stringResource(sf__clear_cookies), testTag = LoginViewTestTags.MENU_ITEM_CLEAR_COOKIES) {
-                        clearCookies()
-                        reloadWebView()
-                        showMenu = false
-                    }
-                    MenuItem(stringResource(sf__clear_cache), testTag = LoginViewTestTags.MENU_ITEM_CLEAR_CACHE) {
-                        clearWebViewCache()
-                        reloadWebView()
-                        showMenu = false
-                    }
-                    MenuItem(stringResource(sf__reload), testTag = LoginViewTestTags.MENU_ITEM_RELOAD) {
-                        reloadWebView()
-                        showMenu = false
-                    }
-                    onLoginForAdmins?.let {
-                        MenuItem(stringResource(sf__login_for_admins), testTag = LoginViewTestTags.MENU_ITEM_LOGIN_FOR_ADMINS) {
-                            it.invoke()
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false },
+                        // The menu renders in its own popup window, so opt in here as well to expose
+                        // the menu items' testTags as Android resource-ids for UI automation.
+                        modifier = Modifier.semantics { testTagsAsResourceId = true },
+                    ) {
+                        MenuItem(stringResource(sf__pick_server), testTag = LoginViewTestTags.MENU_ITEM_PICK_SERVER) {
+                            showServerPicker.value = true
                             showMenu = false
                         }
-                    }
-                    showDevSupport?.let {
-                        MenuItem(stringResource(sf__dev_support_title_menu_item), testTag = LoginViewTestTags.MENU_ITEM_DEV_SUPPORT) {
-                            it.invoke()
+                        MenuItem(stringResource(sf__clear_cookies), testTag = LoginViewTestTags.MENU_ITEM_CLEAR_COOKIES) {
+                            clearCookies()
+                            reloadWebView()
                             showMenu = false
+                        }
+                        MenuItem(stringResource(sf__clear_cache), testTag = LoginViewTestTags.MENU_ITEM_CLEAR_CACHE) {
+                            clearWebViewCache()
+                            reloadWebView()
+                            showMenu = false
+                        }
+                        MenuItem(stringResource(sf__reload), testTag = LoginViewTestTags.MENU_ITEM_RELOAD) {
+                            reloadWebView()
+                            showMenu = false
+                        }
+                        onLoginForAdmins?.let {
+                            MenuItem(stringResource(sf__login_for_admins), testTag = LoginViewTestTags.MENU_ITEM_LOGIN_FOR_ADMINS) {
+                                it.invoke()
+                                showMenu = false
+                            }
+                        }
+                        showDevSupport?.let {
+                            MenuItem(stringResource(sf__dev_support_title_menu_item), testTag = LoginViewTestTags.MENU_ITEM_DEV_SUPPORT) {
+                                it.invoke()
+                                showMenu = false
+                            }
                         }
                     }
                 }
             }
         },
         navigationIcon = {
-            if (shouldShowBackButton) {
+            // Hide the back button while the picker is shown, matching the overflow menu: the
+            // picker's own ModalBottomSheet window covers this bar, so leaving the back button
+            // would keep it an invisible, screen-reader-reachable control behind the scrim.
+            if (shouldShowBackButton && !showServerPicker.value) {
                 ToolTipWrapper(sf__back_button_content_description) { backButtonDescription ->
                     IconButton(
                         onClick = { finish() },

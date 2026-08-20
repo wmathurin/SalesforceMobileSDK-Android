@@ -4,7 +4,8 @@
 warn("Big PR, try to keep changes smaller if you can.", sticky: true) if git.lines_of_code > 1000
 
 # Redirect contributors to PR to dev.
-fail("Please re-submit this PR to the dev branch, we may have already fixed your issue.", sticky: true) if github.branch_for_base != "dev"
+# dpop is a temporary exception for the multi-PR DPoP rollout. Remove once DPoP merges back to dev.
+fail("Please re-submit this PR to the dev branch, we may have already fixed your issue.", sticky: true) if !["dev", "dpop"].include?(github.branch_for_base)
 
 # List of Android libraries for testing
 LIBS = ['SalesforceAnalytics', 'SalesforceSDK', 'SmartStore', 'MobileSync', 'SalesforceHybrid']
