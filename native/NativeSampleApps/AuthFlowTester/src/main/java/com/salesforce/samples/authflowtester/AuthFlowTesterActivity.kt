@@ -26,6 +26,7 @@
  */
 package com.salesforce.samples.authflowtester
 
+// Test-only source marker used to make the fork CI exercise the full AuthFlowTester UI suite.
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
