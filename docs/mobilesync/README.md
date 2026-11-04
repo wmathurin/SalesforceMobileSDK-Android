@@ -311,7 +311,7 @@ Paginates through IDs already in the soup. First run fetches all; `reSync` fetch
 
 ```kotlin
 BriefcaseSyncDownTarget(infos: List<BriefcaseObjectInfo>)
-BriefcaseSyncDownTarget(infos: List<BriefcaseObjectInfo>, countIdsPerRetrieve: Int)  // max 200
+BriefcaseSyncDownTarget(infos: List<BriefcaseObjectInfo>, countIdsPerRetrieve: Int)  // max 2000 (default)
 ```
 
 `BriefcaseObjectInfo` fields: `soupName`, `sobjectType`, `fieldlist`, `idFieldName`, `modificationDateFieldName`.
@@ -419,7 +419,7 @@ Returns `true` (proceed with sync-up) when the local record is the same age or n
 
 Default target. Groups operations by type and sends via `/composite/sobjects`. Max batch size: 200.
 
-Overrides `areNewerThanServer` to batch-fetch `LastModifiedDate` via Collection Retrieve (up to 200 records per call).
+Overrides `areNewerThanServer` to batch-fetch `LastModifiedDate` via Collection Retrieve (up to 2000 records per call).
 
 ---
 
